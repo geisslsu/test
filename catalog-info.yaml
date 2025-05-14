@@ -1,0 +1,619 @@
+# This file is used for the downloadable starter files for TechDocs
+# More information on the format of this file: https://backstage.io/docs/features/software-catalog/descriptor-format
+
+# The 'apiVersion' and 'kind' fields are required and specify the version of the Backstage API and the kind of component respectively.
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: Horizon-API-first-repository
+  description: Horizon API First repository. Contains all public APIs for the Horizon platform.
+  annotations:
+    gitlab.com/project-slug: dematic/horizon/apis
+    # The 'backstage.io/techdocs-ref' field indicates where the documentation for the component resides.
+    # Indicates that the documentation resides in the same directory as the component.
+    backstage.io/techdocs-ref: dir:.
+  links:
+    - url: https://dematic.com
+      icon: dashboard
+      title: Dematic website
+  tags:
+    - docs
+    - documentation
+    - api-first
+    - api
+    - openapi
+    - api-spec
+    - openapi-spec
+spec:
+  type: api-definition
+  lifecycle: production
+  owner: horizon
+  providesApis:
+    - ain-api
+    - fop-api
+    - ftc-api
+    - inb-api
+    - srp-api
+    - dex-api
+    - eai-api
+    - eaitranslator-api
+    - alert-api
+    - configuration-api
+    - cron-api
+    - mfc-api
+    - mfc-edge-api
+    - print-api
+    - scale-api
+    - scale-mock-api
+    - teach-api
+    - cubiscan-mock-api
+    - teachwcs-api
+    - fulfillment-api
+    - inventory-api
+
+
+############### API annotations here, these are used to generate the API documentation ###############
+
+###### Orchestrator APIs ######
+# This is the API descriptor for the orchestrator APIs. It is used to generate the API documentation for the orchestrator APIs.
+
+### ain-api ###
+# This is the API descriptor for the ain-api. It is used to generate the API documentation for the ain-api.
+---
+apiVersion: backstage.io/v1alpha1
+kind: API
+metadata:
+  name: "ain-api"
+  description: Public API for ain-api
+  tags:
+    - rest
+    - api-documentation
+    - api
+    - openapi
+    - ain-api
+  links:
+    - url: https://gitlab.com/dematic/horizon/apis
+      icon: help
+      title: Horizon OpenAPI monorepo in GitLab
+
+spec:
+  type: openapi
+  lifecycle: production
+  owner: Horizon
+  definition: # This does not work with a relative path to the URL such as ./scm/mfc/mfc-api.yaml
+    $text: https://gitlab.com/dematic/horizon/apis/-/blob/master/orchestrator/ain/ain-api.yaml
+
+
+### fop-api ###
+# This is the API descriptor for the fop-api. It is used to generate the API documentation for the fop-api.
+---
+apiVersion: backstage.io/v1alpha1
+kind: API
+metadata:
+  name: "fop-api"
+  description: Public API for fop-api
+  tags:
+    - rest
+    - api-documentation
+    - api
+    - openapi
+    - fop-api
+  links:
+    - url: https://gitlab.com/dematic/horizon/apis
+      icon: help
+      title: Horizon OpenAPI monorepo in GitLab
+
+spec:
+  type: openapi
+  lifecycle: production
+  owner: Horizon
+  definition: # This does not work with a relative path to the URL such as ./scm/mfc/mfc-api.yaml
+    $text: https://gitlab.com/dematic/horizon/apis/-/blob/master/orchestrator/fop/fop-api.yaml
+
+### ftc-api ###
+# This is the API descriptor for the ftc-api. It is used to generate the API documentation for the ftc-api.
+---
+apiVersion: backstage.io/v1alpha1
+kind: API
+metadata:
+  name: "ftc-api"
+  description: Public API for ftc-api
+  tags:
+    - rest
+    - api-documentation
+    - api
+    - openapi
+    - ftc-api
+  links:
+    - url: https://gitlab.com/dematic/horizon/apis
+      icon: help
+      title: Horizon OpenAPI monorepo in GitLab
+
+spec:
+  type: openapi
+  lifecycle: production
+  owner: Horizon
+  definition: # This does not work with a relative path to the URL such as ./scm/mfc/mfc-api.yaml
+    $text: https://gitlab.com/dematic/horizon/apis/-/blob/master/orchestrator/ftc/ftc-api.yaml
+
+
+### inb-api ###
+# This is the API descriptor for the inb-api. It is used to generate the API documentation for the inb-api.
+---
+apiVersion: backstage.io/v1alpha1
+kind: API
+metadata:
+  name: "inb-api"
+  description: Public API for inb-api
+  tags:
+    - rest
+    - api-documentation
+    - api
+    - openapi
+    - inb-api
+  links:
+    - url: https://gitlab.com/dematic/horizon/apis
+      icon: help
+      title: Horizon OpenAPI monorepo in GitLab
+
+spec:
+  type: openapi
+  lifecycle: production
+  owner: Horizon
+  definition: # This does not work with a relative path to the URL such as ./scm/mfc/mfc-api.yaml
+    $text: https://gitlab.com/dematic/horizon/apis/-/blob/master/orchestrator/inb/inb-api.yaml
+
+### srp-api ###
+# This is the API descriptor for the srp-api. It is used to generate the API documentation for the srp-api.
+---
+apiVersion: backstage.io/v1alpha1
+kind: API
+metadata:
+  name: "srp-api"
+  description: Public API for srp-api
+  tags:
+    - rest
+    - api-documentation
+    - api
+    - openapi
+    - srp-api
+  links:
+    - url: https://gitlab.com/dematic/horizon/apis
+      icon: help
+      title: Horizon OpenAPI monorepo in GitLab
+
+spec:
+  type: openapi
+  lifecycle: production
+  owner: Horizon
+  definition: # This does not work with a relative path to the URL such as ./scm/mfc/mfc-api.yaml
+    $text: https://gitlab.com/dematic/horizon/apis/-/blob/master/orchestrator/srp/srp-api.yaml
+
+
+## SCM APIs ##
+# This is the API descriptor for the SCM APIs. It is used to generate the API documentation for the SCM APIs.
+
+### dex-api ###
+# This is the API descriptor for the dex-api. It is used to generate the API documentation for the dex-api.
+---
+apiVersion: backstage.io/v1alpha1
+kind: API
+metadata:
+  name: dex-api
+  description: Public API for DEX
+  tags:
+    - rest
+    - api-documentation
+    - api
+    - openapi
+    - dex-api
+  links:
+    - url: https://gitlab.com/dematic/horizon/apis
+      icon: help
+      title: Horizon OpenAPI monorepo in GitLab
+
+spec:
+  type: openapi
+  lifecycle: production
+  owner: Horizon
+  definition: # This does not work with a relative path to the URL such as ./scm/mfc/mfc-api.yaml
+    $text: https://gitlab.com/dematic/horizon/apis/-/blob/master/scm/dex/dex-api.yaml
+
+
+### eai-api ###
+# This is the API descriptor for the eai-api. It is used to generate the API documentation for the eai-api.
+---
+apiVersion: backstage.io/v1alpha1
+kind: API
+metadata:
+  name: eai-api
+  description: Public API for eai-api
+  tags:
+    - rest
+    - api-documentation
+    - api
+    - openapi
+    - eai-api
+  links:
+    - url: https://gitlab.com/dematic/horizon/apis
+      icon: help
+      title: Horizon OpenAPI monorepo in GitLab
+
+spec:
+  type: openapi
+  lifecycle: production
+  owner: Horizon
+  definition: # This does not work with a relative path to the URL such as ./scm/mfc/mfc-api.yaml
+    $text: https://gitlab.com/dematic/horizon/apis/-/blob/master/scm/eai/eai-api.yaml
+
+### eaitranslator-api ###
+# This is the API descriptor for the eaitranslator-api. It is used to generate the API documentation for the eaitranslator-api.
+---
+apiVersion: backstage.io/v1alpha1
+kind: API
+metadata:
+  name: "eaitranslator-api"
+  description: Public API for eai-translator-api
+  tags:
+    - rest
+    - api-documentation
+    - api
+    - openapi
+    - eaitranslator-api
+  links:
+    - url: https://gitlab.com/dematic/horizon/apis
+      icon: help
+      title: Horizon OpenAPI monorepo in GitLab
+
+spec:
+  type: openapi
+  lifecycle: production
+  owner: Horizon
+  definition: # This does not work with a relative path to the URL such as ./scm/mfc/mfc-api.yaml
+    $text: https://gitlab.com/dematic/horizon/apis/-/blob/master/scm/eai-translator/eaitranslator-api.yaml
+
+
+### alert-api ###
+# This is the API descriptor for the alert-api. It is used to generate the API documentation for the alert-api.
+---
+apiVersion: backstage.io/v1alpha1
+kind: API
+metadata:
+  name: "alert-api"
+  description: Public API for alert-api
+  tags:
+    - rest
+    - api-documentation
+    - api
+    - openapi
+    - alert-api
+  links:
+    - url: https://gitlab.com/dematic/horizon/apis
+      icon: help
+      title: Horizon OpenAPI monorepo in GitLab
+
+spec:
+  type: openapi
+  lifecycle: production
+  owner: Horizon
+  definition: # This does not work with a relative path to the URL such as ./scm/mfc/mfc-api.yaml
+    $text: https://gitlab.com/dematic/horizon/apis/-/blob/master/scm/fbs-alert/alert-api.yaml
+
+
+### configuration-api ###
+# This is the API descriptor for the configuration-api. It is used to generate the API documentation for the configuration-api.
+---
+apiVersion: backstage.io/v1alpha1
+kind: API
+metadata:
+  name: "configuration-api"
+  description: Public API for configuration-api
+  tags:
+    - rest
+    - api-documentation
+    - api
+    - openapi
+    - configuration-api
+  links:
+    - url: https://gitlab.com/dematic/horizon/apis
+      icon: help
+      title: Horizon OpenAPI monorepo in GitLab
+
+spec:
+  type: openapi
+  lifecycle: production
+  owner: Horizon
+  definition: # This does not work with a relative path to the URL such as ./scm/mfc/mfc-api.yaml
+    $text: https://gitlab.com/dematic/horizon/apis/-/blob/master/scm/fbs-configuration/configuration-api.yaml
+
+### cron-api ###
+# This is the API descriptor for the cron-api. It is used to generate the API documentation for the cron-api.
+---
+apiVersion: backstage.io/v1alpha1
+kind: API
+metadata:
+  name: "cron-api"
+  description: Public API for cron-api
+  tags:
+    - rest
+    - api-documentation
+    - api
+    - openapi
+    - cron-api
+  links:
+    - url: https://gitlab.com/dematic/horizon/apis
+      icon: help
+      title: Horizon OpenAPI monorepo in GitLab
+
+spec:
+  type: openapi
+  lifecycle: production
+  owner: Horizon
+  definition: # This does not work with a relative path to the URL such as ./scm/mfc/mfc-api.yaml
+    $text: https://gitlab.com/dematic/horizon/apis/-/blob/master/scm/fbs-cron/cron-api.yaml
+
+### mfc-api ###
+# This is the API descriptor for the mfc-api. It is used to generate the API documentation for the mfc-api.
+---
+apiVersion: backstage.io/v1alpha1
+kind: API
+metadata:
+  name: "mfc-api"
+  description: Public API for mfc-api
+  tags:
+    - rest
+    - api-documentation
+    - api
+    - openapi
+    - mfc-api
+  links:
+    - url: https://gitlab.com/dematic/horizon/apis
+      icon: help
+      title: Horizon OpenAPI monorepo in GitLab
+
+spec:
+  type: openapi
+  lifecycle: production
+  owner: Horizon
+  definition: # This does not work with a relative path to the URL such as ./scm/mfc/mfc-api.yaml
+    $text: https://gitlab.com/dematic/horizon/apis/-/blob/master/scm/mfc/mfc-api.yaml
+
+### mfc-edge-api ###
+# This is the API descriptor for the mfc-edge-api. It is used to generate the API documentation for the mfc-edge-api.
+---
+apiVersion: backstage.io/v1alpha1
+kind: API
+metadata:
+  name: "mfc-edge-api"
+  description: Public API for mfc-edge-api
+  tags:
+    - rest
+    - api-documentation
+    - api
+    - openapi
+    - mfc-edge-api
+  links:
+    - url: https://gitlab.com/dematic/horizon/apis
+      icon: help
+      title: Horizon OpenAPI monorepo in GitLab
+
+spec:
+  type: openapi
+  lifecycle: production
+  owner: Horizon
+  definition: # This does not work with a relative path to the URL such as ./scm/mfc/mfc-api.yaml
+    $text: https://gitlab.com/dematic/horizon/apis/-/blob/master/scm/mfcedge/mfcedge-api.yaml
+
+### print-api ###
+# This is the API descriptor for the print-api. It is used to generate the API documentation for the print-api.
+---
+apiVersion: backstage.io/v1alpha1
+kind: API
+metadata:
+  name: "print-api"
+  description: Public API for print-api
+  tags:
+    - rest
+    - api-documentation
+    - api
+    - openapi
+    - print-api
+  links:
+    - url: https://gitlab.com/dematic/horizon/apis
+      icon: help
+      title: Horizon OpenAPI monorepo in GitLab
+
+spec:
+  type: openapi
+  lifecycle: production
+  owner: Horizon
+  definition: # This does not work with a relative path to the URL such as ./scm/mfc/mfc-api.yaml
+    $text: https://gitlab.com/dematic/horizon/apis/-/blob/master/scm/print/print-api.yaml
+
+### scale-api ###
+# This is the API descriptor for the scale-api. It is used to generate the API documentation for the scale-api.
+---
+apiVersion: backstage.io/v1alpha1
+kind: API
+metadata:
+  name: "scale-api"
+  description: Public API for scale-api
+  tags:
+    - rest
+    - api-documentation
+    - api
+    - openapi
+    - scale-api
+  links:
+    - url: https://gitlab.com/dematic/horizon/apis
+      icon: help
+      title: Horizon OpenAPI monorepo in GitLab
+
+spec:
+  type: openapi
+  lifecycle: production
+  owner: Horizon
+  definition: # This does not work with a relative path to the URL such as ./scm/mfc/mfc-api.yaml
+    $text: https://gitlab.com/dematic/horizon/apis/-/blob/master/scm/scale/scale-api.yaml
+
+### scale-mock-api ###
+# This is the API descriptor for the scale-mock-api. It is used to generate the API documentation for the scale-mock-api.
+---
+apiVersion: backstage.io/v1alpha1
+kind: API
+metadata:
+  name: "scale-mock-api"
+  description: Public API for scale-mock-api
+  tags:
+    - rest
+    - api-documentation
+    - api
+    - openapi
+    - scale-mock-api
+  links:
+    - url: https://gitlab.com/dematic/horizon/apis
+      icon: help
+      title: Horizon OpenAPI monorepo in GitLab
+
+spec:
+  type: openapi
+  lifecycle: production
+  owner: Horizon
+  definition: # This does not work with a relative path to the URL such as ./scm/mfc/mfc-api.yaml
+    $text: https://gitlab.com/dematic/horizon/apis/-/blob/master/scm/scale-mock/scalemock-api.yaml
+
+### teach-api ###
+# This is the API descriptor for the teach-api. It is used to generate the API documentation for the teach-api.
+---
+apiVersion: backstage.io/v1alpha1
+kind: API
+metadata:
+  name: "teach-api"
+  description: Public API for teach-api
+  tags:
+    - rest
+    - api-documentation
+    - api
+    - openapi
+    - teach-api
+  links:
+    - url: https://gitlab.com/dematic/horizon/apis
+      icon: help
+      title: Horizon OpenAPI monorepo in GitLab
+
+spec:
+  type: openapi
+  lifecycle: production
+  owner: Horizon
+  definition: # This does not work with a relative path to the URL such as ./scm/mfc/mfc-api.yaml
+    $text: https://gitlab.com/dematic/horizon/apis/-/blob/master/scm/teach/teach-api.yaml
+
+### cubiscan-mock-api ###
+# This is the API descriptor for the cubiscan-mock-api. It is used to generate the API documentation for the cubiscan-mock-api.
+---
+apiVersion: backstage.io/v1alpha1
+kind: API
+metadata:
+  name: "cubiscan-mock-api"
+  description: Public API for cubiscan-mock-api
+  tags:
+    - rest
+    - api-documentation
+    - api
+    - openapi
+    - cubiscan-mock-api
+  links:
+    - url: https://gitlab.com/dematic/horizon/apis
+      icon: help
+      title: Horizon OpenAPI monorepo in GitLab
+
+spec:
+  type: openapi
+  lifecycle: production
+  owner: Horizon
+  definition: # This does not work with a relative path to the URL such as ./scm/mfc/mfc-api.yaml
+    $text: https://gitlab.com/dematic/horizon/apis/-/blob/master/scm/teach-cubiscan-mock/teachcubiscanmock-api.yaml
+
+### teachwcs-api ###
+# This is the API descriptor for the teachwcs-api. It is used to generate the API documentation for the teachwcs-api.
+---
+apiVersion: backstage.io/v1alpha1
+kind: API
+metadata:
+  name: "teachwcs-api"
+  description: Public API for teachwcs-api
+  tags:
+    - rest
+    - api-documentation
+    - api
+    - openapi
+    - teachwcs-api
+  links:
+    - url: https://gitlab.com/dematic/horizon/apis
+      icon: help
+      title: Horizon OpenAPI monorepo in GitLab
+
+spec:
+  type: openapi
+  lifecycle: production
+  owner: Horizon
+  definition: # This does not work with a relative path to the URL such as ./scm/mfc/mfc-api.yaml
+    $text: https://gitlab.com/dematic/horizon/apis/-/blob/master/scm/teach-wcs/teachwcs-api.yaml
+
+
+## Subsystem APIs ##
+# This is the API descriptor for the Subsystem APIs. It is used to generate the API documentation for the Subsystem APIs.
+
+
+### fulfillment-api ###
+# This is the API descriptor for the fulfillment-api. It is used to generate the API documentation for the fulfillment-api.
+---
+apiVersion: backstage.io/v1alpha1
+kind: API
+metadata:
+  name: "fulfillment-api"
+  description: Public API for fulfillment-api
+  tags:
+    - rest
+    - api-documentation
+    - api
+    - openapi
+    - fulfillment-api
+  links:
+    - url: https://gitlab.com/dematic/horizon/apis
+      icon: help
+      title: Horizon OpenAPI monorepo in GitLab
+
+spec:
+  type: openapi
+  lifecycle: production
+  owner: Horizon
+  definition: # This does not work with a relative path to the URL such as ./scm/mfc/mfc-api.yaml
+    $text: https://gitlab.com/dematic/horizon/apis/-/blob/master/sub/fulfillment/fulfillment-api.yaml
+
+
+### inventory-api ###
+# This is the API descriptor for the inventory-api. It is used to generate the API documentation for the inventory-api.
+---
+apiVersion: backstage.io/v1alpha1
+kind: API
+metadata:
+  name: "inventory-api"
+  description: Public API for inventory-api
+  tags:
+    - rest
+    - api-documentation
+    - api
+    - openapi
+    - inventory-api
+  links:
+    - url: https://gitlab.com/dematic/horizon/apis
+      icon: help
+      title: Horizon OpenAPI monorepo in GitLab
+
+spec:
+  type: openapi
+  lifecycle: production
+  owner: Horizon
+  definition: # This does not work with a relative path to the URL such as ./scm/mfc/mfc-api.yaml
+    $text: https://gitlab.com/dematic/horizon/apis/-/blob/master/sub/inventory/inventory-api.yaml

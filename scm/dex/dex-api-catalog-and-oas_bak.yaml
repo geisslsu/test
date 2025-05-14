@@ -1,0 +1,152 @@
+### dex-api ###
+# This is the API descriptor for the dex-api. It is used to generate the API documentation for the dex-api.
+---
+apiVersion: backstage.io/v1alpha1
+kind: API
+metadata:
+  name: test-dex-api
+  description: Public API for DEX
+  tags:
+    - rest
+    - api-documentation
+    - api
+    - openapi
+    - dex-api
+  links:
+    - url: https://gitlab.com/dematic/horizon/apis
+      icon: help
+      title: Horizon OpenAPI monorepo in GitLab
+
+spec:
+  type: openapi
+  lifecycle: production
+  owner: Horizon
+  definition:
+    $openapi: |
+        ---
+        openapi: 3.0.3
+        info:
+          title: test-dex-api
+          description: Public API for DEX
+          version: '12'
+        paths:
+          /dex/facts/lifecycle:
+            put:
+              operationId: complete-lifecycle-facts
+              tags:
+                - Fact
+              summary: Completes lifecycle facts.
+              description: >-
+                With the 'complete' step, the data of all related lifecycle facts
+                (identified through the fact type + domainKey) is combined and written
+                to a final fact version.
+              requestBody:
+                content:
+                  application/json:
+                    schema:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/LifecycleFact'
+              responses:
+                '204':
+                  description: No Content
+            post:
+              operationId: publish-lifecycle-facts
+              tags:
+                - Fact
+              summary: >-
+                Publish lifecycle facts. Publish can happen repeatedly for lifecycle
+                facts, each call will 'add' data to the existing fact. Each data field
+                of a lifecyle fact is only allowed to be set once in the complete series
+                of changes (publish) for a specific fact.
+              requestBody:
+                content:
+                  application/json:
+                    schema:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/LifecycleFact'
+              responses:
+                '201':
+                  description: Created
+        components:
+          schemas:
+            LifecycleFact:
+              x-horizon-no-equals-hashcode: true
+              x-horizon-constructor: >-
+                private LifecycleFact() {} public LifecycleFact(HorizonModule
+                horizonModule, String factVersion, String factType, String domainKey) {
+                super(horizonModule, factVersion); setFactType(factType);
+                setDomainKey(domainKey); } public LifecycleFact(HorizonModule
+                horizonModule, String associationId, String typeFamily, String
+                factVersion, String factType, String domainKey) { super(horizonModule,
+                factVersion); setAssociationId(associationId);
+                setTypeFamily(typeFamily); setFactType(factType);
+                setDomainKey(domainKey); }
+              allOf:
+                - $ref: '#/components/schemas/AbstractFact'
+                - type: object
+                  properties:
+                    domainKey:
+                      type: string
+            AbstractFact:
+              x-parent: true
+              x-horizon-no-equals-hashcode: true
+              x-horizon-constructor: "protected AbstractFact() {
+                    this.horizonModule = null;
+                    this.factVersion = null;
+                 }
+                 protected AbstractFact(HorizonModule horizonModule, String factVersion) {
+                    if (null == horizonModule) {
+                        /* This enforces that any users of the Java API must define a module.  Please note that this constructor is not called
+                        when deserializing from JSON, so it is possible for a deserialized instance to have a null module. */
+                       throw new IllegalArgumentException(\"Module must be non-null.\");
+                  }
+                    this.horizonModule = horizonModule;
+                    this.factVersion = factVersion;
+                    this.factData = new HashMap();
+                    factData.put(\"eventDate\", java.time.Instant.now());
+                }"
+              type: object
+              properties:
+                horizonModule:
+                  $ref: "../../lib/types/types-api.yaml#/components/schemas/HorizonModule"
+                  description: "The name of the HorizonModule to which this fact belongs."
+                factVersion:
+                  type: string
+                  description: "A version name of the current fact. If the fact structure changes, the fact version has to be adjusted so that downstream systems (which receives the fact) can differentiate between the versions"
+                factType:
+                  type: string
+                  description: "A unique name identifying which fact this is. Pattern: {@code <horizonModule>.<FactClassName>}, e.g. {@code mfc.MovementFact}"
+                associationId:
+                  type: string
+                  description: "ID which groups certain facts (e.g. to the same order)"
+                typeFamily:
+                  type: string
+                  description: "Can be used to <i>group</i> certain fact types (e.g. a list of OneTimeFacts that result from reworking a previous lifecycle fact"
+                runtimeId:
+                  type: string
+                  description: "The RuntimeId of the system publishing this fact."
+                factVersionSuffix:
+                  type: string
+                factData:
+                  x-horizon-json-any: true
+                  type: object
+                  description: "Map which contains all the fact properties. \
+                    \ By using the @JsonAnyGetter / @JsonAnySetter, this map only contains the fact properties which are unknown to this class.\
+                    \ That means, that the factData will not contain the 'factType', 'factVersion' and (for LifecycleFacts) 'domainKey' properties."
+                  additionalProperties:
+                    type: object
+                extension:
+                  type: object
+                  description: "Used to add (rucksack) extensions to the Fact. If used, a 'factVersionSuffix' is required."
+                  additionalProperties:
+                    type: object
+                enabled:
+                  type: boolean
+                  default: true
+                  x-field-extra-annotation: "@com.fasterxml.jackson.annotation.JsonIgnore"
+                  description: "By default, a Fact is enabled. SCMs can override as needed. 'Runtime' enablement can be controlled via configuration. Only\
+                    \ enabled Facts are send to DEX (and downstream systems like ControlTower)."
+        DexModule:
+          x-horizon-horizonmodule: true

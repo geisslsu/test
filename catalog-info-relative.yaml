@@ -1,0 +1,37 @@
+# This file is used for the downloadable starter files for TechDocs
+# More information on the format of this file: https://backstage.io/docs/features/software-catalog/descriptor-format
+
+# The 'apiVersion' and 'kind' fields are required and specify the version of the Backstage API and the kind of component respectively.
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: Horizon-API-first-test-relative-path
+  description: Horizon API First repository.Only test
+  annotations:
+    gitlab.com/project-slug: dematic/horizon/apis
+    # The 'backstage.io/techdocs-ref' field indicates where the documentation for the component resides.
+    # Indicates that the documentation resides in the same directory as the component.
+    backstage.io/techdocs-ref: dir:.
+
+spec:
+  type: openapi
+  lifecycle: production
+  owner: Horizon
+  definition: # This does not work with a relative path to the URL such as ./scm/mfc/mfc-api.yaml
+    $text: https://gitlab.com/dematic/horizon/apis/-/blob/master/orchestrator/fop/fop-api.yaml
+
+############### API annotations here, these are used to generate the API documentation ###############
+
+###### Orchestrator APIs ######
+# This is the API descriptor for the orchestrator APIs. It is used to generate the API documentation for the orchestrator APIs.
+---
+apiVersion: backstage.io/v1alpha1
+kind: Location
+metadata:
+  name: horizon-apis-test-relative
+  description: Test - A collection of all Backstage example APIs
+spec:
+  targets:
+    - ./lib/types/types-api-catalog.yaml
+    - ./scm/test/petstore-api.yaml
+    - ./scm/dex/dex-api-catalog.yaml

@@ -1,0 +1,20 @@
+### dex-api ###
+# This is the API descriptor for the dex-api. It is used to generate the API documentation for the dex-api.
+---
+apiVersion: backstage.io/v1alpha1
+kind: API
+metadata:
+  name: test-types-api
+  description: Public API for horizon-types
+  links:
+    - url: https://gitlab.com/dematic/horizon/apis
+      icon: help
+      title: Horizon OpenAPI monorepo in GitLab
+
+spec:
+  type: openapi
+  lifecycle: production
+  owner: Horizon
+  definition:
+    $text: ./types-api.yaml
+

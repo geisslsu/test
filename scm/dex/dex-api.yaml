@@ -1,0 +1,574 @@
+---
+openapi: 3.0.3
+info:
+  title: test-dex-api
+  description: Public API for DEX
+  version: "12"
+paths:
+  /dex/journals/messagetraces:
+    post:
+      operationId: query-message-trace
+      tags:
+        - MessageTrace
+      summary: Query the MessageTraces of DEX
+      description: Filters for MessageTrace entries with the defined query parameters
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MessageTraceQuery'
+      responses:
+        "200":
+          description: The results of the query
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageTraceQueryResponse'
+        "400":
+          description: If the given MessageTraceQuery is empty
+        "500":
+          description: If an unexpected error happened querying the MessageTraces
+  /dex/archives:
+    post:
+      operationId: publish
+      tags:
+        - Archive
+      summary: Publish an archived entity
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ArchivedEntityDto'
+      responses:
+        "201":
+          description: Created
+  /dex/dimensions:
+    post:
+      operationId: publish-fact-dimension
+      tags:
+        - FactDimension
+      summary: Publish a given fact's dimension
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FactDimensionDto'
+      responses:
+        "201":
+          description: Created
+  /dex/facts/lifecycle:
+    put:
+      operationId: complete-lifecycle-facts
+      tags:
+        - Fact
+      summary: Completes lifecycle facts.
+      description: "With the 'complete' step, the data of all related lifecycle facts\
+        \ (identified through the fact type + domainKey) is combined and written to\
+        \ a final fact version."
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/LifecycleFact'
+      responses:
+        "204":
+          description: No Content
+    post:
+      operationId: publish-lifecycle-facts
+      tags:
+        - Fact
+      summary: "Publish lifecycle facts. Publish can happen repeatedly for lifecycle\
+        \ facts, each call will 'add' data to the existing fact. Each data field of\
+        \ a lifecyle fact is only allowed to be set once in the complete series of\
+        \ changes (publish) for a specific fact."
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/LifecycleFact'
+      responses:
+        "201":
+          description: Created
+  /dex/facts/onetime:
+    post:
+      operationId: publish-one-time-facts
+      tags:
+        - Fact
+      summary: Publish one-time facts
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/OneTimeFact'
+      responses:
+        "201":
+          description: Created
+  /dex/facts/query:
+    post:
+      operationId: query-fact-table
+      tags:
+        - Fact
+      summary: Query the facts within the DEX Service
+      description: "Query the facts in the system via providing query parts. The fact\
+        \ query parameter is used to describe the query structure in a way that does\
+        \ not open the call to anything.\
+        \ \n\n Below are the fields within the FactQuery parameter:\
+        \ \n   runtimeId -          optional - The runtimeId of the SCM/subsystem\
+        \ the fact is for\n   horizonModule        required - The horizonModule for\
+        \ the fact type\n   factType -           required - The Fact Type of the fact\n\
+        \   startDate -          required - The Start Date of the time window to query\
+        \ for.\n   selectionClause -    required - The sql string of the selection.\
+        \ ex 'select a, b, c'\n   endDate -            not required - The End Date\
+        \ of the time window to query for. \n                                    \
+        \   If not provided the current time is used.\n   whereClause -        not\
+        \ required - Any additional conditions to filter on.\n   afterWhereClause\
+        \ -   not required - Any raw sql that would come after a where clause.\n\n\
+        The required fields help enforce consistent result sets for an fact types.\n\
+        \nTo see how these parameters are used to create a real SQL request see below:\n\
+        \   {selectionClause} from\n   FACT_QUERY_VIEW\n   where\n   (horizonModule\
+        \ = {horizonModule}\n   and type = {factType}\n   and create_date >= {startDate}\n\
+        \   and create_date <= [{endDate} | Instant.now()])\n   [\"\" | and ({whereClause})]\n\
+        \   [\"\" | {afterWhereClause}]\n\nThis query is limited to the FACT_QUERY_VIEW.\
+        \ The columns available are:\n   RUNTIME_ID     - The runtimeId of the SCM/subsystem\
+        \ who owns the fact\n   HORIZON_MODULE - the horizon module of the fact type\
+        \   TYPE           - The Type of the fact\n   CREATE_DATE    - The Date the\
+        \ fact was created\n   DOMAIN_KEY     - The Domain Key of the fact. Useful\
+        \ possibly grouping facts\n   FACT_VERSION   - The Version of the fact\n \
+        \  DATA           - The Data of the fact. This is JSON data in the database\
+        \ an selection must follow that \nstandard.\n                     <a href='https://www.postgresql.org/docs/14/functions-json.html'>postgres\
+        \ docs</a>\n\nExamples of some usages for selecting from the Data column:\n\
+        \   SELECT data ->> 'fieldOne' as fieldOne, data ->> 'fieldTwo' as fieldTwo\n\
+        \   SELECT CAST(data as varchar) as data\n<br/>Examples of some where clauses\
+        \ on the data column:\n   data ->> 'fieldOne' = 'one'\n   data ->> 'fieldOne'\
+        \ = 'one' or data ->> 'fieldTwo' = 'two'\n<br/>For more on how to access fields\
+        \ in the Data column see here:\n   <a href='https://www.postgresql.org/docs/14/functions-json.html'>postgres\
+        \ docs</a>"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FactQuery'
+      responses:
+        "200":
+          description: The results of the query
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FactQueryResponse'
+components:
+  schemas:
+    ArchivedEntityDto:
+      type: object
+      properties:
+        runtimeId:
+          type: string
+        horizonModule:
+          $ref: "../../lib/types/types-api.yaml#/components/schemas/HorizonModule"
+        archiveType:
+          type: string
+        archiveData:
+          type: string
+        genericFields:
+          x-field-extra-annotation: "@com.fasterxml.jackson.annotation.JsonIgnore"
+          type: object
+          additionalProperties:
+            type: object
+    FactDimensionDto:
+      type: object
+      properties:
+        runtimeId:
+          type: string
+        horizonModule:
+          $ref: "../../lib/types/types-api.yaml#/components/schemas/HorizonModule"
+        factDimensionType:
+          type: string
+        factDimensionVersion:
+          type: string
+        factDimensionId:
+          type: string
+        factDimensionData:
+          type: object
+          additionalProperties: { }
+    AbstractFact:
+      x-parent: true
+      x-horizon-no-equals-hashcode: true
+      x-horizon-constructor: "protected AbstractFact() {
+            this.horizonModule = null;
+            this.factVersion = null;
+         }
+         protected AbstractFact(HorizonModule horizonModule, String factVersion) {
+            if (null == horizonModule) {
+                /* This enforces that any users of the Java API must define a module.  Please note that this constructor is not called
+                when deserializing from JSON, so it is possible for a deserialized instance to have a null module. */
+               throw new IllegalArgumentException(\"Module must be non-null.\");
+          }
+            this.horizonModule = horizonModule;
+            this.factVersion = factVersion;
+            this.factData = new HashMap();
+            factData.put(\"eventDate\", java.time.Instant.now());
+        }"
+      type: object
+      properties:
+        horizonModule:
+          $ref: "../../lib/types/types-api.yaml#/components/schemas/HorizonModule"
+          description: "The name of the HorizonModule to which this fact belongs."
+        factVersion:
+          type: string
+          description: "A version name of the current fact. If the fact structure changes, the fact version has to be adjusted so that downstream systems (which receives the fact) can differentiate between the versions"
+        factType:
+          type: string
+          description: "A unique name identifying which fact this is. Pattern: {@code <horizonModule>.<FactClassName>}, e.g. {@code mfc.MovementFact}"
+        associationId:
+          type: string
+          description: "ID which groups certain facts (e.g. to the same order)"
+        typeFamily:
+          type: string
+          description: "Can be used to <i>group</i> certain fact types (e.g. a list of OneTimeFacts that result from reworking a previous lifecycle fact"
+        runtimeId:
+          type: string
+          description: "The RuntimeId of the system publishing this fact."
+        factVersionSuffix:
+          type: string
+        factData:
+          x-horizon-json-any: true
+          type: object
+          description: "Map which contains all the fact properties. \
+            \ By using the @JsonAnyGetter / @JsonAnySetter, this map only contains the fact properties which are unknown to this class.\
+            \ That means, that the factData will not contain the 'factType', 'factVersion' and (for LifecycleFacts) 'domainKey' properties."
+          additionalProperties:
+            type: object
+        extension:
+          type: object
+          description: "Used to add (rucksack) extensions to the Fact. If used, a 'factVersionSuffix' is required."
+          additionalProperties:
+            type: object
+        enabled:
+          type: boolean
+          default: true
+          x-field-extra-annotation: "@com.fasterxml.jackson.annotation.JsonIgnore"
+          description: "By default, a Fact is enabled. SCMs can override as needed. 'Runtime' enablement can be controlled via configuration. Only\
+            \ enabled Facts are send to DEX (and downstream systems like ControlTower)."
+    LifecycleFact:
+      x-horizon-no-equals-hashcode: true
+      x-horizon-constructor: "private LifecycleFact() {}
+        public LifecycleFact(HorizonModule horizonModule, String factVersion, String factType, String domainKey) {
+          super(horizonModule, factVersion);
+          setFactType(factType);
+          setDomainKey(domainKey);
+        }
+        public LifecycleFact(HorizonModule horizonModule, String associationId, String typeFamily, String factVersion, String factType, String domainKey) {
+          super(horizonModule, factVersion);
+          setAssociationId(associationId);
+          setTypeFamily(typeFamily);
+          setFactType(factType);
+          setDomainKey(domainKey);
+        }"
+      allOf:
+        - $ref: "#/components/schemas/AbstractFact"
+        - type: object
+          properties:
+            domainKey:
+              type: string
+    OneTimeFact:
+      x-horizon-no-equals-hashcode: true
+      x-horizon-constructor: "private OneTimeFact() {}
+         public OneTimeFact(HorizonModule horizonModule, String factVersion, String factType) {
+            super(horizonModule, factVersion);
+            setFactType(factType);
+         }
+         public OneTimeFact(HorizonModule horizonModule, String associationId, String typeFamily, String factVersion, String factType) {
+            super(horizonModule, factVersion);
+            setAssociationId(associationId);
+            setTypeFamily(typeFamily);
+            setFactType(factType);
+         }"
+      allOf:
+        - $ref: "#/components/schemas/AbstractFact"
+        - type: object
+    FactQuery:
+      type: object
+      x-horizon-no-equals-hashcode: true
+      properties:
+        runtimeId:
+          type: string
+        horizonModule:
+          type: string
+        factType:
+          type: string
+        startDate:
+          format: date-time
+          type: string
+          example: 2022-03-10T16:15:50Z
+        endDate:
+          format: date-time
+          type: string
+          example: 2022-03-10T16:15:50Z
+        selectionClause:
+          type: string
+        whereClause:
+          type: string
+        afterWhereClause:
+          type: string
+    FactQueryResponse:
+      type: object
+      x-horizon-no-equals-hashcode: true
+      properties:
+        results:
+          description: the results of the query as a list of JSON objects. The fields in the objects are the name of the columns in the query
+          type: array
+          items:
+            type: object
+            additionalProperties: { }
+    PublishArchivedEntityCommand:
+      description: Messaging command to publish an ArchivedEntityDto
+      x-horizon-topic-name: "dex.archive.publish.cmd"
+      x-horizon-message-type: "archive.publish"
+      x-horizon-no-equals-hashcode: true
+      x-horizon-no-to-string: true
+      type: object
+      properties:
+        archivedEntityDto:
+          $ref: "#/components/schemas/ArchivedEntityDto"
+    PublishFactDimensionCommand:
+      description: Messaging command to publish an FactDimensionDto
+      x-horizon-topic-name: "dex.dimension.publish.cmd"
+      x-horizon-message-type: "dimension.publish"
+      x-horizon-no-equals-hashcode: true
+      x-horizon-no-to-string: true
+      type: object
+      properties:
+        factDimensionDto:
+          $ref: "#/components/schemas/FactDimensionDto"
+        bulkFactDimensionDtos:
+          type: array
+          items:
+            $ref: "#/components/schemas/FactDimensionDto"
+    PublishLifecycleFactCommand:
+      description: Messaging command to publish LifecycleFacts.
+      x-parent: true
+      x-horizon-topic-name: "dex.fact.publish.lifecycle.cmd"
+      x-horizon-message-type: "fact.publish.lifecycle"
+      x-horizon-class-generic: "F extends LifecycleFact"
+      x-horizon-no-equals-hashcode: true
+      x-horizon-no-builders: true
+      x-horizon-no-to-string: true
+      type: object
+      properties:
+        lifecycleFacts:
+          x-horizon-no-singulation: true
+          x-horizon-field-generic: "List<F>"
+          type: array
+          items:
+            $ref: "#/components/schemas/LifecycleFact"
+    CompleteLifecycleFactCommand:
+      description: Messaging command to publish LifecycleFacts.
+      x-horizon-topic-name: "dex.fact.publish.lifecycle.cmd"
+      x-horizon-message-type: "fact.complete.lifecycle"
+      x-horizon-class-generic: "F extends LifecycleFact"
+      x-horizon-no-equals-hashcode: true
+      x-horizon-no-builders: true
+      x-horizon-no-to-string: true
+      allOf:
+        - $ref: "#/components/schemas/PublishLifecycleFactCommand"
+        - type: object
+    PublishOneTimeFactCommand:
+      description: Messaging command to publish OneTimeFacts.
+      x-horizon-topic-name: "dex.fact.publish.onetime.cmd"
+      x-horizon-message-type: "fact.publish.onetime"
+      x-horizon-class-generic: "F extends OneTimeFact"
+      x-horizon-no-equals-hashcode: true
+      x-horizon-no-builders: true
+      x-horizon-no-to-string: true
+      type: object
+      properties:
+        oneTimeFacts:
+          x-horizon-field-generic: "List<F>"
+          x-horizon-no-singulation: true
+          type: array
+          items:
+            $ref: "#/components/schemas/OneTimeFact"
+    FactAndDimensionEnablementChangeEvent:
+      description: This event is intended to be sent by the dex service when the enablement or disablement of a fact
+        or dimension is changed. This event contains the current full configuration to be used by clients.
+      x-horizon-topic-name: "%s.dex.fact-and-dimension.configchange.evt"
+      x-horizon-message-type: "dex.FactAndDimensionEnablementChangeEvent"
+      x-horizon-no-equals-hashcode: true
+      x-horizon-no-builders: true
+      x-horizon-no-to-string: true
+      type: object
+      properties:
+        facts:
+          type: object
+          description: "Map which defines which facts are enabled/disabled. Key: fact type"
+          additionalProperties:
+            type: boolean
+        factDimensions:
+          type: object
+          description: "Map which defines which dimensions are enabled/disabled. Key: dimension type"
+          additionalProperties:
+            type: boolean
+    FactDimensionConfigRequestCommand:
+      description:  This command is to be sent by services using the dex client libraries on startup to trigger a
+        FactDimensionChange event being sent out by the DEX service. This contains the RuntimeId of the service sending
+        the command so that DEX can send out the event for this specific RuntimeId configuration.
+      x-horizon-topic-name: "dex.configrequest.cmd"
+      x-horizon-message-type: "dex.FactDimensionConfigRequestCommand"
+      x-horizon-no-equals-hashcode: true
+      x-horizon-no-builders: true
+      x-horizon-no-to-string: true
+      x-horizon-constructor: "public FactDimensionConfigRequestCommand() {}
+          public FactDimensionConfigRequestCommand(String runtimeId) {
+            this.runtimeId = runtimeId;
+          }"
+      type: object
+      properties:
+        runtimeId:
+          type: string
+          description: "The runtimeId for which the event is requested"
+    TracePointerDto:
+      type: object
+      required:
+        - traceId
+        - spanId
+      properties:
+        traceId:
+          type: string
+          minLength: 32
+          maxLength: 32
+        spanId:
+          type: string
+          minLength: 16
+          maxLength: 16
+    MessageTraceFormat:
+      x-horizon-module-definition: dex
+      x-horizon-domainvalue: true
+      enum:
+        - DCI
+        - JSON
+      type: string
+    MessageTraceDto:
+      type: object
+      x-horizon-no-equals-hashcode: true
+      required:
+        - operationId
+        - rawData
+        - blockCount
+        - sequenceNumber
+        - timestamp
+      properties:
+        tracePointer:
+          $ref: "#/components/schemas/TracePointerDto"
+        timestamp:
+          format: date-time
+          type: string
+          example: 2025-03-24T16:15:50Z
+        operationId:
+          type: string
+        sourceNode:
+          type: string
+        destinationNode:
+          type: string
+        conName:
+          type: string
+        blockCount:
+          type: integer
+          format: int64
+        sequenceNumber:
+          type: integer
+          format: int64
+        flowControl:
+          type: string
+        rawData:
+          format: byte
+          type: string
+        parsedData:
+          type: string
+        subsystemName:
+          type: string
+        warehouseSubsystemId:
+          type: string
+        currentLocation:
+          type: string
+        transportUnitId:
+          type: string
+        destinationLocation:
+          type: string
+        blockIndex:
+          type: integer
+          format: int32
+        responseTime:
+          type: integer
+          format: int64
+        messageTraceFormat:
+          $ref: "#/components/schemas/MessageTraceFormat"
+    MessageTraceCommand:
+      description:  Command to send a MessageTraceDto to DEX.
+      x-horizon-topic-name: "dex.messagetrace.cmd"
+      x-horizon-message-type: "dex.MessageTraceCommand"
+      x-horizon-no-equals-hashcode: true
+      type: object
+      properties:
+        messageTrace:
+          $ref: "#/components/schemas/MessageTraceDto"
+    MessageTraceQuery:
+      description: DTO to define query parameters to filter for MessageTrace entries.
+        Wildcards are not supported!
+      type: object
+      x-horizon-no-equals-hashcode: true
+      x-horizon-no-to-string: true
+      properties:
+        transportUnitId:
+          type: string
+        operationId:
+          type: string
+        conName:
+          type: string
+        timestamp:
+          format: date-time
+          type: string
+          example: 2025-03-24T16:15:50Z
+        currentLocation:
+          type: string
+        destinationLocation:
+          type: string
+        pageSize:
+          description: The size of each page we want to fetch
+          type: integer
+          format: int32
+          default: 100
+          minimum: 1
+          maximum: 1000
+        page:
+          description: The page number to fetch
+          type: integer
+          format: int32
+          minimum: 0
+      anyOf:
+        - required: [transportUnitId]
+        - required: [operationId]
+        - required: [conName]
+        - required: [currentLocation]
+        - required: [destinationLocation]
+    MessageTraceQueryResponse:
+      description: Response object for a MessageTrace query
+      type: object
+      x-horizon-no-equals-hashcode: true
+      x-horizon-no-to-string: true
+      properties:
+        messageTraces:
+          description: The MessageTraces matching the given query
+          type: array
+          items:
+            $ref: "#/components/schemas/MessageTraceDto"
+        pageCount:
+          description: The number of pages which are available for the given query
+          type: integer
+          format: int32
+    DexModule:
+      x-horizon-horizonmodule: true
