@@ -1,8 +1,8 @@
 ---
 openapi: 3.1.0
 info:
-  title: ref-api
-  description: Public API for ref-api
+  title: ref2-api
+  description: Public API for ref2-api
   version: "6"
 paths:
   /mfc/transportexecutor/shuffles:
@@ -76,14 +76,6 @@ components:
             - $ref: "#/components/schemas/LocationId"
           example: "1200"
           default: "123"
-        xExtension:
-          description: "Dynamic dimension: TU extension along X-Axis of equipment\
-            \ system, usually in mm."
-          type: number
-          allOf:
-            - $ref: "../../lib/types/types-api.yaml#/components/schemas/LengthSimpleType"
-          example: 1200
-          default: 123
     LocationId:
       description: The identifying value for a location.
       type: string
