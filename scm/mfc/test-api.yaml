@@ -1,0 +1,40 @@
+---
+openapi: 3.1.0
+info:
+  title: test2-api
+  description: Public API for test2-api
+  version: "6"
+components:
+  schemas:
+    Foo:
+      allOf:
+        - $ref: "#/components/schemas/Bar"
+      properties:
+        ancestors:
+          items:
+            $ref: "#/components/schemas/Bar"
+          type: array
+        description:
+          type: object
+          additionalProperties:
+            type: string
+        id:
+          description: id
+          type: string
+      type: object
+    Bar:
+      discriminator:
+        propertyName: barType
+        mapping:
+          foo: "#/components/schemas/Foo"
+      properties:
+        accessAllowed:
+          items:
+            type: string
+          type: array
+        catalog:
+          type: boolean
+        children:
+          items:
+            $ref: "#/components/schemas/Bar"
+          type: array
