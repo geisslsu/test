@@ -32,4 +32,4 @@ spec:
   targets:
     - ./lib/types/types-api-catalog.yaml
     - ./scm/test/petstore-api.yaml
-    - ./scm/dex/dex-api-catalog-and-oas.yaml
+    - ./scm/dex/dex-api-catalog.yaml
