@@ -1259,9 +1259,8 @@ components:
           description: "Dynamic dimension: TU extension along X-Axis of equipment\
             \ system, usually in mm."
           type: number
-          allOf:
-          - $ref: "../../lib/types/types-api.yaml#/components/schemas/LengthSimpleType"
-          example: 1200
+          $ref: "../../lib/types/types-api.yaml#/components/schemas/LengthSimpleType"
+          example: 1300
         effectiveLhdXExtension:
           description: The effective x-extension of a transport unit is its extension
             in x-direction of a location under consideration of positional uncertainty
