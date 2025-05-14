@@ -3,7 +3,7 @@ openapi: 3.0.3
 info:
   title: fop-api
   description: Public API for fop-api
-  version: @project.version@
+  version: 99
 paths:
   /fop/order/command/create:
     put:

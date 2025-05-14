@@ -3,7 +3,7 @@ openapi: 3.0.3
 info:
   title: ain-api
   description: Public API for ain-api
-  version: @project.version@
+  version: 99
 paths:
   /ain/handling-unit/{handlingUnitBid}:
     get:
