@@ -542,8 +542,7 @@ components:
               description: The quantity expressed in the base quantity unit of the SKU
                 to be allocated.
               type: number
-              allOf:
-                - $ref: "../../lib/types/types-api.yaml#/components/schemas/QuantitySimpleType"
+              $ref: "../../lib/types/types-api.yaml#/components/schemas/QuantitySimpleType"
             allocationReference:
               description: "Reference for why this allocation is being requested, typically\
                 \ an order."
@@ -614,43 +613,36 @@ components:
           description: "The length of the handling unit. Static HU dimension: length\
             \ of the longest edge (different from the height)."
           type: number
-          allOf:
-            - $ref: "../../lib/types/types-api.yaml#/components/schemas/LengthSimpleType"
+          $ref: "../../lib/types/types-api.yaml#/components/schemas/LengthSimpleType"
         width:
           description: "The width of the handling unit. Static HU dimension: length\
             \ of the smallest edge (different from the height)."
           type: number
-          allOf:
-            - $ref: "../../lib/types/types-api.yaml#/components/schemas/LengthSimpleType"
+          $ref: "../../lib/types/types-api.yaml#/components/schemas/LengthSimpleType"
         height:
           description: The height of the handling unit.
           type: number
-          allOf:
-            - $ref: "../../lib/types/types-api.yaml#/components/schemas/LengthSimpleType"
+          $ref: "../../lib/types/types-api.yaml#/components/schemas/LengthSimpleType"
         xExtension:
           description: "Dynamic dimension: HandlingUnit extension in the direction\
             \ of transport, usually in the base unit of measure."
           type: number
-          allOf:
-            - $ref: "../../lib/types/types-api.yaml#/components/schemas/LengthSimpleType"
+          $ref: "../../lib/types/types-api.yaml#/components/schemas/LengthSimpleType"
         yExtension:
           description: "Dynamic dimension: HandlingUnit extension orthogonal to x\
             \ extension, usually in the base unit of measure."
           type: number
-          allOf:
-            - $ref: "../../lib/types/types-api.yaml#/components/schemas/LengthSimpleType"
+          $ref: "../../lib/types/types-api.yaml#/components/schemas/LengthSimpleType"
         zExtension:
           description: "Dynamic dimension: HandlingUnit extension along Z-Axis of\
             \ the equipment system, usually in the base unit of measure."
           type: number
-          allOf:
-            - $ref: "../../lib/types/types-api.yaml#/components/schemas/LengthSimpleType"
+          $ref: "../../lib/types/types-api.yaml#/components/schemas/LengthSimpleType"
         weight:
           description: The measured weight of the handling unit. The weight may be
             measured or calculated. A value of 0 represents an unspecified weight.
           type: number
-          allOf:
-            - $ref: "../../lib/types/types-api.yaml#/components/schemas/WeightSimpleType"
+          $ref: "../../lib/types/types-api.yaml#/components/schemas/WeightSimpleType"
         contourState:
           description: The byte pattern that is filled when the error code is ME (measurement
             error).
@@ -1241,8 +1233,7 @@ components:
           description: "The quantity to set on hold expressed in the base quantity\
             \ unit of the SKU. In case not specified, the complete quantity is used."
           type: number
-          allOf:
-            - $ref: "../../lib/types/types-api.yaml#/components/schemas/QuantitySimpleType"
+          $ref: "../../lib/types/types-api.yaml#/components/schemas/QuantitySimpleType"
         batch:
           type: string
         bestBeforeDate:
@@ -1508,8 +1499,7 @@ components:
               description: The total quantity expressed in the base quantity unit of the
                 SKU.
               type: number
-              allOf:
-                - $ref: "../../lib/types/types-api.yaml#/components/schemas/QuantitySimpleType"
+              $ref: "../../lib/types/types-api.yaml#/components/schemas/QuantitySimpleType"
             compartment:
               description: Information if the InventoryUnit is placed at an Compartment
               type: string
@@ -1832,8 +1822,7 @@ components:
               description: The requested quantity expressed in the base quantity unit
                 of the SKU.
               type: number
-              allOf:
-                - $ref: "../../lib/types/types-api.yaml#/components/schemas/QuantitySimpleType"
+              $ref: "../../lib/types/types-api.yaml#/components/schemas/QuantitySimpleType"
             aggregationBucket:
               description: The subsystem this inventory belongs to.
               type: string
@@ -1879,8 +1868,7 @@ components:
               description: The requested quantity expressed in the base quantity unit
                 of the SKU.
               type: number
-              allOf:
-                - $ref: "../../lib/types/types-api.yaml#/components/schemas/QuantitySimpleType"
+              $ref: "../../lib/types/types-api.yaml#/components/schemas/QuantitySimpleType"
             newAggregationBucket:
               description: The new subsystem this inventory should be reserved to.
               type: string
@@ -1992,14 +1980,12 @@ components:
           description: The requested quantity expressed in the base quantity unit
             of the SKU.
           type: number
-          allOf:
-            - $ref: "../../lib/types/types-api.yaml#/components/schemas/QuantitySimpleType"
+          $ref: "../../lib/types/types-api.yaml#/components/schemas/QuantitySimpleType"
         quantityReserved:
           description: The reserved quantity expressed in the base quantity unit of
             the SKU.
           type: number
-          allOf:
-            - $ref: "../../lib/types/types-api.yaml#/components/schemas/QuantitySimpleType"
+          $ref: "../../lib/types/types-api.yaml#/components/schemas/QuantitySimpleType"
         aggregationBucket:
           description: The aggregation bucket this inventory belongs to.
           type: string
@@ -2241,19 +2227,16 @@ components:
           description: The requested quantity expressed in the base quantity unit
             of the SKU.
           type: number
-          allOf:
-            - $ref: "../../lib/types/types-api.yaml#/components/schemas/QuantitySimpleType"
+          $ref: "../../lib/types/types-api.yaml#/components/schemas/QuantitySimpleType"
         quantityUpdated:
           description: New quantity reservation has been made for.
           type: number
-          allOf:
-            - $ref: "../../lib/types/types-api.yaml#/components/schemas/QuantitySimpleType"
+          $ref: "../../lib/types/types-api.yaml#/components/schemas/QuantitySimpleType"
         quantityReserved:
           description: The reserved quantity expressed in the base quantity unit of
             the SKU.
           type: number
-          allOf:
-            - $ref: "../../lib/types/types-api.yaml#/components/schemas/QuantitySimpleType"
+          $ref: "../../lib/types/types-api.yaml#/components/schemas/QuantitySimpleType"
         aggregationBucket:
           description: The aggregation bucket this inventory belongs to.
           type: string
@@ -2362,19 +2345,16 @@ components:
           description: The requested quantity expressed in the base quantity unit
             of the SKU.
           type: number
-          allOf:
-            - $ref: "../../lib/types/types-api.yaml#/components/schemas/QuantitySimpleType"
+          $ref: "../../lib/types/types-api.yaml#/components/schemas/QuantitySimpleType"
         quantityUpdated:
           description: New quantity reservation has been made for.
           type: number
-          allOf:
-            - $ref: "../../lib/types/types-api.yaml#/components/schemas/QuantitySimpleType"
+          $ref: "../../lib/types/types-api.yaml#/components/schemas/QuantitySimpleType"
         quantityReserved:
           description: The reserved quantity expressed in the base quantity unit of
             the SKU.
           type: number
-          allOf:
-            - $ref: "../../lib/types/types-api.yaml#/components/schemas/QuantitySimpleType"
+          $ref: "../../lib/types/types-api.yaml#/components/schemas/QuantitySimpleType"
         aggregationBucket:
           description: The aggregation bucket this inventory belongs to.
           type: string
