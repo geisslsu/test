@@ -1,0 +1,26 @@
+### ain-api ###
+# This is the API descriptor for the ain-api. It is used to generate the API documentation for the ain-api.
+---
+apiVersion: backstage.io/v1alpha1
+kind: API
+metadata:
+  name: "ain-api"
+  description: Public API for ain-api
+  tags:
+    - rest
+    - api-documentation
+    - api
+    - openapi
+    - ain-api
+  links:
+    - url: https://gitlab.com/dematic/horizon/apis
+      icon: help
+      title: Horizon OpenAPI monorepo in GitLab
+
+spec:
+  type: openapi
+  lifecycle: production
+  owner: Horizon
+  definition:
+    $openapi: ./ain-api.yaml
+

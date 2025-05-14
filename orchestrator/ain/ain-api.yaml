@@ -1,0 +1,2395 @@
+---
+openapi: 3.0.3
+info:
+  title: ain-api
+  description: Public API for ain-api
+  version: @project.version@
+paths:
+  /ain/handling-unit/{handlingUnitBid}:
+    get:
+      tags:
+        - handlingUnitQuery
+      operationId: get-handling-unit
+      summary: Returns the given handling unit.
+      description: A handling unit will be returned with associated inventory units.
+      parameters:
+        - name: handlingUnitBid
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: The given handling unit result for the requested handling unit
+            bid.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HandlingUnitWithInventoryDto"
+        "400":
+          description: If an invalid request was made.
+  /ain/inventory/aggregation-bucket:
+    get:
+      tags:
+        - inventoryQuery
+      operationId: get-aggregation-buckets
+      summary: Returns all aggregation buckets.
+      description: All aggregation buckets in the system will be returned to the caller.
+      responses:
+        "200":
+          description: All aggregation buckets in the system.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AggregationBucketsDto"
+  /ain/inventory/command/allocate:
+    put:
+      tags:
+        - inventory
+      operationId: allocate-inventory
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AllocateInventoryCommand"
+      responses:
+        "204":
+          description: No Content
+  /ain/inventory/command/cancelreservation:
+    delete:
+      tags:
+        - inventory
+      operationId: cancel-reservation
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CancelInventoryReservationCommand"
+      responses:
+        "204":
+          description: No Content
+  /ain/inventory/command/create:
+    put:
+      tags:
+        - inventory
+      operationId: create-handling-units-and-inventory
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateHandlingUnitsAndInventoryCommand"
+      responses:
+        "204":
+          description: No Content
+  /ain/inventory/command/remove/inventory:
+    delete:
+      tags:
+        - inventory
+      operationId: remove-handling-units-and-inventory
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RemoveHandlingUnitsAndInventoryCommand"
+      responses:
+        "204":
+          description: No Content
+  /ain/inventory/command/removehold:
+    delete:
+      tags:
+        - inventory
+      operationId: remove-inventory-hold
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RemoveAggregateInventoryHoldsCommand"
+      responses:
+        "204":
+          description: No Content
+  /ain/inventory/command/repack/handlingunit:
+    put:
+      tags:
+        - inventory
+      operationId: repack-handling-unit
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RepackHandlingUnitsAndInventoryCommand"
+      responses:
+        "204":
+          description: No Content
+  /ain/inventory/command/repack/inventory:
+    put:
+      tags:
+        - inventory
+      operationId: repack-inventory
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RepackInventoryCommand"
+      responses:
+        "204":
+          description: No Content
+  /ain/inventory/command/reserve:
+    put:
+      tags:
+        - inventory
+      operationId: reserve-inventory
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ReserveInventoryCommand"
+      responses:
+        "204":
+          description: No Content
+  /ain/inventory/command/sethold:
+    put:
+      tags:
+        - inventory
+      operationId: set-inventory-hold
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SetAggregateInventoryHoldsCommand"
+      responses:
+        "204":
+          description: No Content
+  /ain/inventory/command/updatebucket:
+    put:
+      tags:
+        - inventory
+      operationId: update-handling-unit-bucket
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateHandlingUnitsBucketCommand"
+      responses:
+        "204":
+          description: No Content
+  /ain/inventory/inventory-balance:
+    post:
+      tags:
+        - inventoryQuery
+      operationId: get-inventory-balance
+      summary: Returns inventory balance information.
+      description: "This will return information about inventory in the system. The\
+        \ list can be filtered by aggregation bucket, snapshot time, and/or particular\
+        \ SKUs."
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/InventoryBalanceRequestDto"
+      responses:
+        "200":
+          description: The inventory balance result for the requested snapshot time.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InventoryBalanceResult"
+        "400":
+          description: If an invalid request was made.
+  /ain/inventory/inventory-balances:
+    post:
+      tags:
+        - inventoryQuery
+      operationId: get-inventory-balances
+      summary: Returns inventory balance information of a group of RequestDtos.
+      description: "This will return information about inventory in the system. The\
+        \ list can be filtered by aggregation bucket, snapshot time, and/or particular\
+        \ SKUs."
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: "#/components/schemas/InventoryBalanceRequestDto"
+      responses:
+        "200":
+          description: The inventory balance result for the requested snapshot time.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/InventoryBalanceResult"
+        "400":
+          description: If an invalid request was made.
+components:
+  schemas:
+    AbstractBalanceRequestDto:
+      x-parent: true
+      description: Abstract Balance Request
+      required:
+        - aggregationBucket
+        - skus
+      type: object
+      properties:
+        aggregationBucket:
+          description: The subsystem bucket being queried
+          type: string
+          example: DMS01
+        inventoryBalanceSnapshotTime:
+          format: date-time
+          description: Only changes after this time will be reported.
+          type: string
+          example: 2007-12-03T10:15:30.00Z
+        skus:
+          type: string
+          items:
+            $ref: "#/components/schemas/AbstractBalanceSkuDto"
+    AbstractBalanceResultDto:
+      x-parent: true
+      description: Abstract Balance Result
+      required:
+        - ownerBid
+        - skuBid
+        - quantity
+        - quantityReserved
+        - quantityAllocated
+        - reservationBalanceQuantityReservedDtos
+        - reservationBalanceQuantityAllocateDtos
+        - holds
+      type: object
+      properties:
+        inventoryBalanceTime:
+          format: date-time
+          type: string
+          example: 2022-03-10T16:15:50Z
+        ownerBid:
+          type: string
+        skuBid:
+          type: string
+        quantity:
+          $ref: "./types-api.yaml#/components/schemas/QuantitySimpleType"
+        quantityReserved:
+          $ref: "./types-api.yaml#/components/schemas/QuantitySimpleType"
+        quantityAllocated:
+          $ref: "./types-api.yaml#/components/schemas/QuantitySimpleType"
+        reservationBalanceQuantityReservedDtos:
+          type: array
+          items:
+            $ref: "#/components/schemas/ReservationBalanceQuantityReservedDto"
+        reservationBalanceQuantityAllocateDtos:
+          type: array
+          items:
+            $ref: "#/components/schemas/ReservationBalanceQuantityAllocateDto"
+        batch:
+          type: string
+        expiryDate:
+          format: date
+          type: string
+          example: 2022-03-10
+        countryOfOrigin:
+          type: string
+        packagingLevelBid:
+          type: string
+        specialInventoryMark:
+          $ref: "#/components/schemas/SpecialInventoryMark"
+        specialInventoryReferenceBid:
+          type: string
+        storageQualifier:
+          $ref: "#/components/schemas/StorageQualifier"
+        holds:
+          type: array
+          items:
+            $ref: "#/components/schemas/InventoryHoldResultDto"
+    AbstractBalanceSkuDto:
+      x-parent: true
+      description: Abstract Balance Sku
+      required:
+        - ownerBid
+        - skuBid
+      type: object
+      properties:
+        ownerBid:
+          description: Owner of the SKU
+          type: string
+          example: CL001
+        skuBid:
+          description: Business ID of the SKU
+          type: string
+          example: SKU01
+    AggregationBucketsDto:
+      description: Abstract Buckets
+      required:
+        - aggregationBuckets
+      type: object
+      properties:
+        aggregationBuckets:
+          type: array
+          items:
+            type: string
+    AinCommandWithConfirmation:
+      description: Base class for all AIN commands that will send a confirmation back
+        to the caller.
+      required:
+        - confirmationChannel
+      type: object
+      properties:
+        confirmationChannel:
+          type: string
+    AllocateInventoryCommand:
+      x-horizon-topic-name: "ain.inventory.cmd"
+      x-horizon-message-type: "ain.allocate.inventory"
+      x-horizon-no-equals-hashcode: true
+      required:
+        - confirmationChannel
+        - allocationRequests
+      type: object
+      properties:
+        confirmationChannel:
+          type: string
+        allocationRequests:
+          minItems: 1
+          type: array
+          items:
+            $ref: "#/components/schemas/AllocationRequestDto"
+    AllocateInventoryConfirmation:
+      description: Used to confirm inventory allocation.
+      required:
+        - allocateInventoryConfirmations
+      type: object
+      properties:
+        allocateInventoryConfirmations:
+          minItems: 1
+          type: array
+          items:
+            $ref: "#/components/schemas/AllocateInventoryConfirmationDto"
+    AllocateInventoryConfirmationDto:
+      description: Used to confirm inventory allocation.
+      required:
+        - quantity
+        - quantityReserved
+        - aggregationBucket
+        - allocationReference
+        - confirmationCode
+      type: object
+      properties:
+        ownerBid:
+          description: The business identification of the owner associated to the
+            SKU of the inventory unit. The owner is the the owner of the products
+            in the warehouse. In a 3rd party warehouse the products owned by different
+            vendors are assigned to different owner for example.
+          type: string
+        skuBidPart:
+          description: The unique business identification of the SKU (within the owner
+            of the order) requested by the line.
+          type: string
+        fifoDate:
+          format: date
+          description: By default the FIFO date is the best before date and if the
+            best before date is undefined it will be the date of receipt plus shelf
+            life of SKU.
+          type: string
+          example: 2022-03-10
+        packagingLevelBid:
+          description: "The business id of the quantity unit that represents the packaging\
+            \ the inventory unit. E.g. this defines, if the inventory packaged in\
+            \ 6-packs of 12-packs."
+          type: string
+        batch:
+          description: "If the inventory is batch/lot controlled, the batch the inventory\
+            \ belongs to."
+          type: string
+        expiryDate:
+          format: date
+          description: The date in which it is recommended to consume the inventory
+            before.
+          type: string
+          example: 2022-03-10
+        countryOfOrigin:
+          description: The country of origin defines where the inventory was produced.
+          type: string
+        specialInventoryMark:
+          description: A special inventory mark can classify an inventory unit to
+            have special requirements for the usage for customer orders. An inventory
+            unit without a special inventory mark can be used freely to satisfy customer
+            orders. An example for a special inventory mark is 'inventory on commission'.
+          type: string
+          allOf:
+            - $ref: "#/components/schemas/SpecialInventoryMark"
+        specialInventoryReferenceBid:
+          description: "The special inventory reference id can be used to link the\
+            \ inventory marked as special inventory to a corresponding object. Example:\
+            \ Inventory on commission can be needs to be identified by the commission\
+            \ id."
+          type: string
+        quantity:
+          description: The requested quantity expressed in the base quantity unit
+            of the SKU.
+          type: number
+          allOf:
+            - $ref: "./types-api.yaml#/components/schemas/QuantitySimpleType"
+        quantityReserved:
+          description: The reserved quantity expressed in the base quantity unit of
+            the SKU.
+          type: number
+          allOf:
+            - $ref: "./types-api.yaml#/components/schemas/QuantitySimpleType"
+        aggregationBucket:
+          description: The aggregation bucket this inventory belongs to.
+          type: string
+          example: DMS01#CL001#SKUA
+        allocationReference:
+          description: "Reference for allocation, if any. Typically an order bid."
+          type: string
+        allocationReferenceLine:
+          description: "Reference for allocation, if any. Typically an order line\
+            \ bid."
+          type: string
+        allocationReferenceLineSplit:
+          description: "Allocation split reference, if request has been further split\
+            \ by the caller."
+          type: string
+        confirmationCode:
+          $ref: "#/components/schemas/ConfirmationCode"
+    AllocationCancellationRequestDto:
+      description: Used for cancelling any allocations that have been done.
+      required:
+        - aggregationBucket
+        - allocationReference
+      type: object
+      properties:
+        aggregationBucket:
+          description: Subsystem the allocation was requested from.
+          type: string
+          example: DMS01
+        allocationReference:
+          description: "Reference for why this allocation is being requested, typically\
+            \ an order."
+          type: string
+          example: Order001
+        allocationReferenceLine:
+          description: "Reference line for the allocation, typically an order line."
+          type: string
+          example: Line001
+        allocationReferenceLineSplit:
+          description: "If the reference line has been split, information can be provided."
+          type: string
+    AllocationRequestDto:
+      allOf:
+        - $ref: '#/components/schemas/BaseInventoryUnitDtoWithoutQuantity'
+        - type: object
+          required:
+            - quantity
+            - aggregationBucket
+            - allocationType
+            - allocationReference
+          properties:
+            quantity:
+              description: The requested quantity expressed in the base quantity unit
+                of the SKU.
+              type: number
+              allOf:
+                - $ref: "./types-api.yaml#/components/schemas/QuantitySimpleType"
+            aggregationBucket:
+              description: The subsystem this inventory belongs to.
+              type: string
+              example: DMS01
+            allocationType:
+              description: Type of reservation being made.
+              type: string
+              allOf:
+                - $ref: "#/components/schemas/AllocationType"
+              example: ORDER
+            allocationReference:
+              description: "Reference for allocation, if any. Typically an order bid."
+              type: string
+            allocationReferenceLine:
+              description: "Reference for reservation, if any. Typically an order line\
+                \ bid."
+              type: string
+            allocationReferenceLineSplit:
+              description: Reference for allocation line when split.
+              type: string
+            handlingUnitBid:
+              description: Handling unit bid reference.
+              type: string
+    AllocationType:
+      x-horizon-domainvalue: true
+      x-horizon-module-definition: ain
+      enum:
+        - ORDER
+        - NONE
+      type: string
+    AllocationUpdateRequestDto:
+      allOf:
+        - $ref: '#/components/schemas/BaseInventoryUnitDtoWithoutQuantity'
+        - type: object
+          required:
+            - newAggregationBucket
+            - oldAggregationBucket
+            - quantity
+            - allocationReference
+          properties:
+            newAggregationBucket:
+              description: The new aggregation bucket that inventory shall be allocated
+                to.
+              type: string
+            oldAggregationBucket:
+              description: The old aggregation bucket that allocated inventory shall be
+                taken from.
+              type: string
+            quantity:
+              description: The quantity expressed in the base quantity unit of the SKU
+                to be allocated.
+              type: number
+              allOf:
+                - $ref: "./types-api.yaml#/components/schemas/QuantitySimpleType"
+            allocationReference:
+              description: "Reference for why this allocation is being requested, typically\
+                \ an order."
+              type: string
+              example: Order001
+            allocationReferenceLine:
+              description: "Reference line for the allocation, typically an order line."
+              type: string
+              example: Line001
+            allocationReferenceLineSplit:
+              description: "If the reference line has been split, information can be provided."
+              type: string
+            handlingUnitBid:
+              description: Handling unit bid reference.
+              type: string
+    AllotmentType:
+      x-horizon-domainvalue: true
+      x-horizon-module-definition: ain
+      enum:
+        - RESERVATION
+        - ALLOCATION
+      type: string
+    BaseAinCommand:
+      x-horizon-topic-name: "ain.inventory.cmd"
+      x-horizon-message-type: "ain.base.inventory"
+      x-horizon-no-equals-hashcode: true
+      description: Base class used for all AIN commands.
+      type: object
+      properties:
+        apiPlaceHolder:
+          type: string
+    BaseHandlingUnitWithInventoryDto:
+      x-parent: true
+      allOf:
+        - $ref: '#/components/schemas/BaseHandlingUnitsDto'
+        - type: object
+          required:
+            - inventoryUnits
+          description: Describes a handling unit dto containing inventory.
+          properties:
+            inventoryUnits:
+              description: The list of inventory units in the handling unit.
+              type: array
+              items:
+                $ref: "#/components/schemas/InventoryUnitDto"
+    BaseHandlingUnitsDto:
+      x-parent: true
+      description: Common load unit related fields for command dtos.
+      required:
+        - handlingUnitBid
+        - handlingUnitTypeBid
+        - childHandlingUnits
+      type: object
+      properties:
+        handlingUnitBid:
+          description: The unique business id of the handling unit. This is typically
+            the handling unit barcode.
+          type: string
+        handlingUnitTypeBid:
+          description: "The business id of the handling unit type, which represents\
+            \ the physical attributes of the handling unit."
+          type: string
+        alternativeId:
+          description: The unique business id of the handling unit. This is typically
+            the handling unit barcode.
+          type: string
+        length:
+          description: "The length of the handling unit. Static HU dimension: length\
+            \ of the longest edge (different from the height)."
+          type: number
+          allOf:
+            - $ref: "./types-api.yaml#/components/schemas/LengthSimpleType"
+        width:
+          description: "The width of the handling unit. Static HU dimension: length\
+            \ of the smallest edge (different from the height)."
+          type: number
+          allOf:
+            - $ref: "./types-api.yaml#/components/schemas/LengthSimpleType"
+        height:
+          description: The height of the handling unit.
+          type: number
+          allOf:
+            - $ref: "./types-api.yaml#/components/schemas/LengthSimpleType"
+        xExtension:
+          description: "Dynamic dimension: HandlingUnit extension in the direction\
+            \ of transport, usually in the base unit of measure."
+          type: number
+          allOf:
+            - $ref: "./types-api.yaml#/components/schemas/LengthSimpleType"
+        yExtension:
+          description: "Dynamic dimension: HandlingUnit extension orthogonal to x\
+            \ extension, usually in the base unit of measure."
+          type: number
+          allOf:
+            - $ref: "./types-api.yaml#/components/schemas/LengthSimpleType"
+        zExtension:
+          description: "Dynamic dimension: HandlingUnit extension along Z-Axis of\
+            \ the equipment system, usually in the base unit of measure."
+          type: number
+          allOf:
+            - $ref: "./types-api.yaml#/components/schemas/LengthSimpleType"
+        weight:
+          description: The measured weight of the handling unit. The weight may be
+            measured or calculated. A value of 0 represents an unspecified weight.
+          type: number
+          allOf:
+            - $ref: "./types-api.yaml#/components/schemas/WeightSimpleType"
+        contourState:
+          description: The byte pattern that is filled when the error code is ME (measurement
+            error).
+          type: string
+        errorCode:
+          description: The error code identifies the last transport related error
+            which occurred with this handling unit.
+          type: string
+          allOf:
+            - $ref: "#/components/schemas/ErrorCode"
+        logisticErrorCode:
+          description: The logistics error code identifies the last transport related
+            error which occurred with this handling unit.
+          type: string
+          allOf:
+            - $ref: "#/components/schemas/LogisticsErrorCode"
+        errorReason:
+          description: The error reason provides a free text to explain the reason
+            of the error.
+          type: string
+        locationBid:
+          description: The business id of the location where the handling unit currently
+            resides. In case of handling unit stack only the lowest HandlingUnit unit
+            in the stack (the base handling unit) has the location. The location is
+            mandatory for the base handling unit.
+          type: string
+        locationArrivalDate:
+          format: date-time
+          description: The time when the handling unit arrived at the current location.
+            This date is e.g. required to determine the handling unit from which inventory
+            has been picked if only a location is given.
+          type: string
+          example: 2022-03-10T16:15:50Z
+        lockStatus:
+          description: The lock status of the handling unit object. The Lock Status
+            specifies if the handling unit has been locked for specific operations.
+            When the lock status is not specified FREE is assumed.
+          type: string
+          allOf:
+            - $ref: "#/components/schemas/LoadUnitLockStatus"
+        childHandlingUnits:
+          description: The list of handling units or compartments within the handling
+            unit.
+          type: array
+          items:
+            $ref: "#/components/schemas/ChildHandlingUnitDto"
+    BaseInventoryUnitDtoWithoutQuantity:
+      x-parent: true
+      description: "Base inventory unit for use with AIN commands. Contains all shared\
+        \ fields for use with several dto commands, has no quantities."
+      required:
+        - ownerBid
+        - skuBidPart
+        - holds
+      type: object
+      properties:
+        ownerBid:
+          description: The business identification of the owner associated to the
+            SKU of the inventory unit. The is owner of the products in the warehouse.
+            In a 3rd party warehouse the products owned by different vendors are assigned
+            to different owners for example.
+          type: string
+          example: CL001
+        skuBidPart:
+          description: The unique business identification of the SKU (within the owner
+            of the order) requested by the line.
+          type: string
+          example: SKU001
+        fifoDate:
+          format: date
+          description: By default the FIFO date is the best before date and if the
+            best before date is undefined it will be the date of receipt plus shelf
+            life of SKU.
+          type: string
+          example: 2023-01-30
+        packagingLevelBid:
+          description: "The business id of the quantity unit that represents the packaging\
+            \ the inventory unit. E.g. this defines, if the inventory packaged in\
+            \ 6-packs or 12-packs."
+          type: string
+          example: EA
+        batch:
+          description: "If the inventory is batch/lot controlled, the batch the inventory\
+            \ belongs to."
+          type: string
+          example: A
+        expiryDate:
+          format: date
+          description: The date in which it is recommended to consume the inventory
+            before.
+          type: string
+          example: 2023-01-30
+        countryOfOrigin:
+          description: The country of origin defines where the inventory was produced.
+          type: string
+          example: CA
+        specialInventoryMark:
+          description: A special inventory mark can classify an inventory unit to
+            have special requirements for the usage for customer orders. An inventory
+            unit without a special inventory mark can be used freely to satisfy customer
+            orders. An example for a special inventory mark is 'inventory on commission'.
+          type: string
+          allOf:
+            - $ref: "#/components/schemas/SpecialInventoryMark"
+        specialInventoryReferenceBid:
+          description: "The special inventory reference id can be used to link the\
+            \ inventory marked as special inventory to a corresponding object. Example:\
+            \ Inventory on commission can be needs to be identified by the commission\
+            \ id."
+          type: string
+        storageQualifier:
+          description: The storage qualifier recommends to the subsystem where to
+            store inventory. For example the storage qualifier could be RESERVE to
+            indicate that the inventory shall be stored in the reserve part of the
+            warehouse and not in the direct fulfillment buffer.
+          type: string
+          allOf:
+            - $ref: "#/components/schemas/StorageQualifier"
+          example: RESERVE
+        dateOfManufacture:
+          format: date
+          description: The date that the inventory was manufactured.
+          type: string
+          example: 2022-03-10
+        dateOfReceipt:
+          format: date
+          description: "Date when this inventory was received. In the event of a return,\
+            \ it is not updated."
+          type: string
+          example: 2022-03-10
+        receivingBid:
+          description: The business id associated with the original receiving of this
+            inventory.
+          type: string
+          example: ADV001
+        receivingReferenceLineId:
+          description: Additional receipt reference. Will generally be the advice
+            line.
+          type: string
+        receivingReferenceType:
+          description: Type of receiving that created this inventory.
+          type: string
+          allOf:
+            - $ref: "#/components/schemas/ReceivingReferenceType"
+        holds:
+          description: "The list of hold reasons of the inventory, if case the hold\
+            \ reasons are a separator concerning inventory aggregation. See the aggregation\
+            \ separator flag in the SKU blueprint line. If set the inventory is on\
+            \ hold."
+          type: array
+          items:
+            $ref: "#/components/schemas/InventoryHoldDto"
+    BaseReservationConfirmation:
+      description: Base class for all AIN commands that will send a confirmation back
+        to the caller.
+      type: object
+      properties:
+        ownerBid:
+          description: The business identification of the owner associated to the
+            SKU of the inventory unit. The owner is the the owner of the products
+            in the warehouse. In a 3rd party warehouse the products owned by different
+            vendors are assigned to different owner for example.
+          type: string
+        skuBidPart:
+          description: The unique business identification of the SKU (within the owner
+            of the order) requested by the line.
+          type: string
+        fifoDate:
+          format: date
+          description: By default the FIFO date is the best before date and if the
+            best before date is undefined it will be the date of receipt plus shelf
+            life of SKU.
+          type: string
+          example: 2022-03-10
+        packagingLevelBid:
+          description: "The business id of the quantity unit that represents the packaging\
+            \ the inventory unit. E.g. this defines, if the inventory packaged in\
+            \ 6-packs of 12-packs."
+          type: string
+        batch:
+          description: "If the inventory is batch/lot controlled, the batch the inventory\
+            \ belongs to."
+          type: string
+        expiryDate:
+          format: date
+          description: The date in which it is recommended to consume the inventory
+            before.
+          type: string
+          example: 2022-03-10
+        countryOfOrigin:
+          description: The country of origin defines where the inventory was produced.
+          type: string
+        specialInventoryMark:
+          description: A special inventory mark can classify an inventory unit to
+            have special requirements for the usage for customer orders. An inventory
+            unit without a special inventory mark can be used freely to satisfy customer
+            orders. An example for a special inventory mark is 'inventory on commission'.
+          type: string
+          allOf:
+            - $ref: "#/components/schemas/SpecialInventoryMark"
+        specialInventoryReferenceBid:
+          description: "The special inventory reference id can be used to link the\
+            \ inventory marked as special inventory to a corresponding object. Example:\
+            \ Inventory on commission can be needs to be identified by the commission\
+            \ id."
+          type: string
+    CancelInventoryAllocationCommand:
+      x-horizon-topic-name: "ain.inventory.cmd"
+      x-horizon-message-type: "ain.cancel.inventory.allocation"
+      x-horizon-no-equals-hashcode: true
+      description: Cancel inventory allocation command.
+      required:
+        - confirmationChannel
+        - cancellationRequests
+      type: object
+      properties:
+        confirmationChannel:
+          type: string
+        cancellationRequests:
+          type: array
+          items:
+            $ref: "#/components/schemas/AllocationCancellationRequestDto"
+    CancelInventoryAllocationConfirmation:
+      description: Used to confirm cancel of inventory allocation.
+      required:
+        - cancelInventoryReservationConfirmations
+      type: object
+      properties:
+        cancelInventoryReservationConfirmations:
+          minItems: 1
+          type: array
+          items:
+            $ref: "#/components/schemas/CancelInventoryAllocationConfirmationDto"
+    CancelInventoryAllocationConfirmationDto:
+      description: Used for confirm cancel of inventory allocation.
+      required:
+        - confirmationCode
+        - allocationReference
+      type: object
+      properties:
+        ownerBid:
+          description: The business identification of the owner associated to the
+            SKU of the inventory unit. The owner is the the owner of the products
+            in the warehouse. In a 3rd party warehouse the products owned by different
+            vendors are assigned to different owner for example.
+          type: string
+        skuBidPart:
+          description: The unique business identification of the SKU (within the owner
+            of the order) requested by the line.
+          type: string
+        fifoDate:
+          format: date
+          description: By default the FIFO date is the best before date and if the
+            best before date is undefined it will be the date of receipt plus shelf
+            life of SKU.
+          type: string
+          example: 2022-03-10
+        packagingLevelBid:
+          description: "The business id of the quantity unit that represents the packaging\
+            \ the inventory unit. E.g. this defines, if the inventory packaged in\
+            \ 6-packs of 12-packs."
+          type: string
+        batch:
+          description: "If the inventory is batch/lot controlled, the batch the inventory\
+            \ belongs to."
+          type: string
+        expiryDate:
+          format: date
+          description: The date in which it is recommended to consume the inventory
+            before.
+          type: string
+          example: 2022-03-10
+        countryOfOrigin:
+          description: The country of origin defines where the inventory was produced.
+          type: string
+        specialInventoryMark:
+          description: A special inventory mark can classify an inventory unit to
+            have special requirements for the usage for customer orders. An inventory
+            unit without a special inventory mark can be used freely to satisfy customer
+            orders. An example for a special inventory mark is 'inventory on commission'.
+          type: string
+          allOf:
+            - $ref: "#/components/schemas/SpecialInventoryMark"
+        specialInventoryReferenceBid:
+          description: "The special inventory reference id can be used to link the\
+            \ inventory marked as special inventory to a corresponding object. Example:\
+            \ Inventory on commission can be needs to be identified by the commission\
+            \ id."
+          type: string
+        confirmationCode:
+          $ref: "#/components/schemas/ConfirmationCode"
+        allocationReference:
+          description: "Reference for allocation, if any. Typically an order bid."
+          type: string
+        allocationReferenceLine:
+          description: "Reference for allocation, if any. Typically an order line\
+            \ bid."
+          type: string
+        allocationReferenceLineSplit:
+          description: "Allocation split reference, if request has been further split\
+            \ by the caller."
+          type: string
+    CancelInventoryReservationCommand:
+      x-horizon-topic-name: "ain.inventory.cmd"
+      x-horizon-message-type: "ain.cancel.inventory.reservation"
+      x-horizon-no-equals-hashcode: true
+      required:
+        - confirmationChannel
+        - cancellationRequests
+      type: object
+      properties:
+        confirmationChannel:
+          type: string
+        cancellationRequests:
+          minItems: 1
+          type: array
+          items:
+            $ref: "#/components/schemas/ReservationCancellationRequestDto"
+    CancelInventoryReservationConfirmation:
+      description: Used to confirm cancel of inventory reservation.
+      required:
+        - cancelInventoryReservationConfirmations
+      type: object
+      properties:
+        cancelInventoryReservationConfirmations:
+          minItems: 1
+          type: array
+          items:
+            $ref: "#/components/schemas/CancelInventoryReservationConfirmationDto"
+    CancelInventoryReservationConfirmationDto:
+      description: Used to confirm cancel of inventory reservation.
+      required:
+        - confirmationCode
+        - reservationReference
+      type: object
+      properties:
+        ownerBid:
+          description: The business identification of the owner associated to the
+            SKU of the inventory unit. The owner is the the owner of the products
+            in the warehouse. In a 3rd party warehouse the products owned by different
+            vendors are assigned to different owner for example.
+          type: string
+        skuBidPart:
+          description: The unique business identification of the SKU (within the owner
+            of the order) requested by the line.
+          type: string
+        fifoDate:
+          format: date
+          description: By default the FIFO date is the best before date and if the
+            best before date is undefined it will be the date of receipt plus shelf
+            life of SKU.
+          type: string
+          example: 2022-03-10
+        packagingLevelBid:
+          description: "The business id of the quantity unit that represents the packaging\
+            \ the inventory unit. E.g. this defines, if the inventory packaged in\
+            \ 6-packs of 12-packs."
+          type: string
+        batch:
+          description: "If the inventory is batch/lot controlled, the batch the inventory\
+            \ belongs to."
+          type: string
+        expiryDate:
+          format: date
+          description: The date in which it is recommended to consume the inventory
+            before.
+          type: string
+          example: 2022-03-10
+        countryOfOrigin:
+          description: The country of origin defines where the inventory was produced.
+          type: string
+        specialInventoryMark:
+          description: A special inventory mark can classify an inventory unit to
+            have special requirements for the usage for customer orders. An inventory
+            unit without a special inventory mark can be used freely to satisfy customer
+            orders. An example for a special inventory mark is 'inventory on commission'.
+          type: string
+          allOf:
+            - $ref: "#/components/schemas/SpecialInventoryMark"
+        specialInventoryReferenceBid:
+          description: "The special inventory reference id can be used to link the\
+            \ inventory marked as special inventory to a corresponding object. Example:\
+            \ Inventory on commission can be needs to be identified by the commission\
+            \ id."
+          type: string
+        confirmationCode:
+          $ref: "#/components/schemas/ConfirmationCode"
+        reservationReference:
+          description: "Reference for allocation, if any. Typically an order bid."
+          type: string
+        reservationReferenceLine:
+          description: "Reference for allocation, if any. Typically an order line\
+            \ bid."
+          type: string
+        reservationReferenceLineSplit:
+          description: "Allocation split reference, if request has been further split\
+            \ by the caller."
+          type: string
+        aggregationBucket:
+          description: The aggregation bucket this inventory belongs to.
+          type: string
+          example: CDMS
+    ChildHandlingUnitDto:
+      required:
+        - handlingUnitBid
+        - handlingUnitTypeBid
+        - inventoryUnits
+        - childHandlingUnits
+      type: object
+      properties:
+        handlingUnitBid:
+          description: The unique business id of the handling unit. This is typically
+            the handling unit barcode.
+          type: string
+        alternativeBid:
+          description: "The alternative ID is an optional alternative ID of the handling\
+            \ unit. For example, one that is used to reference the handling unit from\
+            \ an external system."
+          type: string
+        handlingUnitTypeBid:
+          description: "The business id of the handling unit type, which represents\
+            \ the physical attributes of the handling unit."
+          type: string
+        positionOnParent:
+          format: int64
+          description: The position on parent represents where the handling unit is
+            placed relative to the parent handling unit. In case of compartments the
+            position may be related to raster size x and raster size y of the parent
+            handling unit type.
+          type: integer
+        inventoryUnits:
+          description: The list of inventory units in the child handling unit.
+          type: array
+          items:
+            $ref: "#/components/schemas/InventoryUnitDto"
+        childHandlingUnits:
+          description: The list of handling units or compartments within the child
+            handling unit.
+          type: array
+          items:
+            $ref: "#/components/schemas/ChildHandlingUnitDto"
+    CompartmentDto:
+      required:
+        - handlingUnitBid
+        - position
+        - handlingUnitTypeBid
+      type: object
+      properties:
+        handlingUnitBid:
+          description: Handling Unit Id of the Compartment
+          type: string
+        position:
+          format: int32
+          description: Position of the Compartment on the LoadUnit
+          type: integer
+        handlingUnitTypeBid:
+          description: Handling Unit Type of the Compartment
+          type: string
+        logisticErrorCode:
+          description: Logistic error code assigned to the compartment
+          type: string
+          allOf:
+            - $ref: "#/components/schemas/LogisticsErrorCode"
+    ConfirmationCode:
+      x-horizon-domainvalue: true
+      x-horizon-module-definition: ain
+      enum:
+        - OK
+        - FAIL
+      type: string
+    CreateHandlingUnitsAndInventoryCommand:
+      x-horizon-topic-name: "ain.inventory.cmd"
+      x-horizon-message-type: "ain.create.handlingunits.and.inventory"
+      x-horizon-no-equals-hashcode: true
+      required:
+        - confirmationChannel
+        - handlingUnits
+      type: object
+      properties:
+        confirmationChannel:
+          type: string
+        handlingUnits:
+          minItems: 1
+          type: array
+          items:
+            $ref: "#/components/schemas/HandlingUnitWithInventoryDto"
+    CreateHandlingUnitsAndInventoryConfirmation:
+      description: Used to confirm the creation of handling units and inventory.
+      required:
+        - handlingUnits
+      type: object
+      properties:
+        handlingUnits:
+          minItems: 1
+          type: array
+          items:
+            $ref: "#/components/schemas/CreateHandlingUnitsAndInventoryConfirmationDto"
+    CreateHandlingUnitsAndInventoryConfirmationDto:
+      description: Used to confirm the creation of handling units and inventory.
+      required:
+        - handlingUnitBid
+        - confirmationCode
+      type: object
+      properties:
+        handlingUnitBid:
+          type: string
+        confirmationCode:
+          $ref: "#/components/schemas/ConfirmationCode"
+    ErrorCode:
+      x-horizon-domainvalue: true
+      x-horizon-module-definition: ain
+      enum:
+        - OK
+        - MANUAL_OPERATION
+        - PLACE_OCC
+        - PLACE_FREE
+        - SOURCE_PLACE_NOT_REACHABLE
+        - DEST_PLACE_NOT_REACHABLE
+        - ABORT_DELETED
+        - CANCEL_NOT_ACCEPTED
+        - DROPSTATION_OCCUPIED
+        - DEST_NOT_REACHABLE
+        - FORK_OCC
+        - FALSE_NUMBER
+        - LOAD_TOO_HIGH
+        - LOAD_TOO_WIDE
+        - LOAD_TOO_HEAVY
+        - CONTOUR
+        - NOREAD
+        - MAX_LOOP
+        - WRONG_DEST
+        - UNKNOWN_LOADUNIT
+        - UNKNOWN_LOADUNIT_TYPE
+        - LEVEL_OCCUPIED
+        - SEQUENCE_ERROR
+        - GENERAL_ERROR
+        - CANCEL_REDIRECT
+        - SHUTTLE_BROKEN
+        - UNKNOWN_SKU
+        - WRONG_SKU
+        - MISSING_QUANTITY
+      type: string
+    HandlingUnitWithInventoryDto:
+      x-horizon-constructor: "public HandlingUnitWithInventoryDto() {}"
+      allOf:
+        - $ref: '#/components/schemas/BaseHandlingUnitWithInventoryDto'
+        - type: object
+          required:
+            - aggregationBucket
+          properties:
+            aggregationBucket:
+              description: The subsystem this inventory belongs to.
+              type: string
+              example: DMS01
+    InventoryBalanceRequestDto:
+      allOf:
+        - $ref: '#/components/schemas/AbstractBalanceRequestDto'
+        - type: object
+    InventoryBalanceResult:
+      required:
+        - resultList
+      type: object
+      properties:
+        resultList:
+          type: array
+          items:
+            $ref: "#/components/schemas/InventoryBalanceResultDto"
+    InventoryBalanceResultDto:
+      allOf:
+        - $ref: '#/components/schemas/AbstractBalanceResultDto'
+        - type: object
+    InventoryHoldConfirmationDto:
+      description: Used to confirm inventory hold.
+      required:
+        - ownerBid
+        - skuBid
+      type: object
+      properties:
+        holdReasonBid:
+          type: string
+        comment:
+          type: string
+        ownerBid:
+          type: string
+        skuBid:
+          type: string
+        quantity:
+          description: "The quantity to set on hold expressed in the base quantity\
+            \ unit of the SKU. In case not specified, the complete quantity is used."
+          type: number
+          allOf:
+            - $ref: "./types-api.yaml#/components/schemas/QuantitySimpleType"
+        batch:
+          type: string
+        bestBeforeDate:
+          format: date
+          type: string
+          example: 2022-03-10
+        packagingLevel:
+          type: string
+        confirmationCode:
+          $ref: "#/components/schemas/ConfirmationCode"
+    InventoryHoldDto:
+      required:
+        - ownerBid
+        - skuBid
+      type: object
+      properties:
+        ownerBid:
+          description: The business ID of the client associated to the order
+          type: string
+          example: HUB1.PTG-AMB.0001.0101.01011001010000
+        skuBid:
+          description: The unique business identifier of the SKU within the client
+          type: string
+          example: CL-BLK-COT-MED-12345
+        holdReasonBid:
+          description: The list of business IDs of the holds to be placed on the inventory
+          type: string
+        comment:
+          description: The comment to be added to the hold
+          type: string
+        quantity:
+          description: "The quantity to set on hold expressed in the base quantity\
+            \ unit of the SKU. In case not specified, the complete quantity is used."
+          type: number
+          allOf:
+            - $ref: "./types-api.yaml#/components/schemas/QuantitySimpleType"
+        batch:
+          description: The batch of the changed inventory
+          type: string
+        expiryDate:
+          format: date
+          description: The expiry date of the changed inventory
+          type: string
+          example: 2022-03-10
+        packagingLevel:
+          description: The packaging level of the changed inventory
+          type: string
+        countryOfOrigin:
+          description: The country of origin of the changed inventory
+          type: string
+    InventoryHoldResultDto:
+      type: object
+      properties:
+        ownerBid:
+          type: string
+          deprecated: true
+        skuBid:
+          type: string
+          deprecated: true
+        subsystemBid:
+          type: string
+          deprecated: true
+        holdReasonBid:
+          description: The reason for the hold.
+          type: string
+        comment:
+          type: string
+          deprecated: true
+        quantity:
+          description: The quantity held expressed in the base quantity unit of the
+            SKU.
+          type: number
+          allOf:
+            - $ref: "./types-api.yaml#/components/schemas/QuantitySimpleType"
+        batch:
+          type: string
+          deprecated: true
+        expiryDate:
+          format: date
+          type: string
+          example: 2022-03-10
+          deprecated: true
+        packagingLevel:
+          type: string
+          deprecated: true
+        storageQualifier:
+          type: string
+          deprecated: true
+        bookingQualifier:
+          type: string
+          deprecated: true
+        bookingQualifierReason:
+          type: string
+          deprecated: true
+        countryOfOrigin:
+          type: string
+          deprecated: true
+        handlingUnitBid:
+          type: string
+          deprecated: true
+    InventoryReportCorrection:
+      description: Inventory Report Correction.
+      required:
+        - owner
+        - sku
+        - quantityDifference
+        - bookingQualifier
+        - holdReasons
+      type: object
+      properties:
+        facilityBid:
+          type: string
+        owner:
+          maxLength: 30
+          minLength: 1
+          type: string
+        sku:
+          maxLength: 28
+          minLength: 1
+          type: string
+        holdReasons:
+          type: array
+          items:
+            type: string
+        batch:
+          maxLength: 20
+          type: string
+        expiryDate:
+          format: date
+          type: string
+          example: 2022-03-10
+        packagingLevel:
+          maxLength: 10
+          type: string
+        quantityDifference:
+          type: number
+        bookingQualifier:
+          maxLength: 25
+          minLength: 1
+          type: string
+        bookingQualifierReason:
+          maxLength: 25
+          type: string
+        eventTime:
+          format: date-time
+          type: string
+          example: 2022-03-10T16:15:50Z
+    InventoryReportHold:
+      description: Inventory Report Hold.
+      required:
+        - owner
+        - sku
+        - oldHoldReasons
+        - newHoldReasons
+      type: object
+      properties:
+        facilityBid:
+          type: string
+        owner:
+          maxLength: 30
+          minLength: 1
+          type: string
+        sku:
+          maxLength: 28
+          minLength: 1
+          type: string
+        quantity:
+          $ref: "./types-api.yaml#/components/schemas/QuantitySimpleType"
+        oldHoldReasons:
+          type: array
+          items:
+            type: string
+        newHoldReasons:
+          type: array
+          items:
+            type: string
+        bookingQualifier:
+          maxLength: 25
+          type: string
+        bookingQualifierReason:
+          maxLength: 25
+          type: string
+        batch:
+          maxLength: 20
+          type: string
+        expiryDate:
+          format: date
+          type: string
+          example: 2022-03-10
+        packagingLevel:
+          maxLength: 10
+          type: string
+    InventoryReportRequalify:
+      description: Inventory Report Requalify.
+      required:
+        - owner
+        - sku
+        - quantity
+        - bookingQualifier
+        - holdReasons
+      type: object
+      properties:
+        facilityBid:
+          type: string
+        owner:
+          maxLength: 30
+          minLength: 1
+          type: string
+        sku:
+          maxLength: 28
+          minLength: 1
+          type: string
+        quantity:
+          $ref: "./types-api.yaml#/components/schemas/QuantitySimpleType"
+        holdReasons:
+          type: array
+          items:
+            type: string
+        bookingQualifier:
+          maxLength: 25
+          minLength: 1
+          type: string
+        bookingQualifierReason:
+          maxLength: 25
+          type: string
+        batch:
+          maxLength: 20
+          type: string
+        expiryDate:
+          format: date
+          type: string
+          example: 2022-03-10
+        packagingLevel:
+          maxLength: 10
+          type: string
+        newBatch:
+          maxLength: 20
+          type: string
+        newExpiryDate:
+          format: date
+          type: string
+          example: 2022-03-10
+        newPackagingLevel:
+          maxLength: 10
+          type: string
+        operatorId:
+          maxLength: 30
+          type: string
+        previousBatch:
+          type: string
+        previousExpiryDate:
+          format: date
+          type: string
+          example: 2022-03-10
+    InventoryUnitDto:
+      allOf:
+        - $ref: '#/components/schemas/BaseInventoryUnitDtoWithoutQuantity'
+        - type: object
+          required:
+            - quantity
+          properties:
+            quantity:
+              description: The total quantity expressed in the base quantity unit of the
+                SKU.
+              type: number
+              allOf:
+                - $ref: "./types-api.yaml#/components/schemas/QuantitySimpleType"
+            compartment:
+              description: Information if the InventoryUnit is placed at an Compartment
+              type: string
+              allOf:
+                - $ref: "#/components/schemas/CompartmentDto"
+            consumeReservation:
+              description: Indicates if the referenced reservation should be consumed.
+                Used when repacking.
+              type: boolean
+            reservationReference:
+              description: "Reference for reservation, if any. Typically an order bid."
+              type: string
+            reservationReferenceLine:
+              description: "Reference for reservation, if any. Typically an order line\
+                \ bid."
+              type: string
+            reservationReferenceLineSplit:
+              description: Reference for reservation lines when split.
+              type: string
+    LoadUnitLockStatus:
+      x-horizon-domainvalue: true
+      x-horizon-module-definition: ain
+      enum:
+        - FREE
+        - LOCKED_STOCKTAKING
+        - LOCKED_CLARIFICATION
+        - LOCKED_INVENTORY_MISSING
+        - LOCKED_COMPARTMENTS
+        - CONSOLIDATION
+        - DECANTING
+        - CONFIRMATION_PENDING
+      type: string
+    LogisticsErrorCode:
+      x-horizon-domainvalue: true
+      x-horizon-module-definition: ain
+      enum:
+        - BREAKAGE
+        - DAMAGED_INVENTORY
+        - DAMAGED_SKU
+        - DECANTING_DIRTY_TOTE
+        - DECANTING_NOT_EMPTY
+        - DECANTING_UNEXPECTED_TOTE
+        - HANDLING_UNIT_DAMAGED
+        - MISSING_QUANTITY
+        - PUTAWAY_ERROR
+        - RECEIVING_ERROR
+        - TEMPERATURE_EXCEEDED
+        - WRONG_EXPIRY_DATE
+        - WRONG_HU
+        - WRONG_INVENTORY
+        - WRONG_SKU
+      type: string
+    ReceivingReferenceType:
+      x-horizon-domainvalue: true
+      x-horizon-module-definition: ain
+      enum:
+        - ADVICE
+        - RECEIPT
+      type: string
+    RemoveAggregateInventoryHoldsCommand:
+      x-horizon-topic-name: "ain.inventory.cmd"
+      x-horizon-message-type: "ain.remove.aggregate.inventory.holds"
+      x-horizon-no-equals-hashcode: true
+      required:
+        - holds
+      type: object
+      properties:
+        holds:
+          minItems: 1
+          type: array
+          items:
+            $ref: "#/components/schemas/SetRemoveInventoryHoldDto"
+    RemoveHandlingUnitsAndInventoryCommand:
+      x-horizon-topic-name: "ain.inventory.cmd"
+      x-horizon-message-type: "ain.remove.handlingunits.and.inventory"
+      x-horizon-no-equals-hashcode: true
+      required:
+        - handlingUnits
+      type: object
+      properties:
+        handlingUnits:
+          minItems: 1
+          type: array
+          items:
+            $ref: "#/components/schemas/RemoveHandlingUnitsAndInventoryDto"
+    RemoveHandlingUnitsAndInventoryDto:
+      allOf:
+        - $ref: '#/components/schemas/BaseHandlingUnitsDto'
+        - type: object
+          required:
+            - aggregationBucket
+            - inventoryUnits
+          properties:
+            aggregationBucket:
+              description: The subsystem this inventory will be removed from.
+              type: string
+              example: DMS01
+            inventoryUnits:
+              description: The list of inventory units in the load unit.
+              type: array
+              items:
+                $ref: "#/components/schemas/RemoveInventoryUnitDto"
+    RemoveInventoryHoldsConfirmation:
+      description: Used to confirm the removal of inventory holds.
+      required:
+        - removeInventoryHoldConfirmations
+      type: object
+      properties:
+        removeInventoryHoldConfirmations:
+          minItems: 1
+          type: array
+          items:
+            $ref: "#/components/schemas/InventoryHoldConfirmationDto"
+      deprecated: true
+    RemoveInventoryUnitDto:
+      x-horizon-constructor: "public RemoveInventoryUnitDto() {}"
+      allOf:
+        - $ref: '#/components/schemas/InventoryUnitDto'
+        - type: object
+          properties:
+            reservationReference:
+              description: "Reference for reservation, if any. Typically an order bid."
+              type: string
+            reservationReferenceLine:
+              description: "Reference for reservation, if any. Typically an order line\
+                \ bid."
+              type: string
+            reservationReferenceLineSplit:
+              description: Reference for reservation lines when split.
+              type: string
+    RepackConfirmation:
+      description: Confirmation message to indicate the status of the repack requests.
+      required:
+        - repackConfirmations
+      type: object
+      properties:
+        repackConfirmations:
+          minItems: 1
+          type: array
+          items:
+            $ref: "#/components/schemas/RepackConfirmationDto"
+    RepackConfirmationDto:
+      description: Confirms a specific repack request with a status.
+      required:
+        - requestBid
+        - confirmationCode
+      type: object
+      properties:
+        requestBid:
+          description: The request BID that was to be repacked.
+          type: string
+        confirmationCode:
+          description: Confirms status of the repack request.
+          type: string
+          allOf:
+            - $ref: "#/components/schemas/ConfirmationCode"
+          example: OK
+    RepackHandlingUnitAndInventoryDto:
+      x-horizon-constructor: "public RepackHandlingUnitAndInventoryDto() {}"
+      allOf:
+        - $ref: '#/components/schemas/BaseHandlingUnitWithInventoryDto'
+        - type: object
+          required:
+            - requestBid
+            - aggregationBucket
+          properties:
+            requestBid:
+              description: External request for tracking purposes.
+              type: string
+            aggregationBucket:
+              description: Aggregation bucket the inventory will belong to.
+              type: string
+              example: DMS01
+            oldHandlingUnitBid:
+              description: Handling unit to remove the inventory from.
+              type: string
+              example: HU01
+            oldPackagingLevel:
+              description: "Old packaging level of the inventory, if converting during\
+                \ the repack."
+              type: string
+            oldStorageQualifier:
+              description: "Old storage qualifier of the inventory, if converting during\
+                \ the repack."
+              type: string
+              allOf:
+                - $ref: "#/components/schemas/StorageQualifier"
+              example: RESERVE
+    RepackHandlingUnitsAndInventoryCommand:
+      x-horizon-topic-name: "ain.inventory.cmd"
+      x-horizon-message-type: "ain.repack.handlingunits.and.inventory"
+      x-horizon-no-equals-hashcode: true
+      required:
+        - confirmationChannel
+        - repacks
+      type: object
+      properties:
+        confirmationChannel:
+          type: string
+        repacks:
+          minItems: 1
+          type: array
+          items:
+            $ref: "#/components/schemas/RepackHandlingUnitAndInventoryDto"
+    RepackInventoryCommand:
+      x-horizon-topic-name: "ain.inventory.cmd"
+      x-horizon-message-type: "ain.repack.inventory"
+      x-horizon-no-equals-hashcode: true
+      required:
+        - confirmationChannel
+        - repacks
+      type: object
+      properties:
+        confirmationChannel:
+          type: string
+        repacks:
+          minItems: 1
+          type: array
+          items:
+            $ref: "#/components/schemas/RepackInventoryDto"
+    RepackInventoryDto:
+      x-horizon-constructor: "public RepackInventoryDto() {}"
+      allOf:
+        - $ref: '#/components/schemas/InventoryUnitDto'
+        - type: object
+          required:
+            - requestBid
+          properties:
+            requestBid:
+              description: Reference request for performing the repack.
+              type: string
+            aggregationBucket:
+              description: "The aggregation bucket the inventory will be placed in, usually\
+                \ a subsystem."
+              type: string
+              example: DMS01
+            oldHandlingUnitBid:
+              description: Handling unit to remove the inventory from.
+              type: string
+              example: HU01
+            oldPackagingLevel:
+              description: "Old packaging level of the inventory, if converting during\
+                \ the repack."
+              type: string
+            oldStorageQualifier:
+              description: "The old storage qualifier of the inventory, if converting\
+                \ during repack."
+              type: string
+              allOf:
+                - $ref: "#/components/schemas/StorageQualifier"
+              example: RESERVE
+    ReservationBalanceQuantityAllocateDto:
+      required:
+        - allocationType
+        - quantity
+      type: object
+      properties:
+        allocationType:
+          description: Type of allocation being made.
+          type: string
+          allOf:
+            - $ref: "#/components/schemas/AllocationType"
+          example: ORDER
+        quantity:
+          $ref: "./types-api.yaml#/components/schemas/QuantitySimpleType"
+    ReservationBalanceQuantityReservedDto:
+      required:
+        - reservationType
+        - quantity
+      type: object
+      properties:
+        reservationType:
+          description: Type of reservation being made.
+          type: string
+          allOf:
+            - $ref: "#/components/schemas/ReservationType"
+          example: ORDER
+        quantity:
+          $ref: "./types-api.yaml#/components/schemas/QuantitySimpleType"
+    ReservationBalanceRequestDto:
+      description: Reservation Balance Request
+      allOf:
+        - $ref: '#/components/schemas/AbstractBalanceRequestDto'
+        - type: object
+    ReservationBalanceResultDto:
+      allOf:
+        - $ref: '#/components/schemas/AbstractBalanceResultDto'
+        - type: object
+    ReservationCancellationRequestDto:
+      required:
+        - aggregationBucket
+        - reservationReference
+      type: object
+      properties:
+        aggregationBucket:
+          description: The subsystem this inventory belongs to.
+          type: string
+          example: DMS01
+        reservationReference:
+          description: "Reference for reservation, if any. Typically an order bid."
+          type: string
+        reservationReferenceLine:
+          description: "Reference for reservation, if any. Typically an order line\
+            \ bid."
+          type: string
+        reservationReferenceLineSplit:
+          description: Reference for reservation line splits.
+          type: string
+    ReservationRequestDto:
+      allOf:
+        - $ref: '#/components/schemas/BaseInventoryUnitDtoWithoutQuantity'
+        - type: object
+          required:
+            - quantity
+            - aggregationBucket
+            - reservationType
+            - reservationReference
+          properties:
+            quantity:
+              description: The requested quantity expressed in the base quantity unit
+                of the SKU.
+              type: number
+              allOf:
+                - $ref: "./types-api.yaml#/components/schemas/QuantitySimpleType"
+            aggregationBucket:
+              description: The subsystem this inventory belongs to.
+              type: string
+              example: DMS01
+            reservationType:
+              description: Type of reservation being made.
+              type: string
+              allOf:
+                - $ref: "#/components/schemas/ReservationType"
+              example: ORDER
+            reservationReference:
+              description: "Reference for reservation, if any. Typically an order bid."
+              type: string
+            reservationReferenceLine:
+              description: "Reference for reservation, if any. Typically an order line\
+                \ bid."
+              type: string
+            reservationReferenceLineSplit:
+              description: Reference for reservation lines when split.
+              type: string
+            handlingUnitBid:
+              description: Handling unit bid reference.
+              type: string
+    ReservationType:
+      x-horizon-domainvalue: true
+      x-horizon-module-definition: ain
+      enum:
+        - REPLEN
+        - ORDER
+        - NONE
+      type: string
+    ReservationUpdateRequestDto:
+      allOf:
+        - $ref: '#/components/schemas/BaseInventoryUnitDtoWithoutQuantity'
+        - type: object
+          required:
+            - quantity
+            - newAggregationBucket
+            - oldAggregationBucket
+            - reservationReference
+          properties:
+            quantity:
+              description: The requested quantity expressed in the base quantity unit
+                of the SKU.
+              type: number
+              allOf:
+                - $ref: "./types-api.yaml#/components/schemas/QuantitySimpleType"
+            newAggregationBucket:
+              description: The new subsystem this inventory should be reserved to.
+              type: string
+              example: DMS01
+            oldAggregationBucket:
+              description: The old subsystem this inventory shall be taken from.
+              type: string
+              example: DMS01
+            reservationReference:
+              description: "Reference for reservation, if any. Typically an order bid."
+              type: string
+            reservationReferenceLine:
+              description: "Reference for reservation, if any. Typically an order line\
+                \ bid."
+              type: string
+            reservationReferenceLineSplit:
+              description: Reference for reservation lines when split.
+              type: string
+            handlingUnitBid:
+              description: Handling unit bid reference.
+              type: string
+    ReserveInventoryCommand:
+      x-horizon-topic-name: "ain.inventory.cmd"
+      x-horizon-message-type: "ain.reserve.inventory"
+      x-horizon-no-equals-hashcode: true
+      required:
+        - confirmationChannel
+        - reservationRequests
+      type: object
+      properties:
+        confirmationChannel:
+          type: string
+        reservationRequests:
+          minItems: 1
+          type: array
+          items:
+            $ref: "#/components/schemas/ReservationRequestDto"
+    ReserveInventoryConfirmation:
+      description: Used to confirm inventory reservation.
+      required:
+        - reserveInventoryConfirmations
+      type: object
+      properties:
+        reserveInventoryConfirmations:
+          minItems: 1
+          type: array
+          items:
+            $ref: "#/components/schemas/ReserveInventoryConfirmationDto"
+    ReserveInventoryConfirmationDto:
+      description: Used to confirm inventory reservation.
+      required:
+        - quantity
+        - quantityReserved
+        - aggregationBucket
+        - reservationReference
+        - confirmationCode
+      type: object
+      properties:
+        ownerBid:
+          description: The business identification of the owner associated to the
+            SKU of the inventory unit. The owner is the the owner of the products
+            in the warehouse. In a 3rd party warehouse the products owned by different
+            vendors are assigned to different owner for example.
+          type: string
+        skuBidPart:
+          description: The unique business identification of the SKU (within the owner
+            of the order) requested by the line.
+          type: string
+        fifoDate:
+          format: date
+          description: By default the FIFO date is the best before date and if the
+            best before date is undefined it will be the date of receipt plus shelf
+            life of SKU.
+          type: string
+          example: 2022-03-10
+        packagingLevelBid:
+          description: "The business id of the quantity unit that represents the packaging\
+            \ the inventory unit. E.g. this defines, if the inventory packaged in\
+            \ 6-packs of 12-packs."
+          type: string
+        batch:
+          description: "If the inventory is batch/lot controlled, the batch the inventory\
+            \ belongs to."
+          type: string
+        expiryDate:
+          format: date
+          description: The date in which it is recommended to consume the inventory
+            before.
+          type: string
+          example: 2022-03-10
+        countryOfOrigin:
+          description: The country of origin defines where the inventory was produced.
+          type: string
+        specialInventoryMark:
+          description: A special inventory mark can classify an inventory unit to
+            have special requirements for the usage for customer orders. An inventory
+            unit without a special inventory mark can be used freely to satisfy customer
+            orders. An example for a special inventory mark is 'inventory on commission'.
+          type: string
+          allOf:
+            - $ref: "#/components/schemas/SpecialInventoryMark"
+        specialInventoryReferenceBid:
+          description: "The special inventory reference id can be used to link the\
+            \ inventory marked as special inventory to a corresponding object. Example:\
+            \ Inventory on commission can be needs to be identified by the commission\
+            \ id."
+          type: string
+        quantity:
+          description: The requested quantity expressed in the base quantity unit
+            of the SKU.
+          type: number
+          allOf:
+            - $ref: "./types-api.yaml#/components/schemas/QuantitySimpleType"
+        quantityReserved:
+          description: The reserved quantity expressed in the base quantity unit of
+            the SKU.
+          type: number
+          allOf:
+            - $ref: "./types-api.yaml#/components/schemas/QuantitySimpleType"
+        aggregationBucket:
+          description: The aggregation bucket this inventory belongs to.
+          type: string
+          example: DMS01#CL001#SKUA
+        reservationReference:
+          description: "Reference for reservation, if any. Typically an order bid."
+          type: string
+        reservationReferenceLine:
+          description: "Reference for reservation, if any. Typically an order line\
+            \ bid."
+          type: string
+        reservationReferenceLineSplit:
+          description: Reference line splits.
+          type: string
+        confirmationCode:
+          $ref: "#/components/schemas/ConfirmationCode"
+    SetAggregateInventoryHoldsCommand:
+      x-horizon-topic-name: "ain.inventory.cmd"
+      x-horizon-message-type: "ain.set.aggregate.inventory.holds"
+      x-horizon-no-equals-hashcode: true
+      required:
+        - holds
+      type: object
+      properties:
+        holds:
+          minItems: 1
+          type: array
+          items:
+            $ref: "#/components/schemas/SetRemoveInventoryHoldDto"
+    SetInventoryHoldsConfirmation:
+      description: Set inventory holds confirmation.
+      required:
+        - holdConfirmations
+      type: object
+      properties:
+        holdConfirmations:
+          minItems: 1
+          type: array
+          items:
+            $ref: "#/components/schemas/InventoryHoldConfirmationDto"
+      deprecated: true
+    SetRemoveInventoryHoldDto:
+      required:
+        - ownerBid
+        - skuBid
+      type: object
+      properties:
+        ownerBid:
+          description: The business ID of the client associated to the order
+          type: string
+          example: CL001
+        skuBid:
+          description: The unique business identifier of the SKU within the client
+          type: string
+          example: SKUA001
+        holdReasonBid:
+          description: The list of business IDs of the holds to be placed on the inventory
+          type: string
+          example: DAMAGED
+        comment:
+          description: The comment to be added to the hold
+          type: string
+        batch:
+          description: The batch of the changed inventory
+          type: string
+          example: B001
+        expiryDate:
+          format: date
+          description: The expiry date of the changed inventory
+          type: string
+          example: 2022-03-10
+        packagingLevel:
+          description: The packaging level of the changed inventory
+          type: string
+          example: PCE
+        countryOfOrigin:
+          description: The country of origin of the changed inventory
+          type: string
+          example: US
+    SpecialInventoryMark:
+      x-horizon-domainvalue: true
+      x-horizon-module-definition: ain
+      enum:
+        - REQUEST
+        - ORDER
+        - ON_COMMISSION
+      type: string
+    StorageQualifier:
+      x-horizon-domainvalue: true
+      x-horizon-module-definition: ain
+      enum:
+        - RESERVE
+        - FULFILLMENT
+      type: string
+    UpdateHandlingUnitsAggregationBucketDto:
+      x-horizon-constructor: "public UpdateHandlingUnitsAggregationBucketDto() {}"
+      allOf:
+        - $ref: '#/components/schemas/BaseHandlingUnitWithInventoryDto'
+        - type: object
+          required:
+            - newAggregationBucket
+            - oldAggregationBucket
+          properties:
+            newAggregationBucket:
+              description: The subsystem this inventory belongs to.
+              type: string
+              example: DMS01
+            oldAggregationBucket:
+              description: The subsystem this inventory no longer belongs to.
+              type: string
+              example: DMS01
+    UpdateHandlingUnitsBucketCommand:
+      x-horizon-topic-name: "ain.inventory.cmd"
+      x-horizon-message-type: "ain.update.handlingunits.bucket"
+      x-horizon-no-equals-hashcode: true
+      description: Updates the aggregation bucket for specified inventory.
+      required:
+        - confirmationChannel
+        - updates
+      type: object
+      properties:
+        confirmationChannel:
+          type: string
+        updates:
+          minItems: 1
+          type: array
+          items:
+            $ref: "#/components/schemas/UpdateHandlingUnitsAggregationBucketDto"
+    UpdateHandlingUnitsBucketConfirmation:
+      description: Used to confirm the update of handling units bucket.
+      required:
+        - handlingUnits
+      type: object
+      properties:
+        handlingUnits:
+          minItems: 1
+          type: array
+          items:
+            $ref: "#/components/schemas/UpdateHandlingUnitsBucketConfirmationDto"
+    UpdateHandlingUnitsBucketConfirmationDto:
+      description: Used to confirm handling unit bucket update.
+      required:
+        - handlingUnitBid
+        - confirmationCode
+      type: object
+      properties:
+        handlingUnitBid:
+          type: string
+        confirmationCode:
+          $ref: "#/components/schemas/ConfirmationCode"
+    UpdateInventoryAllocationCommand:
+      x-horizon-topic-name: "ain.inventory.cmd"
+      x-horizon-message-type: "ain.update.inventory.allocation"
+      x-horizon-no-equals-hashcode: true
+      description: Update inventory allocation command.
+      required:
+        - confirmationChannel
+        - allocationUpdates
+      type: object
+      properties:
+        confirmationChannel:
+          type: string
+        allocationUpdates:
+          type: array
+          items:
+            $ref: "#/components/schemas/AllocationUpdateRequestDto"
+    UpdateInventoryAllocationConfirmation:
+      description: Used to confirm the update of inventory allocation.
+      required:
+        - updateInventoryAllocationConfirmations
+      type: object
+      properties:
+        updateInventoryAllocationConfirmations:
+          minItems: 1
+          type: array
+          items:
+            $ref: "#/components/schemas/UpdateInventoryAllocationConfirmationDto"
+    UpdateInventoryAllocationConfirmationDto:
+      description: Used to confirm updates to inventory allocation.
+      required:
+        - quantity
+        - quantityUpdated
+        - quantityReserved
+        - aggregationBucket
+        - allocationReference
+        - confirmationCode
+      type: object
+      properties:
+        ownerBid:
+          description: The business identification of the owner associated to the
+            SKU of the inventory unit. The owner is the the owner of the products
+            in the warehouse. In a 3rd party warehouse the products owned by different
+            vendors are assigned to different owner for example.
+          type: string
+        skuBidPart:
+          description: The unique business identification of the SKU (within the owner
+            of the order) requested by the line.
+          type: string
+        fifoDate:
+          format: date
+          description: By default the FIFO date is the best before date and if the
+            best before date is undefined it will be the date of receipt plus shelf
+            life of SKU.
+          type: string
+          example: 2022-03-10
+        packagingLevelBid:
+          description: "The business id of the quantity unit that represents the packaging\
+            \ the inventory unit. E.g. this defines, if the inventory packaged in\
+            \ 6-packs of 12-packs."
+          type: string
+        batch:
+          description: "If the inventory is batch/lot controlled, the batch the inventory\
+            \ belongs to."
+          type: string
+        expiryDate:
+          format: date
+          description: The date in which it is recommended to consume the inventory
+            before.
+          type: string
+          example: 2022-03-10
+        countryOfOrigin:
+          description: The country of origin defines where the inventory was produced.
+          type: string
+        specialInventoryMark:
+          description: A special inventory mark can classify an inventory unit to
+            have special requirements for the usage for customer orders. An inventory
+            unit without a special inventory mark can be used freely to satisfy customer
+            orders. An example for a special inventory mark is 'inventory on commission'.
+          type: string
+          allOf:
+            - $ref: "#/components/schemas/SpecialInventoryMark"
+        specialInventoryReferenceBid:
+          description: "The special inventory reference id can be used to link the\
+            \ inventory marked as special inventory to a corresponding object. Example:\
+            \ Inventory on commission can be needs to be identified by the commission\
+            \ id."
+          type: string
+        quantity:
+          description: The requested quantity expressed in the base quantity unit
+            of the SKU.
+          type: number
+          allOf:
+            - $ref: "./types-api.yaml#/components/schemas/QuantitySimpleType"
+        quantityUpdated:
+          description: New quantity reservation has been made for.
+          type: number
+          allOf:
+            - $ref: "./types-api.yaml#/components/schemas/QuantitySimpleType"
+        quantityReserved:
+          description: The reserved quantity expressed in the base quantity unit of
+            the SKU.
+          type: number
+          allOf:
+            - $ref: "./types-api.yaml#/components/schemas/QuantitySimpleType"
+        aggregationBucket:
+          description: The aggregation bucket this inventory belongs to.
+          type: string
+          example: CDMS
+        allocationReference:
+          description: "Reference for allocation, if any. Typically an order bid."
+          type: string
+        allocationReferenceLine:
+          description: "Reference for allocation, if any. Typically an order line\
+            \ bid."
+          type: string
+        allocationReferenceLineSplit:
+          description: "Reference line split for allocation, if any. Typically an\
+            \ order line bid."
+          type: string
+        confirmationCode:
+          $ref: "#/components/schemas/ConfirmationCode"
+    UpdateInventoryReservationCommand:
+      x-horizon-topic-name: "ain.inventory.cmd"
+      x-horizon-message-type: "ain.update.inventory.reservation"
+      x-horizon-no-equals-hashcode: true
+      description: Update inventory reservation command.
+      required:
+        - confirmationChannel
+        - reservationUpdates
+      type: object
+      properties:
+        confirmationChannel:
+          type: string
+        reservationUpdates:
+          type: array
+          items:
+            $ref: "#/components/schemas/ReservationUpdateRequestDto"
+    UpdateInventoryReservationConfirmation:
+      description: Used to confirm the update of inventory reservation.
+      required:
+        - updateInventoryReservationConfirmations
+      type: object
+      properties:
+        updateInventoryReservationConfirmations:
+          minItems: 1
+          type: array
+          items:
+            $ref: "#/components/schemas/UpdateInventoryReservationConfirmationDto"
+    UpdateInventoryReservationConfirmationDto:
+      description: Used to confirm updates to inventory reservation.
+      required:
+        - quantity
+        - quantityUpdated
+        - quantityReserved
+        - aggregationBucket
+        - reservationReference
+        - confirmationCode
+      type: object
+      properties:
+        ownerBid:
+          description: The business identification of the owner associated to the
+            SKU of the inventory unit. The owner is the the owner of the products
+            in the warehouse. In a 3rd party warehouse the products owned by different
+            vendors are assigned to different owner for example.
+          type: string
+        skuBidPart:
+          description: The unique business identification of the SKU (within the owner
+            of the order) requested by the line.
+          type: string
+        fifoDate:
+          format: date
+          description: By default the FIFO date is the best before date and if the
+            best before date is undefined it will be the date of receipt plus shelf
+            life of SKU.
+          type: string
+          example: 2022-03-10
+        packagingLevelBid:
+          description: "The business id of the quantity unit that represents the packaging\
+            \ the inventory unit. E.g. this defines, if the inventory packaged in\
+            \ 6-packs of 12-packs."
+          type: string
+        batch:
+          description: "If the inventory is batch/lot controlled, the batch the inventory\
+            \ belongs to."
+          type: string
+        expiryDate:
+          format: date
+          description: The date in which it is recommended to consume the inventory
+            before.
+          type: string
+          example: 2022-03-10
+        countryOfOrigin:
+          description: The country of origin defines where the inventory was produced.
+          type: string
+        specialInventoryMark:
+          description: A special inventory mark can classify an inventory unit to
+            have special requirements for the usage for customer orders. An inventory
+            unit without a special inventory mark can be used freely to satisfy customer
+            orders. An example for a special inventory mark is 'inventory on commission'.
+          type: string
+          allOf:
+            - $ref: "#/components/schemas/SpecialInventoryMark"
+        specialInventoryReferenceBid:
+          description: "The special inventory reference id can be used to link the\
+            \ inventory marked as special inventory to a corresponding object. Example:\
+            \ Inventory on commission can be needs to be identified by the commission\
+            \ id."
+          type: string
+        quantity:
+          description: The requested quantity expressed in the base quantity unit
+            of the SKU.
+          type: number
+          allOf:
+            - $ref: "./types-api.yaml#/components/schemas/QuantitySimpleType"
+        quantityUpdated:
+          description: New quantity reservation has been made for.
+          type: number
+          allOf:
+            - $ref: "./types-api.yaml#/components/schemas/QuantitySimpleType"
+        quantityReserved:
+          description: The reserved quantity expressed in the base quantity unit of
+            the SKU.
+          type: number
+          allOf:
+            - $ref: "./types-api.yaml#/components/schemas/QuantitySimpleType"
+        aggregationBucket:
+          description: The aggregation bucket this inventory belongs to.
+          type: string
+          example: DMS01#CL001#SKUA
+        reservationReference:
+          description: "Reference for reservation, if any. Typically an order bid."
+          type: string
+        reservationReferenceLine:
+          description: "Reference for reservation, if any. Typically an order line\
+            \ bid."
+          type: string
+        reservationReferenceLineSplit:
+          description: Reference for line splits.
+          type: string
+        confirmationCode:
+          $ref: "#/components/schemas/ConfirmationCode"
+    AinModule:
+      x-horizon-horizonmodule: true

@@ -1,0 +1,1596 @@
+---
+openapi: 3.0.3
+info:
+  title: fop-api
+  description: Public API for fop-api
+  version: @project.version@
+paths:
+  /fop/order/command/create:
+    put:
+      tags:
+      - Facility Order
+      operationId: createFacilityOrdersCommand
+      summary: Creates facility orders
+      description: Create facility orders using CreateFacilityOrdersCommand.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateFacilityOrdersCommand"
+      responses:
+        "204":
+          description: Facility Orders processed
+        "500":
+          description: If an unexpected error happened creating the orders
+
+  /fop/order/command/update:
+    post:
+      tags:
+        - Facility Order
+      operationId: updateFacilityOrdersCommand
+      summary: Update facility orders
+      description: Updates existing facility orders
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateFacilityOrdersCommand"
+      responses:
+        "204":
+          description: Update processed
+
+  /fop/order/command/cutoff:
+    post:
+      tags:
+        - Facility Order
+      operationId: cutoffFacilityOrdersCommand 
+      summary: Cutoff facility orders 
+      description: Cuts off facility orders. 
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CutoffFacilityOrdersCommand"
+      responses:
+        "204":
+          description: Cutoff Processed 
+
+  /fop/order/command/cancel:
+    post:
+      tags:
+        - Facility Order
+      operationId: cancelFacilityOrdersCommand 
+      summary: Cancel facility orders 
+      description: Cancels facility orders. 
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CancelFacilityOrdersCommand"
+      responses:
+        "204":
+          description: Cancel Processed 
+
+  /fop/order/command/cancel-order-lines:
+    post:
+      tags:
+        - Facility Order
+      operationId: cancelFacilityOrderLinesCommand 
+      summary: Cancel facility order lines
+      description: Cancels facility orders lines.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CancelFacilityOrderLinesCommand"
+      responses:
+        "204":
+          description: Line Cancel Processed 
+
+  /fop/demand/all-orders:
+    get:
+      tags:
+        - Order Demand
+      operationId: getOrderDemand
+      summary: Returns demand for orders 
+      description: This will return information about inventory requested by orders that have not been fulfilled yet. 
+      responses:
+        "200":
+          description: The order demand result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OrderDemandResult"
+        "404":
+          description: If an invalid request was made. 
+          content:
+            application/json: {}
+
+  /fop/route/command/create:
+    put:
+      tags:
+        - Load Route
+      operationId: createLoadRoutesCommand
+      summary: Create load routes
+      description: Create load routes. 
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateLoadRoutesCommand"
+      responses:
+        "204":
+          description: Load Route created.
+
+  /fop/route/command/update:
+    post:
+      tags:
+        - Load Route
+      operationId: updateLoadRoutesCommand
+      summary: Update load routes
+      description: Update existing load routes. 
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateLoadRoutesCommand"
+      responses:
+        "204":
+          description: Load Routes updated.
+
+  /fop/route/command/cancel:
+    post:
+      tags:
+        - Load Route
+      operationId: cancelLoadRoutesCommand
+      summary: Cancel load routes
+      description: Cancel existing load routes. 
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CancelLoadRoutesCommand"
+      responses:
+        "204":
+          description: Load Routes cancelled.
+
+  /fop/dispatch-handling-unit/build:
+    post:
+      tags:
+        - Dispatch Handling Unit 
+      operationId: buildHandlingUnits 
+      summary: Build dispatch Handling Units 
+      description: Build dispatch handling units for given lines and handling units.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DispatchHandlingUnitBuildRequestCommand"
+      responses:
+        "204":
+          description: Dispatch handling unit build results. 
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DispatchHandlingUnitBuildConfirmation"
+
+  /fop/dispatchGroup/command/release-facility-order-dispatch-group:
+    post:
+      tags:
+        - Facility Order Dispatch Group
+      operationId: releaseFacilityOrderDispatchGroup 
+      summary: Releases a facility order dispatch group. 
+      description: Releases a facility order dispatch group. 
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ReleaseFacilityOrderDispatchGroupCommand"
+      responses:
+        "204":
+          description: Dispatch group released
+
+  /fop/subsystem/get-fulfillment-subsystem:
+    post:
+      tags:
+        - Fulfillment Subsystem 
+      operationId: getFulfillmentSubsystemForSkuQuantityUnits 
+      summary: Get Fulfillment Subsystem for SKU Quantity Units 
+      description: Returns Fulfillment Subsystem for requested SKU Quantity Units. 
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/FulfillmentSubsystemRequestDto"
+      responses:
+        "204":
+          description: Request processed. 
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FulfillmentSubsystemResponseDto"
+
+components:
+  schemas:
+    CreateFacilityOrdersCommand:
+      x-horizon-topic-name: "fop.facility.orders.create.cmd"
+      x-horizon-no-equals-hashcode: true
+      required: 
+      - confirmationChannel
+      - facilityOrders
+      type: object
+      properties:
+        confirmationChannel:
+          type: string
+        facilityOrders:
+          type: array
+          items:
+            $ref: "#/components/schemas/CreateUpdateFacilityOrderDto"
+    UpdateFacilityOrdersCommand:
+      x-horizon-topic-name: "fop.facility.orders.update.cmd"
+      x-horizon-no-equals-hashcode: true
+      required: 
+      - confirmationChannel
+      type: object
+      properties:
+        confirmationChannel:
+          type: string
+        facilityOrders:
+          type: array
+          items:
+            $ref: "#/components/schemas/CreateUpdateFacilityOrderDto"
+    CutoffFacilityOrdersCommand:
+      x-horizon-topic-name: "fop.facility.orders.cutoff.cmd"
+      x-horizon-no-equals-hashcode: true
+      type: object
+      properties:
+        confirmationChannel:
+          type: string
+        facilityOrders:
+          type: array
+          items:
+            $ref: "#/components/schemas/CutoffFacilityOrderDto"
+    CancelFacilityOrdersCommand:
+      x-horizon-topic-name: "fop.facility.orders.cancel.cmd"
+      x-horizon-no-equals-hashcode: true
+      type: object
+      properties:
+        confirmationChannel:
+          type: string
+        facilityOrders:
+          type: array
+          items:
+            $ref: "#/components/schemas/CancelFacilityOrderDto"
+    CancelFacilityOrderLinesCommand:
+      x-horizon-topic-name: "fop.facility.order.lines.cancel.cmd"
+      x-horizon-no-equals-hashcode: true
+      type: object
+      properties:
+        confirmationChannel:
+          type: string
+        facilityOrderLines:
+          type: array
+          items:
+            $ref: "#/components/schemas/CancelFacilityOrderLineDto"
+    CancelFacilityOrdersConfirmation:
+      required: 
+      - facilityOrders
+      type: object
+      properties:
+        facilityOrders:
+          type: array
+          items:
+            $ref: "#/components/schemas/CancelFacilityOrderConfirmationDto"
+    CancelFacilityOrderLinesConfirmation:
+      required: 
+      - facilityOrderLines
+      type: object
+      properties:
+        facilityOrderLines:
+          description: Cancellation confirmations for the order lines.
+          type: array
+          items:
+            $ref: "#/components/schemas/CancelFacilityOrderLineConfirmationDto"
+    CancelFacilityOrderLineConfirmationDto:
+      required:
+      - ownerBid
+      - facilityOrderBid 
+      - facilityOrderLineBid
+      type: object
+      properties:
+        ownerBid:
+          description: bid of the owner associated to the facility order. 
+          type: string
+          example: CL001 
+        facilityOrderBid:
+          description: The business id for this facility order. 
+          type: string
+          example: FO001 
+        facilityOrderLineBid:
+          description: The business id for this facility order line. 
+          type: string
+        confirmationStatus:
+          description: If the cancellation was successful. 
+          type: string
+          allOf:
+          - $ref: "#/components/schemas/ConfirmationStatus"
+        errorReason:
+          description: Error information for why cancellation could not be done, if available 
+          type: string
+    CreateUpdateFacilityOrderDto:
+      required:
+      - ownerBid
+      - facilityOrderBid 
+      - facilityOrderType 
+      - facilityOrderLines
+      type: object
+      properties:
+        ownerBid:
+          description: bid of the owner associated to the facility order. 
+          type: string
+          example: CL001 
+        facilityOrderBid:
+          description: The business id for this facility order. 
+          type: string
+          example: FO001 
+        facilityOrderType:
+          description: The type used by the customer. 
+          type: string
+          example: ECOMMERCE_CARRIER_DELIVERY 
+        orderPlacedTime:
+          format: date-time
+          description: The time the order was placed. If not supplied, download time will be used started.
+          type: string
+          example: 2022-12-20T16:00:00.000Z
+        businessPartner:
+          description: The business partner who placed the order. 
+          type: string
+          example: Company XYZ 
+        dispatchTime:
+          format: date-time
+          description: Planned dispatch date and time. 
+          type: string
+          example: 2022-12-20T16:00:00.000Z
+        cutOffTime:
+          format: date-time
+          description: If supplied, the order will be cutoff automatically at the given time.
+          type: string
+          example: 2022-12-20T16:00:00.000Z
+        facilityOrderCarrierService:
+          type: object 
+          $ref: "#/components/schemas/FacilityOrderCarrierServiceDto"
+        facilityOrderLines:
+          type: array 
+          items:
+            $ref: "#/components/schemas/CreateUpdateFacilityOrderLineDto"
+    FacilityOrderCarrierServiceDto:
+      required:
+      - carrierServiceLevelBid 
+      - requestedDeliveryStartTime 
+      - requestedDeliveryEndTime
+      type: object
+      properties:
+        carrierServiceLevelBid:
+          description: The bid of the carrier service level requested by the customer. 
+          type: string
+          example: NDD 
+        requestedDeliveryStartTime:
+          format: date-time
+          description: The start of the delivery window. 
+          type: string
+          example: 2022-12-20T16:00:00.000Z
+        requestedDeliveryEndTime:
+          format: date-time
+          description: The end of the delivery window. 
+          type: string
+          example: 2022-12-20T16:00:00.000Z
+        signatureRequired:
+          description: Signature required for delivery. 
+          type: boolean 
+        insuranceRequired:
+          description: Insurance required for delivery. 
+          type: boolean 
+
+    CancelFacilityOrderConfirmationDto:
+      required:
+      - ownerBid
+      - facilityOrderBid 
+      - confirmationStatus 
+      type: object
+      properties:
+        ownerBid:
+          description: bid of the owner associated to the facility order. 
+          type: string
+          example: CL001 
+        facilityOrderBid:
+          description: The business id for this facility order. 
+          type: string
+          example: FO001 
+        confirmationStatus:
+          description: If the cancellation was successful. 
+          type: string
+          allOf:
+          - $ref: "#/components/schemas/ConfirmationStatus"
+        errorMessage:
+          description: Error information for why the cancellation could not be done, if available. 
+          type: string
+
+    CutoffFacilityOrderDto:
+      required:
+      - ownerBid
+      - facilityOrderBid 
+      - cutoff 
+      type: object
+      properties:
+        ownerBid:
+          description: bid of the owner associated to the facility order. 
+          type: string
+          example: CL001 
+        facilityOrderBid:
+          description: The business id for this facility order. 
+          type: string
+          example: FO001 
+        cutoff:
+          description: When set the order is cutoff and can no longer be modifed and processing can start in the facility. Cannot cut-off an already cutoff order. Can only clear this if processing has not started. 
+          type: boolean  
+    CancelFacilityOrderDto:
+      required:
+      - ownerBid
+      - facilityOrderBid 
+      type: object
+      properties:
+        ownerBid:
+          description: bid of the owner associated to the facility order. 
+          type: string
+          example: CL001 
+        facilityOrderBid:
+          description: The business id for this facility order. 
+          type: string
+          example: FO001 
+        cancelReason:
+          description: Reason for cancelling the order.
+          type: string 
+    CancelFacilityOrderLineDto:
+      required:
+      - ownerBid
+      - facilityOrderBid 
+      - facilityOrderLineBid 
+      type: object
+      properties:
+        ownerBid:
+          description: bid of the owner associated to the facility order. 
+          type: string
+          example: CL001 
+        facilityOrderBid:
+          description: The business id for this facility order. 
+          type: string
+          example: FO001 
+        facilityOrderLineBid:
+          description: The business id for this facility order line.
+          type: string
+          example: FO001-1
+        cancelReason:
+          description: Reason for cancelling the order.
+          type: string 
+
+    CreateUpdateFacilityOrderLineDto:
+      required:
+      - facilityOrderLineBid 
+      - orderLinePlacedTime 
+      - selectionCriteria 
+      type: object
+      properties:
+        facilityOrderLineBid:
+          description: The bid of facility order line 
+          type: string
+          example: FO001-1 
+        handlingHint:
+          description: Description to be displayed when an operator fulfills the line.
+          type: string
+        orderLinePlacedTime:
+          format: date-time
+          description: Time the order line was placed. If not supplied, the creation time will be used. 
+          type: string
+          example: 2022-12-20T16:00:00.000Z
+        selectionCriteria:
+          description: The criteria by which this line will be selected. One of the SKU ID or Product ID must be provided. 
+          type: object 
+          allOf:
+          - $ref: "#/components/schemas/SelectionCriteriaDto"
+        substitutionCriteria:
+          description: 
+          type: object 
+          items:
+            $ref: "#/components/schemas/SubstitutionCriteriaDto"
+    SelectionCriteriaDto:
+      required:
+      - quantity 
+      type: object
+      properties:
+        productBid:
+          description: The bid of the product requested for the line. The SkuBid or the productBid must be provided. 
+          type: string
+        skuBid:
+          description: The BID of the Stock Keeping Unit (SKU) requested for the line. The SkuBid or the ProductBid must be provided. 
+          type: string
+        expiryDate:
+          format: date
+          description: The expiry date is the date before that is required to consume the inventory. 
+          type: string
+          example: 2022-12-20
+        quantity:
+          description: The quantity to be fulfilled.
+          $ref: "./types-api.yaml#/components/schemas/QuantitySimpleType"
+        quantityUnitBid:
+          description: The quantity unit business id defines the quantity unit in that the requested quantity is expressed. When this field is not defined, the base quantity unit of the SKU is assumed. 
+          type: string
+        packagingLevel:
+          description: The unit in which the Sales quantities of the line is expressed. This string must match the quantity units defined by the host for each SKU. 
+          type: string
+          example: CASE
+        batch:
+          description: Defines the batch for the inventory unit which should be used for the line. Synonymous with lot number. 
+          type: string
+        specialInventoryMark:
+          description: The special inventory mark of the inventory used to fulfill the order lines. 
+          type: string
+          allOf:
+          - $ref: "#/components/schemas/SpecialInventoryMark"
+          example: "ORDER, ON_COMMISSION"
+        specialInventoryReferenceId:
+          description: The special inventory reference id links a given inventory to a corresponding object. 
+          type: string
+    SubstitutionCriteriaDto:
+      required:
+      - allowSubstitutes 
+      type: object
+      properties:
+        allowSubstitutes:
+          description: Defines if substitutions are allowed. If not, the line will be shorted. 
+          type: boolean  
+        substitutes:
+          type: array
+          $ref: "#/components/schemas/FacilityOrderLineSubstitutesDto"
+    FacilityOrderLineSubstitutesDto:
+      required:
+      - facilityOrderLineSubstitutesBid 
+      - rank 
+      - ratio 
+      - selectionCriteria 
+      type: object
+      properties:
+        facilityOrderLineSubstitutesBid:
+          description: The bid of the facility order line. 
+          type: string 
+          example: FO001-1
+        rank:
+          description: Sequence to use substitutions 
+          format: int32
+          type: integer
+        ratio:
+          description: Decimal value for ratio from original to substitute product/SKU. 
+          $ref: "./types-api.yaml#/components/schemas/QuantitySimpleType"
+          example: 0.5
+        handlingHint:
+          description: A description to be displayed when an operator fulfills the line. 
+          type: string 
+        selectionCriteria:
+          description: The criteria by which this line will be selected. One of the SKU ID or Product ID must be provided.
+          type: object 
+          $ref: "#/components/schemas/SelectionCriteriaDto"
+    SpecialInventoryMark:
+      x-horizon-module-definition: fop 
+      x-horizon-domainvalue: true
+      enum:
+      - ORDER 
+      - ON_COMMISSION 
+      type: string
+    ConfirmationStatus:
+      x-horizon-module-definition: fop 
+      x-horizon-domainvalue: true
+      enum:
+      - OK 
+      - FAIL 
+      type: string
+    OrderDemandResult:
+      type: object
+      required: 
+      - demandResultDtos
+      properties:
+        demandResultDtos:
+          type: array
+          items:
+            $ref: "#/components/schemas/OrderDemandResultDto"
+    OrderDemandResultDto:
+      required:
+      - ownerBid
+      - skuBid
+      - quantity
+      type: object
+      properties:
+        ownerBid:
+          type: string
+        skuBid:
+          type: string
+        quantity:
+          description: The quantity in demand.  
+          $ref: "./types-api.yaml#/components/schemas/QuantitySimpleType"
+        batch:
+          type: string
+        expiryDate:
+          format: date
+          type: string
+          example: 2022-03-10
+        countryOfOrigin:
+          type: string
+        packagingLevelBid:
+          type: string
+        specialInventoryMark:
+          description: The special inventory mark of the order demand. 
+          allOf:
+          - $ref: "#/components/schemas/SpecialInventoryMark"
+          example: "ORDER, ON_COMMISSION"
+        specialInventoryReferenceBid:
+          type: string
+        preferredSubsystem:
+          type: string
+        priority:
+          format: int32
+          type: integer
+        inventoryAllocationTime:
+          format: date-time
+          type: string
+          example: 2022-03-10T16:15:50Z
+
+    CreateLoadRoutesCommand:
+      x-horizon-topic-name: "fop.load.routes.create.cmd"
+      x-horizon-no-equals-hashcode: true
+      type: object
+      properties:
+        confirmationChannel:
+          type: string
+        loadRoutes:
+          type: array
+          items:
+            $ref: "#/components/schemas/CreateUpdateLoadRouteDto"
+    UpdateLoadRoutesCommand:
+      x-horizon-topic-name: "fop.load.routes.update.cmd"
+      x-horizon-no-equals-hashcode: true
+      type: object
+      properties:
+        confirmationChannel:
+          type: string
+        loadRoutes:
+          type: array
+          items:
+            $ref: "#/components/schemas/CreateUpdateLoadRouteDto"
+    CancelLoadRoutesCommand:
+      x-horizon-topic-name: "fop.load.routes.cancel.cmd"
+      x-horizon-no-equals-hashcode: true
+      type: object
+      properties:
+        confirmationChannel:
+          type: string
+        loadRoutes:
+          type: array
+          items:
+            $ref: "#/components/schemas/CancelLoadRouteDto"
+
+    CreateUpdateLoadRouteDto:
+      required:
+      - ownerBid
+      - loadRouteBid 
+      - dispatchTime 
+      - facilityOrders 
+      type: object
+      properties:
+        ownerBid:
+          description: bid of the owner associated to the load route. 
+          type: string
+          example: CL001 
+        loadRouteBid:
+          description: The business id of the load route. 
+          type: string
+        trailerBid:
+          description: Unique BID of the trailer that the load route will be loaded on. 
+          type: string
+        trailerTypeBid:
+          description: Type of trailer, used for dock door planning. 
+          type: string
+        dockDoorBid:
+          description: Dock door the trailer will be loaded at. 
+          type: string
+        onDoorTime:
+          format: date-time
+          description: Time trailer is on dock door (when loading can start). 
+          type: string
+          example: 2022-12-20T16:00:00.000Z
+        dispatchTime:
+          format: date-time
+          description: Time of which the load route needs to be dispatched from the facility.
+          type: string
+          example: 2022-12-20T16:00:00.000Z
+        facilityOrders:
+          type: array 
+          items:
+            $ref: "#/components/schemas/CreateUpdateLoadRouteFacilityOrdersDto"
+
+    CreateUpdateLoadRouteFacilityOrdersDto:
+      required:
+      - facilityOrderBid 
+      - dropNumber 
+      type: object
+      properties:
+        facilityOrderBid :
+          description: bid of the facility order on the load route. 
+          type: string
+        dropNumber:
+          description: Drop number/sequence of the faciity order on the load route. 
+          format: int32
+          type: integer
+
+    CancelLoadRouteDto:
+      required:
+      - ownerBid
+      - loadRouteBid 
+      type: object
+      properties:
+        ownerBid:
+          description: bid of the owner associated to the load route. 
+          type: string
+          example: CL001 
+        loadRouteBid:
+          description: The business id of the load route. 
+          type: string
+    
+    DispatchHandlingUnitBuildRequestCommand:
+      x-horizon-topic-name: "fop.facility.order.dispatch.handling.unit.build.cmd"
+      x-horizon-no-equals-hashcode: true
+      type: object
+      properties:
+        confirmationChannel:
+          type: string
+        requestDtos:
+          type: array
+          items:
+            $ref: "#/components/schemas/DispatchHandlingUnitBuildRequestDto"
+    DispatchHandlingUnitBuildConfirmation:
+      type: object
+      properties:
+        confirmations:
+          description: The list of built facility order dispatch handling units. 
+          type: array
+          items:
+            $ref: "#/components/schemas/DispatchHandlingUnitBuildConfirmationDto"
+
+    DispatchHandlingUnitBuildConfirmationDto:
+      required:
+      - requestBid 
+      - resultLines 
+      type: object
+      properties:
+        requestBid:
+          description: The bid of the DHU build result. 
+          type: string
+        resultLines:
+          description: List of the built DHUs.
+          type: array
+          items:
+            $ref: "#/components/schemas/DispatchHandlingUnitBuildDto"
+
+    DispatchHandlingUnitBuildDto:
+      required:
+      - handlingUnitTypeBid 
+      - totalWeight 
+      - totalVolume 
+      - dispatchHandlingUnitLines
+      type: object
+      properties:
+        handlingUnitTypeBid:
+          description: The handling unit type of the DHU. 
+          type: string
+          example: BOX1
+        totalWeight:
+          description: The total weight of the items in the handling unit. 
+          type: number
+          allOf:
+          - $ref: "./types-api.yaml#/components/schemas/WeightSimpleType"
+        totalVolume:
+          description: The total volume of the items in the handling unit. 
+          type: number
+          $ref: "./types-api.yaml#/components/schemas/QuantitySimpleType"
+        dispatchHandlingUnitLines:
+          description: List of planned lines and quantities within the DHU. 
+          type: array
+          items:
+            $ref: "#/components/schemas/DispatchHandlingUnitBuildLineDto"
+
+    DispatchHandlingUnitBuildLineDto:
+      required:
+      - requestLineBid 
+      - quantity 
+      - volume 
+      - totalVolume 
+      - weight 
+      - totalWeight 
+      type: object
+      properties:
+        requestLineBid:
+          description: The bid of the DHU build request line. 
+          type: string
+          example: LINE001 
+        quantity:
+          description: The quantity in base quantity units.
+          type: number
+          allOf:
+          - $ref: "./types-api.yaml#/components/schemas/QuantitySimpleType"
+        volume:
+          description: The volume of the line SKU using SKU dimensions. 
+          type: number
+          allOf:
+          - $ref: "./types-api.yaml#/components/schemas/QuantitySimpleType"
+        totalVolume:
+          description: Total volume of the line calculated by SKU volume multiplied by quantity. 
+          type: number
+          allOf:
+          - $ref: "./types-api.yaml#/components/schemas/QuantitySimpleType"
+        weight:
+          description: The weight of the line SKU using SKU weight. 
+          type: number
+          allOf:
+          - $ref: "./types-api.yaml#/components/schemas/WeightSimpleType"
+        totalWeight:
+          description: The total weight of the items in the handling unit. 
+          type: number
+          allOf:
+          - $ref: "./types-api.yaml#/components/schemas/WeightSimpleType"
+        dispatchHandlingUnitLines:
+          description: List of planned lines and quantities within the DHU. 
+          type: array
+          items:
+            $ref: "#/components/schemas/DispatchHandlingUnitBuildLineDto"
+
+    DispatchHandlingUnitBuildRequestDto:
+      required:
+      - requestBid 
+      - requestLines
+      - dispatchHandlingUnits 
+      type: object
+      properties:
+        requestBid:
+          description: The bid of the dispatch handling unit build request. 
+          type: string
+        referenceBid:
+          description: Reference bid to the request. 
+          type: string
+        requestLines:
+          description: List of lines for the DHU build request. 
+          type: array
+          items:
+            $ref: "#/components/schemas/DispatchHandlingUnitBuildRequestLineDto"
+        dispatchHandlingUnits:
+          description: List of dispatch handling units for the build. 
+          type: array
+          items:
+            $ref: "#/components/schemas/DispatchHandlingUnitDto"
+
+    DispatchHandlingUnitBuildRequestLineDto:
+      required:
+      - requestLineBid 
+      - quantity 
+      - weight
+      type: object
+      properties:
+        requestLineBid:
+          description: BID of the DHU build request.
+          type: string
+        referenceLineBid:
+          description: An optional reference for the line. 
+          type: string
+        quantity:
+          description: The quantity in base quantity units.
+          type: number
+          allOf:
+          - $ref: "./types-api.yaml#/components/schemas/QuantitySimpleType"
+          example: 2
+        height:
+          description: Height of the item, this has to be specified if volume is not specified. 
+          type: number
+          allOf:
+          - $ref: "./types-api.yaml#/components/schemas/LengthSimpleType"
+        width:
+          description: Width of the item, this has to be specified if volume is not specified. 
+          type: number
+          allOf:
+          - $ref: "./types-api.yaml#/components/schemas/LengthSimpleType"
+        depth:
+          description: Depth of the item, this has to be specified if volume is not specified. 
+          type: number
+          allOf:
+          - $ref: "./types-api.yaml#/components/schemas/LengthSimpleType"
+        volume:
+          description: Volume of the item. if height, width, depth not specified, volume must be specified. 
+          $ref: "./types-api.yaml#/components/schemas/QuantitySimpleType"
+        weight:
+          description: Wieght of the item 
+          type: number
+          allOf:
+          - $ref: "./types-api.yaml#/components/schemas/WeightSimpleType"
+
+    DispatchHandlingUnitDto:
+      required:
+      - handlingUnitTypeBid 
+      - maxWeight 
+      type: object
+      properties:
+        handlingUnitTypeBid:
+          description: Dispatch Handling Unit type BID 
+          type: string
+          example: "TOTE"
+        maxHeight:
+          description: Max height. 
+          type: number
+          allOf:
+          - $ref: "./types-api.yaml#/components/schemas/LengthSimpleType"
+        maxWidth:
+          description: Max width.
+          type: number
+          allOf:
+          - $ref: "./types-api.yaml#/components/schemas/LengthSimpleType"
+        maxDepth:
+          description: Max depth.
+          type: number
+          allOf:
+          - $ref: "./types-api.yaml#/components/schemas/LengthSimpleType"
+        maxVolume:
+          description: Max available volume for the DHU, this is different than the height*width*depth because of max fill percentage. 
+          $ref: "./types-api.yaml#/components/schemas/QuantitySimpleType"
+        maxWeight:
+          description: Max weight. 
+          type: number
+          allOf:
+          - $ref: "./types-api.yaml#/components/schemas/WeightSimpleType"
+
+    ReleaseFacilityOrderDispatchGroupCommand:
+      required:
+      - facilityOrderDispatchGroupId 
+      type: object
+      properties:
+        facilityOrderDispatchGroupId:
+          description: The id of the dispatch group to release.
+          type: string
+
+    FulfillmentSubsystemRequestDto:
+      required:
+      - requestDtos 
+      type: object
+      properties:
+        requestDtos:
+          description: The list of requests containing SKU quantity units.
+          type: array
+          items:
+            $ref: "#/components/schemas/SkuQuantityUnitFulfillmentSubsystemRequestDto"
+
+    SkuQuantityUnitFulfillmentSubsystemRequestDto:
+      required:
+      - ownerBid 
+      - skuBid 
+      - skuQuantityUnitBid 
+      type: object
+      properties:
+        ownerBid:
+          description: The BID of the owner of the SKU.
+          type: string
+          example: CL001
+        skuBid:
+          description: The BID of the SKU.
+          type: string
+        skuQuantityUnitBid:
+          description: The SKU quantity unit BID 
+          type: string
+
+    FulfillmentSubsystemResponseDto:
+      required:
+      - responseDtos 
+      type: object
+      properties:
+        responseDtos:
+          description: The response containing Fulfillment Subsystems for the given SKU quantity units. 
+          type: array
+          items:
+            $ref: "#/components/schemas/SkuQuantityUnitFulfillmentSubsystemResponseDto"
+
+    SkuQuantityUnitFulfillmentSubsystemResponseDto:
+      required:
+      - ownerBid 
+      - skuBid 
+      - skuQuantityUnitBid 
+      - subsystemBid 
+      type: object
+      properties:
+        ownerBid:
+          description: The BID of the owner of the SKU.
+          type: string
+          example: CL001
+        skuBid:
+          description: The BID of the SKU.
+          type: string
+        skuQuantityUnitBid:
+          description: The SKU quantity unit BID 
+          type: string
+        subsystemBid:
+          description: The fulfillment subsystem BID. 
+          type: string
+
+
+    CreateUpdateOrderEaiDto:
+      required:
+      - owner 
+      - orderReference 
+      - hostOrderBid 
+      - orderBid 
+      - orderType 
+      type: object
+      properties:
+        facility:
+          description: The facility where the order needs to be fulfilled. this is only specified if the facility has already been determined. 
+          type: string
+        owner:
+          description: Business ID of the owner for this order. 
+          type: string
+        orderReference:
+          description: Reference used for the order with the business party or system. Note this can be different to the external value in case such as the Host Order is more an internal Host ID and the external party is given a simplified order number. 
+          type: string
+        hostOrderBid:
+          description: Identifier used by the host for the overall order. 
+          type: string
+        orderBid:
+          description: Identifier used by the host for the order provided to the Dematic solution. hostOrderBid and OrderBid can be different. Example use case is when the host has split the overall host order into separate facility pure orders. 
+          type: string
+        orderType:
+          description: The order type used by the host. 
+          type: string
+        orderChannel:
+          description: Defines the order/sales route used. THis can influence rules as carrier selection.
+          type: string
+        orderPlacedTime:
+          description: The date and time the order was placed.
+          format: date-time
+          type: string
+          example: 2022-12-20T16:00:00.000Z
+        customerDetails:
+          description: Customer info. 
+          type: object 
+          allOf:
+          - $ref: "#/components/schemas/CustomerDetailsEaiDto"
+        brand:
+          description: Items represent a specific Brand. This can be used to influence such rules as Carrier Selection. 
+          type: string
+        priority:
+          description: Specifies the relative urgency of an order and is usually an integer value between 1 and 10. The lower the value, the higher the priority. 
+          format: int32
+          type: integer
+        preferredHuType:
+          description: Handling unit type to use. Uses defaults if not specified. 
+          type: string
+        defaultDestination:
+          description: This is the default destination for all the order lines. Cannot be provided when the facility/facilities have not been determined. In case it is empty the area of type ship is selected as default destination.
+          type: string
+        serviceQualifierId:
+          description: Optional attribute that describes how the order has to be fulfilled. It may be used in a project-specific way. 
+          type: string
+        cutOff:
+          description: Order is fixed and will not be further modified. So can be considered for fulfillment. The cutOffOrder message can be used to separately set this. 
+          type: boolean 
+        timeConstraints:
+          description: Specific time related constraints which can be applied to the order processing. 
+          type: object 
+          allOf:
+          - $ref: "#/components/schemas/TimeConstraintsEaiDto"
+        deliveryOption:
+          description: Selected delivery option and any associated constraint. 
+          type: object 
+          allOf:
+          - $ref: "#/components/schemas/DeliveryOptionEaiDto"
+        orderTexts:
+          description: Set of additional texts. Can be used in a project-specific way, such as for label printing.
+          type: array 
+          items: 
+            type: string
+        orderLines:
+          description: One or more Order Lines.
+          type: array 
+          items:
+            $ref: "#/components/schemas/CreateUpdateOrderLineEaiDto"
+
+    CutoffOrderEaiDto:
+      required:
+      - owner 
+      - orderBid 
+      - cutoff 
+      type: object
+      properties:
+        owner:
+          description: The business ID of the owner for this order. 
+          type: string
+        orderBid:
+          description: Identifier used by the Host for the order provided to the Dematic solution in this message. 
+          type: string
+        cutOff:
+          description: When set then order is cutoff and can no longer be modified and processing can start in the facility. Cannot cut-off an already cut-off order. Can only clear this if processing has not started. 
+          type: boolean 
+
+
+    CustomerDetailsEaiDto:
+      type: object
+      properties:
+        customer:
+          description: The business partner of type customer for the order. 
+          type: string
+        accountNumber:
+          description: The reference used between the customer and the enterprise to identify their account. 
+          type: string
+        customerExperience:
+          description: Customer designation.
+          type: string
+
+    TimeConstraintsEaiDto:
+      type: object
+      properties:
+        cutOffTime:
+          description: Provides the time to use for automatically cutting off an order. Once an order is cut off, it is eligable for release.
+          format: date-time
+          type: string
+          example: 2022-12-20T16:00:00.000Z
+        latestStagingTime:
+          description: The latest time for the ordered mechandise to arrive in teh staging area. 
+          format: date-time
+          type: string
+          example: 2022-12-20T16:00:00.000Z
+        dispatchByTime:
+          description: The last date limit for transportation. After this date, transportation is no longer possible. It is also called Pick-By Time. 
+          format: date-time
+          type: string
+          example: 2022-12-20T16:00:00.000Z
+
+    DeliveryOptionEaiDto:
+      type: object
+      properties:
+        name:
+          description: Name of a preconfigured Delivery Option which has meaning to the Host and the Dematic solution. 
+          type: string
+        displayName:
+          description: Textual description of the delivery option name. 
+          type: string
+        deliveryWindow:
+          description: Time period for required delivery. 
+          type: object 
+          allOf:
+          - $ref: "#/components/schemas/DeliveryWindowEaiDto"
+        deliveryInstructions:
+          type: string
+
+    CreateUpdateOrderLineEaiDto:
+      required:
+      - orderLineBid
+      - selectionCriteria
+      type: object
+      properties:
+        orderLineBid:
+          description: The ID of the order line inside the order. It defines a sequence for the lines inside the order. This sequence is especially needed when the order has a chaining mode for its lines. Then the lines should be processed as specified by this sequence. 
+          type: string
+        orderLineReference:
+          description: Ability to provide a reference field at the line level. 
+          type: string
+        orderLinePlacedTime:
+          description: The date and time the order line was placed. Where not specified it is the same as the order header field. This is especially relevant where new lines are added to an existing order. 
+          format: date-time
+          type: string
+          example: 2022-12-20T16:00:00.000Z
+        selectionCriteria:
+          description: The date and time the order line was placed. Where not specified it is the same as the order header field. This is especially relevant where new lines are added to an existing order. 
+          type: object 
+          allOf:
+          - $ref: "#/components/schemas/SelectionCriteriaEaiDto"
+        orderLineTexts:
+          description: Set of additional texts. Can be used in a project-specific way, such as for label printing.
+          type: array 
+          items:
+            type: string
+        handlingHint:
+          description: A description to be displayed when an operator fulfills this request line (such as picking). This is only required for Point Solutions where no Product Data is used.  
+          type: string
+        dispatchPackingGroup:
+          description: The dispatch packing group defines a default group for the order line. Different dispatch packing groups must not be packed together into the same dispatch handling unit. For example, when delivering to a store, products which are not located in the same department or shelf shall not be put on the same pallet, even if this would save space. 
+          type: string
+
+
+    SelectionCriteriaEaiDto:
+      type: object
+      properties:
+        handlingUnitBid:
+          description: The Business ID of the handling unit for selection. 
+          type: string
+        product:
+          description: The BID of the product for selection. This is provided by the host and is unique per owner.
+          type: string
+        owner:
+          description: The BID of the owner provided for the SKU. 
+          type: string
+        sku:
+          description: The business ID of this SKU to be selected. SKU is only unique per Owner. SKU is part of a Product. 
+          type: string
+        quantity:
+          description: Number of items to be selected. 
+          $ref: "./types-api.yaml#/components/schemas/QuantitySimpleType"
+        quantityUnitBid:
+          description: The business identifier of the quantity unit for the SKU. 
+          type: string
+        packagingLevel:
+          description: The quantityUnit that represents the package size that is to be picked. 
+          type: string
+        batch:
+          description: If specified – defines the specific batch of the inventory to be picked. 
+          type: string
+        expiryDate:
+          description: If specified – defines the specific expiryDate of the inventory to be picked. 
+          format: date
+          type: string
+          example: 2022-12-20
+
+    DeliveryWindowEaiDto:
+      type: object
+      properties:
+        start:
+          description: Earliest estimated delivery date & time 
+          format: date-time
+          type: string
+          example: 2022-12-20T16:00:00.000Z
+        end:
+          description: Latest estimated delivery date & time 
+          format: date-time
+          type: string
+          example: 2022-12-20T16:00:00.000Z
+
+    CancelOrderEaiDto:
+      required:
+      - owner 
+      - orderBid 
+      - cancelReason 
+      - cancellationTime 
+      type: object
+      properties:
+        owner:
+          description: The BID of the owner for this order. 
+          type: string
+          example: CL001
+        orderBid:
+          description: Identifier used by the host for the order provided to the Dematic solution in this message. 
+          type: string
+        cancelReason:
+          description: Code or textual comment defining why the cancellation has been requested. 
+          type: string
+        cancellationTime:
+          description: Date and Time the cancellation was requested. Note this may be different to the time of the message. 
+          format: date-time
+          type: string
+          example: 2022-12-20T16:00:00.000Z
+
+
+    CancelOrderLineEaiDto:
+      required:
+      - owner 
+      - orderBid 
+      - orderLineBid 
+      - cancelReason 
+      - cancellationTime 
+      type: object
+      properties:
+        owner:
+          description: The BID of the owner for this order. 
+          type: string
+          example: CL001
+        orderBid:
+          description: Identifier used by the host for the order provided to the Dematic solution in this message. 
+          type: string
+        orderLineBid:
+          description: The ID of the order line inside the order. It defines a sequence for the lines inside the order. 
+          type: string
+        cancelReason:
+          description: Code or textual comment defining why the cancellation has been requested. 
+          type: string
+        cancellationTime:
+          description: Date and Time the cancellation was requested. Note this may be different to the time of the message. 
+          format: date-time
+          type: string
+          example: 2022-12-20T16:00:00.000Z
+
+    CancelledItemEaiDto:
+      required:
+      - cancelledReason
+      type: object
+      properties:
+        quantity:
+          description: Number of items cancelled. 
+          $ref: "./types-api.yaml#/components/schemas/QuantitySimpleType"
+        cancelledReason:
+          description: Code or textual comment for the cancelled quantity. 
+          type: string
+
+    OrderConfirmationEaiDto:
+      required:
+      - owner 
+      - orderBid 
+      - orderStatus 
+      - confirmationTime 
+      - orderLines 
+      type: object
+      properties:
+        owner:
+          description: The business ID of the owner for this order. 
+          type: string
+        orderBid:
+          description: Identifier used by the host for the order provided to the Dematic solution in this message. 
+          type: string
+        orderStatus:
+          description: Summary state of the order for the host. The valid states are defined with an enumeration. Base state is COMPLETE. Other states are defined based on the specific solution. 
+          type: string
+        confirmationTime:
+          description: Date and Time the confirmation represents. Note this may be different to the time of the message. 
+          format: date-time
+          type: string
+          example: 2022-12-20T16:00:00.000Z
+        orderLines:
+          description: One or more Order Lines.
+          type: array 
+          items:
+            $ref: "#/components/schemas/OrderLineConfirmationEaiDto"
+
+    OrderLineConfirmationEaiDto:
+      required:
+      - orderLineBid
+      - orderLineStatus 
+      type: object
+      properties:
+        orderLineBid:
+          description: The ID of the order line inside the order. It defines a sequence for the lines inside the order. 
+          type: string
+        orderLineStatus:
+          description: State of the order line. The valid states are defined with an enumeration. Base state is COMPLETE. Other states are defined based on the specific solution. 
+          type: string
+        ordered:
+          description: Based on the ordered selection criteria. 
+          type: object 
+          allOf:
+          - $ref: "#/components/schemas/OrderedEaiDto"
+        fulfilledItems:
+          description: One or more quantities which have been fulfilled. 
+          type: array 
+          items:
+            $ref: "#/components/schemas/FulfilledItemEaiDto"
+        shortedItems:
+          description: One or more quantities which have been shorted (part or all of the quantity cannot be supplied). 
+          type: array 
+          items:
+            $ref: "#/components/schemas/ShortedItemEaiDto"
+        cancelledItems:
+          description: One or more quantities which have been cancelled.
+          type: array 
+          items:
+            $ref: "#/components/schemas/CancelledItemEaiDto"
+
+    OrderedEaiDto:
+      type: object
+      properties:
+        product:
+          description: The business identifier of the product which is being fulfilled. This is provided by the host and is unique per owner.
+          type: string
+        skuOwner:
+          description: The business identifier of the owner provided for the SKU. 
+          type: string
+        sku:
+          description: The business ID of this SKU to be selected. SKU is only unique per owned. SKU is part of a Product. 
+          type: string
+        quantity:
+          description: Number of ordered items. 
+          $ref: "./types-api.yaml#/components/schemas/QuantitySimpleType"
+        quantityUnitBid:
+          description: Quantity unit for the picked items. 
+          type: string
+        packagingLevel:
+          description: The quantityUnit that represents the package size that is to be picked. Utilised for internal operational decision making, and not used to determine how to receive.
+          type: string
+        expiryDate:
+          description: The recommended date by which the inventory is consumed or used. 
+          format: date
+          type: string
+          example: 2022-12-20
+        batch:
+          description: Batch for the picked item. 
+          type: string
+
+    FulfilledItemEaiDto:
+      type: object
+      properties:
+        product:
+          description: The business identifier of the product which is being fulfilled. This is provided by the host and is unique per owner.
+          type: string
+        skuOwner:
+          description: The business identifier of the owner provided for the SKU. 
+          type: string
+        sku:
+          description: The business ID of this SKU to be selected. SKU is only unique per owned. SKU is part of a Product. 
+          type: string
+        productCode:
+          description: The product code that was picked. 
+          type: string
+        quantity:
+          description: Number of items picked. 
+          $ref: "./types-api.yaml#/components/schemas/QuantitySimpleType"
+        quantityUnitBid:
+          description: Quantity unit for the picked items. 
+          type: string
+        packagingLevel:
+          description: The quantityUnit that represents the package size that is to be picked. Utilised for internal operational decision making, and not used to determine how to receive.
+          type: string
+        weight:
+          description: The total weight for the fulfilled product and sku. This includes the weight of the packaging and the net weight.
+          type: number
+          allOf:
+          - $ref: "./types-api.yaml#/components/schemas/WeightSimpleType"
+        expiryDate:
+          description: The recommended date by which the inventory is consumed or used. 
+          format: date
+          type: string
+          example: 2022-12-20
+        batch:
+          description: Batch for the picked item. 
+          type: string
+
+    ShortedItemEaiDto:
+      required:
+      - shortedReason 
+      type: object
+      properties:
+        quantity:
+          description: Number of items shorted. 
+          $ref: "./types-api.yaml#/components/schemas/QuantitySimpleType"
+        shortedReason:
+          description: Code or textual comment for the shorted quantity. 
+          type: string
+
+    AllocateReserveInventoryCommand:
+      x-horizon-topic-name: "fop.facility.orders.allocation.cmd"
+      x-horizon-no-equals-hashcode: true
+      required:
+      - allocateReserveInventoryDtos 
+      type: object
+      properties:
+        confirmationChannel:
+          description: The messaging channel to send confirmations to. 
+          type: string
+          example: CL001
+        allocateReserveInventoryDtos:
+          type: array
+          items:
+            $ref: "#/components/schemas/AllocateReserveInventoryDto"
+    AllocateReserveInventoryDto:
+      required:
+      - ownerBid 
+      - skuBidPart 
+      type: object
+      properties:
+        ownerBid:
+          description: The bid of the owner associated to the inventory and order. 
+          type: string
+          example: CL001
+        skuBidPart:
+          description: The bid of the SKU. 
+          type: string
+          example: CL001
+
+    MultiplicityDto:
+      required:
+      - ownerBid 
+      - skuBid 
+      - quantityUnitBid 
+      - handlingUnitTypeBid 
+      - facilityBid 
+      - multiplicity 
+      type: object
+      properties:
+        id:
+          description: The id of the multiplicity.
+          type: string
+        ownerBid:
+          description: The bid of the  owner of the SKU. 
+          type: string
+        skuBid:
+          description: The bid of the SKU. 
+          type: string
+        quantityUnitBid:
+          description: The bid of the SKU quantity unit. 
+          type: string
+        handlingUnitTypeBid:
+          description: The business id of the handling unit type that the multiplicity is related to. 
+          type: string
+        facilityBid:
+          description: The business id of the facility the multiplicity is defined for. 
+          type: string
+        multiplicity:
+          description: The number of handling units/ compartments with this SKU Quantity Unit, which should be ideally in the preferred allocation zone of the facility. The multiplicity is an Integer value greater then 1. When SKU Quantity Unit is created, then the Multiplicity will not be defined. Consumer services are  recommended to use 1 as default.
+          format: int32
+          type: integer
+
+
+
+
+
+    FopModule:
+      x-horizon-horizonmodule: true
+      x-horizon-horizonmodule-value: fop 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

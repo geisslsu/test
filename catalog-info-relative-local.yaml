@@ -34,3 +34,8 @@ spec:
     - ./scm/test/petstore-api.yaml
     - ./scm/dex/dex-api-catalog.yaml
     - ./scm/mfc/mfc-api-catalog.yaml
+    - ./orchestrator/ain/ain-api-catalog.yaml
+    - ./orchestrator/fop/fop-api-catalog.yaml
+    - ./orchestrator/ftc/ftc-api-catalog.yaml
+    - ./orchestrator/inb/inb-api-catalog.yaml
+    - ./orchestrator/srp/srp-api-catalog.yaml

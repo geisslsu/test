@@ -1,0 +1,26 @@
+### ftc-api ###
+# This is the API descriptor for the ftc-api. It is used to generate the API documentation for the ftc-api.
+---
+apiVersion: backstage.io/v1alpha1
+kind: API
+metadata:
+  name: "ftc-api"
+  description: Public API for ftc-api
+  tags:
+    - rest
+    - api-documentation
+    - api
+    - openapi
+    - ftc-api
+  links:
+    - url: https://gitlab.com/dematic/horizon/apis
+      icon: help
+      title: Horizon OpenAPI monorepo in GitLab
+
+spec:
+  type: openapi
+  lifecycle: production
+  owner: Horizon
+  definition:
+    $openapi: ./ftc-api.yaml
+

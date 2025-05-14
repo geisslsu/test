@@ -1,0 +1,2587 @@
+---
+openapi: 3.0.3
+info:
+  title: ftc-api
+  description: Public API for ftc-api
+  version: @project.version@
+tags:
+- name: Announce
+- name: Booking Request
+- name: Graph
+- name: Handling Unit Request Info
+- name: Resolution Request
+- name: Transport
+paths:
+  /ftc/announce/announce/transportHandlingUnitsCommand/{subsystemBid}:
+    post:
+      tags:
+      - Announce
+      summary: Announce Transports.
+      description: Announce transports.
+      parameters:
+      - name: subsystemBid
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AnnounceTransportHandlingUnitsCommand"
+      responses:
+        "204":
+          description: Announcement processed. Check confirmationChannel for failures
+            if any.
+  /ftc/bookingrequest/create/{requestingSubsystemBid}/{destinationSubsystemBid}/{locationBid}/{handlingUnitBid}:
+    post:
+      tags:
+      - Booking Request
+      summary: Book handling unit.
+      description: Book handling unit.
+      parameters:
+      - name: destinationSubsystemBid
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: handlingUnitBid
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: locationBid
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: requestingSubsystemBid
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "204":
+          description: Booking request processed. Check <requestingSubsystemBid>.sinv.request.resolution.info.cnf
+            channel for the response.
+  /ftc/graph/graphVisualization:
+    get:
+      tags:
+      - Graph
+      summary: Get FTC graph visualization.
+      description: Get the URL for FTC graph visualization
+      responses:
+        "204":
+          description: Check response for URL.
+  /ftc/handlingunit/requestinfo:
+    post:
+      tags:
+      - Handling Unit Request Info
+      summary: Request info about a handling unit.
+      description: Request info about a handling unit.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/HandlingUnitRequestInfoCommand"
+      responses:
+        "204":
+          description: Request for info processed. Check confirmationChannel for result.
+            if any.
+  /ftc/resolutionrequest/create/{subsystemBid}/{handlingUnitBid}:
+    post:
+      tags:
+      - Resolution Request
+      summary: Request resolution.
+      description: Request resolution.
+      parameters:
+      - name: handlingUnitBid
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: subsystemBid
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "204":
+          description: Request resolution processed. Check <subsystemBid>.sinv.request.resolution.info.cnf
+            channel for the response.
+  /ftc/transport/create:
+    post:
+      tags:
+      - Transport
+      summary: Create transports.
+      description: Create transports for handling units.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TransportHandlingUnitsCommand"
+      responses:
+        "204":
+          description: Transport Request creation processed. Check confirmationChannel
+            for failures if any.
+  /ftc/transport/transport/get-destination-subsystem:
+    post:
+      tags:
+      - Transport
+      summary: Requests a destination subsystem.
+      description: Gets the destination subsystem for a given destination
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GetDestinationSubsystem"
+      responses:
+        "204":
+          description: Request processed. Check response for result or errors
+  /ftc/transport/transport/get-subsystem-exit:
+    post:
+      tags:
+      - Transport
+      summary: Requests subsystem exit.
+      description: "Given a source and destination subsystem pair, this endpoint returns\
+        \ the optimal exit location for the source subsystem"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GetSubsystemExit"
+      responses:
+        "204":
+          description: Request processed. Check response for result or errors
+  /sinv/empty-buffer/fill-level:
+    get:
+      summary: Returns number of handling units in empty buffer per buffer location.
+      description: This endpoint will returns the number of handling units that is
+        currently buffered in the subsystem per location.
+      parameters:
+      - name: handling_unit_type
+        in: query
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/EmptyBufferFillingLevelDto"
+  /sinv/inventory/add-inventory-handling-units:
+    put:
+      summary: Creates inventory
+      description: |+
+        <p>Can create multiple inventory units. The SKU being used should exist before calling.</p><u>Required Parameters:</u>
+
+        <b>handlingUnitBid:</b> The unique business id of the handling unit. This is typically the handling unit barcode.
+
+        <b>length:</b> The handling unit length.
+
+        <b>width:</b> The handling unit width.
+
+        <b>height:</b> The handling unit height.
+
+        <b>handlingUnitTypeBid:</b> The business id of the handling unit type, which represents the physical attributes of the handling unit.
+
+        <b>locationBid:</b> The business id of the location where the handling unit currently resides. In case of handling unit stack only the lowest handling unit in the stack (the base handling unit) has the location.The location is mandatory for the base handling unit.
+
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AddInventoryHandlingUnitsCommand"
+      responses:
+        "204":
+          description: No Content
+  /sinv/inventory/announce-handling-units:
+    post:
+      summary: Announces handling units.
+      description: Announces the handover of handling units to the subsystem.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AnnounceHandlingUnitsCommand"
+      responses:
+        "201":
+          description: Created
+  /sinv/inventory/cancel-announced-handling-units:
+    post:
+      summary: Cancels handling units.
+      description: Cancels the handling unit announcement from subsystem.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CancelAnnouncedHandlingUnitsCommand"
+      responses:
+        "201":
+          description: Created
+  /sinv/inventory/handling-unit/{handling-unit-id}:
+    get:
+      summary: Returns a ResolutionInfoConfirmationDto
+      description: 'Returns a ResolutionInfoConfirmationDto with the detailed information
+        about the handling unit. '
+      parameters:
+      - name: handling-unit-id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: inventory were found and returned
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ResolutionInfoConfirmationDto"
+        "404":
+          description: inventory could not be found
+          content:
+            application/json: {}
+  /sinv/inventory/inventory:
+    get:
+      summary: Returns the complete inventory of the subsystem.
+      description: Returns the complete inventory of the subsystem.
+      responses:
+        "200":
+          description: inventory were found and returned
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InventoryUnitDto"
+        "404":
+          description: inventory could not be found
+          content:
+            application/json: {}
+      deprecated: true
+  /sinv/inventory/inventory-in-chunks:
+    get:
+      summary: Returns a chunk of the inventory snapshot.
+      description: Returns a chunk of the inventory snapshot with given condition.
+      parameters:
+      - name: ownerBid
+        in: query
+        required: true
+        schema:
+          type: string
+      - name: skuBid
+        in: query
+        schema:
+          type: string
+      responses:
+        "200":
+          description: A chunk of the inventory snapshot were found and returned
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InventorySnapshotDto"
+        "404":
+          description: A chunk of the inventory snapshot could not be found
+          content:
+            application/json: {}
+      deprecated: true
+  /sinv/inventory/remove-handling-units:
+    delete:
+      summary: Remove handling units.
+      description: |+
+        Remove the given handling units from subsystem.
+
+        <u>Required Parameters:</u>
+
+        <b>handlingUnitBids:</b> The business id list of the handling units that need to remove.
+
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RemoveHandlingUnitsCommand"
+      responses:
+        "204":
+          description: No Content
+  /sinv/inventory/remove-inventory-holds:
+    delete:
+      summary: Remove holds on inventory
+      description: |-
+        <p>This will remove the holds on inventory based off a handling unit or SKU.</p><u>Required Parameters:</u>
+
+        <b>ownerBid:</b> The owner business id of the SKU.
+
+        <b>skuBid:</b> The unique business identification of the SKU.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RemoveInventoryHoldsCommand"
+      responses:
+        "204":
+          description: No Content
+  /sinv/inventory/set-inventory-holds:
+    post:
+      summary: Set inventory on hold
+      description: |-
+        <p>This will put inventory on hold based off a handling unit or SKU.</p><u>Required Parameters:</u>
+
+        <b>ownerBid:</b> The owner business id of the SKU.
+
+        <b>skuBid:</b> The unique business identification of the SKU.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SetInventoryHoldsCommand"
+      responses:
+        "201":
+          description: Created
+  /sinv/inventory/snapshot:
+    get:
+      summary: Lists inventory snapshot for given owner and SKU
+      description: |+
+        Returns all inventory snapshots and their statuses for the given owner and SKU.
+
+        <u>Required Parameters:</u>
+
+        <b>ownerBid:</b>The `business Id` of the owner who owns the inventory.
+
+        <b>skuId:</b>`Sku Id` of the inventory unit.
+
+      parameters:
+      - name: ownerBid
+        in: query
+        schema:
+          type: string
+      - name: skuBid
+        in: query
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Returns a list of InventorySnapshotDto with inventory on hold.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InventorySnapshotDto"
+components:
+  schemas:
+    AddInventoryHandlingUnitsCommand:
+      required:
+      - handlingUnits
+      type: object
+      properties:
+        confirmationChannel:
+          type: string
+        handlingUnits:
+          description: The load units to add to the subsystem.
+          minItems: 1
+          type: array
+          items:
+            $ref: "#/components/schemas/HandlingUnitWithInventoryDto"
+        destination:
+          type: string
+    AnnounceHandlingUnitDto:
+      required:
+      - announcementBid
+      - handlingUnitBid
+      - handlingUnitTypeBid
+      - destinationLocationBid
+      type: object
+      properties:
+        announcementBid:
+          description: The unique business ID that identifies this announcement in
+            the orchestrator. Eventual cancellation will use this announcement business
+            ID.
+          type: string
+        handlingUnitBid:
+          description: The business id of the handling unit.
+          type: string
+        handlingUnitTypeBid:
+          description: The business id of the handling unit type.
+          type: string
+        destinationLocationBid:
+          description: "The business id of the destination in this subsystem. If null,\
+            \ the consumption, use or storage in the subsystem is assumed."
+          type: string
+    AnnounceHandlingUnitsCommand:
+      required:
+      - handlingUnits
+      type: object
+      properties:
+        confirmationChannel:
+          type: string
+        handlingUnits:
+          description: The list of handling units.
+          minItems: 1
+          type: array
+          items:
+            $ref: "#/components/schemas/AnnounceHandlingUnitDto"
+    AnnounceTransportHandlingUnitsCommand:
+      required:
+      - handlingUnits
+      type: object
+      properties:
+        handlingUnits:
+          description: The list of handling units to announce.
+          minItems: 1
+          type: array
+          items:
+            $ref: "#/components/schemas/TransportHandlingUnitsDto"
+    AttributeId:
+      description: data object identifying a single attribute in the GraphQL domain
+        model.
+      type: object
+      properties:
+        className:
+          description: Java simple class name
+          type: string
+        attributePath:
+          description: path into the class
+          type: string
+        horizonModule:
+          description: module name defining a separate namespace for the className
+          type: string
+    AttributeMetadataGto:
+      description: describes all properties of a single attribute in a GTO
+      type: object
+      properties:
+        softReferences:
+          description: |-
+            When linking data across SCMs or beyond their lifecycle soft references are used.
+            The AttributeId list defines the context to which other attribute in the domain model the soft reference points to
+          type: array
+          items:
+            $ref: "#/components/schemas/AttributeId"
+        array:
+          description: attribute is an array
+          type: boolean
+        additionalClassName:
+          description: |-
+            Optional class name giving additional type information for the base type
+            is required for ENUM, REFERENCE and EMBEDDABLE
+          type: string
+          deprecated: true
+        additionalClassId:
+          description: |-
+            optional class info giving additional type information for the base type.
+            It is required for ENUM, REFERENCE and EMBEDDABLE
+          type: object
+          allOf:
+          - $ref: "#/components/schemas/ClassId"
+        mandatory:
+          type: boolean
+          deprecated: true
+        type:
+          description: base data type of the attribute
+          type: string
+          allOf:
+          - $ref: "#/components/schemas/AttributeType"
+        attributeConstraints:
+          description: ""
+          type: array
+          items:
+            $ref: "#/components/schemas/ConstraintMetadataGto"
+    AttributeType:
+      description: defines a fixed set of attribute types. The primitive types reflect
+        the Java primitives
+      enum:
+      - BOOLEAN
+      - BYTE
+      - SHORT
+      - INTEGER
+      - LONG
+      - FLOAT
+      - DOUBLE
+      - BIG_DECIMAL
+      - STRING
+      - ENUM
+      - REFERENCE
+      - EMBEDDABLE
+      - OBJECT
+      - DATE
+      - TIME
+      - DATE_TIME
+      - TIME_STAMP
+      - DATE_TIME_TO_MINUTE
+      - DURATION
+      type: string
+    BookFailureReason:
+      enum:
+      - NOT_FOUND
+      - STORED
+      - MULTIPLE
+      - FAILED_TRANSPORT
+      type: string
+    CancelAnnouncedHandlingUnitDto:
+      required:
+      - announcementBid
+      - handlingUnitBid
+      type: object
+      properties:
+        announcementBid:
+          description: The unique business ID that identifies this announcement in
+            the orchestrator. Eventual cancellation will use this announcement business
+            ID.
+          type: string
+        handlingUnitBid:
+          description: The business id of the handling unit.
+          type: string
+    CancelAnnouncedHandlingUnitsCommand:
+      required:
+      - handlingUnitCancellations
+      type: object
+      properties:
+        confirmationChannel:
+          type: string
+        handlingUnitCancellations:
+          description: The list of cancellations.
+          minItems: 1
+          type: array
+          items:
+            $ref: "#/components/schemas/CancelAnnouncedHandlingUnitDto"
+    ChildHandlingUnitDto:
+      required:
+      - handlingUnitBid
+      - handlingUnitTypeBid
+      type: object
+      properties:
+        handlingUnitBid:
+          description: The unique business id of the handling unit. This is typically
+            the handling unit barcode.
+          type: string
+          example: HU01
+        alternativeBid:
+          description: "The alternative ID is an optional alternative ID of the handling\
+            \ unit. For example, one that is used to reference the handling unit from\
+            \ an external system."
+          type: string
+          example: HU01
+        handlingUnitTypeBid:
+          description: "The business id of the handling unit type, which represents\
+            \ the physical attributes of the handling unit."
+          type: string
+          example: ORDT
+        positionOnParent:
+          format: int64
+          description: The position on parent represents where the handling unit is
+            placed relative to the parent handling unit. In case of compartments the
+            position may be related to raster size x and raster size y of the parent
+            handling unit type.
+          type: integer
+          example: 1
+        compartments:
+          description: "The list of compartments, could be empty in case a HandlingUnitTemplate\
+            \ is configured."
+          type: array
+          items:
+            $ref: "#/components/schemas/CompartmentDto"
+          example: []
+        inventoryUnits:
+          description: The inventory units located on the child handling unit.
+          type: array
+          items:
+            $ref: "#/components/schemas/InventoryUnitDto"
+        childHandlingUnits:
+          description: The handling units located on the child handling unit.
+          type: array
+          items:
+            $ref: "#/components/schemas/ChildHandlingUnitDto"
+    ClassId:
+      description: Helper class to identify a class uniquely in the system.
+      type: object
+      properties:
+        name:
+          description: The Java simple class name
+          type: string
+        horizonModule:
+          type: string
+        generics:
+          description: list of ClassIds describing the generics parameter types
+          type: array
+          items:
+            $ref: "#/components/schemas/ClassId"
+    CompartmentDto:
+      required:
+      - position
+      - handlingUnitTypeBid
+      type: object
+      properties:
+        position:
+          format: int32
+          description: The position in the raster of the base handling unit.
+          minimum: 0
+          type: integer
+          example: 1
+        handlingUnitTypeBid:
+          description: The business ID of the handling unit type.
+          minLength: 1
+          type: string
+          example: B1
+        inventoryUnits:
+          description: The inventory units located on the compartment.
+          type: array
+          items:
+            $ref: "#/components/schemas/InventoryUnitDto"
+    ConstraintMetadataGto:
+      description: Gto to hold serialized meta data about a constraint.
+      type: object
+      properties:
+        name:
+          description: Simple class name of the constraint annotation
+          type: string
+        i18nMessageKey:
+          description: Usually contains a message key in curly brackets to be used
+            in I18N.
+          type: string
+        groups:
+          description: |-
+            array of validation group names restricting the constraint to certain use cases.
+            predefined values:
+            'ModifyGroupConstraint' for modify
+            'CreateGroupConstraint' for create
+          type: array
+          items:
+            type: string
+        operationValues:
+          description: |-
+            Serialized values of the operation(s) in the constraint. This property will be build recursive because the operation type
+            (s) can be also Annotation. Annotations should be also serialized to a String with own operations (-> recursive).
+          type: string
+        internalOperationValueMap:
+          description: hold the constraints attributes/methods with the values for
+            further analysis.
+          type: object
+          additionalProperties: {}
+    DateTimeToMinute:
+      type: string
+    EmptyBufferFillLevelDurableEvent:
+      description: Durable event to report changes to the filling level of a buffers
+        of empty handling units.
+      required:
+      - fillingLevels
+      type: object
+      properties:
+        fillingLevels:
+          description: List of value objects that contain the filling level of a buffer
+            of empty handling units.
+          type: array
+          items:
+            $ref: "#/components/schemas/EmptyBufferFillingLevelDto"
+    EmptyBufferFillingLevelDto:
+      description: This value object contains the filling level of the buffer of empty
+        handling units of a specific handling unit type.
+      required:
+      - fillingLevel
+      - maxFillingLevel
+      type: object
+      properties:
+        fillingLevel:
+          description: Number of empty transport units.
+          type: number
+          example: 42
+        maxFillingLevel:
+          description: The maximum filling level of the buffer.
+          type: number
+          example: 123
+        handlingUnitTypeBid:
+          description: "The business ID for a handling unit type, e.g. TRAY or SYS1.\
+            \ Not null, when buffer location is null."
+          type: string
+          example: TRAY
+        bufferLocation:
+          description: "The location of the buffer the filling level is reported for.\
+            \ Not null, when handlingUnitTypeBid is null"
+          type: string
+          example: BHB.TA50.0.0.PCRE50IS01
+    EnumMetadataGto:
+      description: provides all values of all enum like data types
+      type: object
+      properties:
+        horizonModule:
+          description: horizon module name defining a private name space
+          type: string
+        runtimeId:
+          description: horizon runtime ID. Non Horizon systems should use the horizonModule
+            value
+          type: string
+        typeName:
+          description: Java simple type name of the enum like data type
+          type: string
+        values:
+          description: array of all values known to the enum like type
+          type: array
+          items:
+            type: string
+    ErrorCode:
+      enum:
+      - OK
+      - FAIL
+      type: string
+    ErrorCode1:
+      enum:
+      - OK
+      - MANUAL_OPERATION
+      - PLACE_OCC
+      - PLACE_FREE
+      - SOURCE_PLACE_NOT_REACHABLE
+      - DEST_PLACE_NOT_REACHABLE
+      - ABORT_DELETED
+      - CANCEL_NOT_ACCEPTED
+      - DROPSTATION_OCCUPIED
+      - DEST_NOT_REACHABLE
+      - FORK_OCC
+      - FALSE_NUMBER
+      - LOAD_TOO_HIGH
+      - LOAD_TOO_WIDE
+      - LOAD_TOO_HEAVY
+      - CONTOUR
+      - NOREAD
+      - MAX_LOOP
+      - WRONG_DEST
+      - UNKNOWN_HANDLINGUNIT
+      - UNKNOWN_HANDLINGUNIT_TYPE
+      - LEVEL_OCCUPIED
+      - SEQUENCE_ERROR
+      - GENERAL_ERROR
+      - CANCEL_REDIRECT
+      - SHUTTLE_BROKEN
+      - UNKNOWN_SKU
+      - WRONG_SKU
+      - MISSING_QUANTITY
+      type: string
+    FacilityIdSimpleType:
+      type: number
+    FunctionProcessingStatus:
+      description: "The functional processing status can be used to track the progress\
+        \ of additional processing at function locations, like for example lid closing,\
+        \ in the handling unit. When undefined, no additional processing has been\
+        \ applied."
+      enum:
+      - LID_CLOSED
+      type: string
+    GetDestinationSubsystem:
+      required:
+      - requests
+      type: object
+      properties:
+        requests:
+          description: A list of requests to get destination subsystem for.
+          minItems: 1
+          type: array
+          items:
+            $ref: "#/components/schemas/GetDestinationSubsystemDto"
+    GetDestinationSubsystemDto:
+      required:
+      - requestId
+      - sourceSubsystemBid
+      - destinationBid
+      type: object
+      properties:
+        requestId:
+          description: The unique id of the request for the response.
+          minLength: 1
+          type: string
+          example: REQ100
+        sourceSubsystemBid:
+          description: The source subsystem bid to get the exit location for routing
+            to the destination.
+          minLength: 1
+          type: string
+          example: CRCV
+        destinationBid:
+          description: The destination location within the subsystem.
+          minLength: 1
+          type: string
+          example: MCF_TC.CC01.0.0.CCTA01NP10
+        handlingUnitTypeBid:
+          description: The type of handling unit.
+          type: string
+          example: CS01
+    GetDestinationSubsystemErrorCode:
+      enum:
+      - OK
+      - SRC_SUBSYSTEM_NOT_FOUND
+      - DEST_SUBSYSTEM_NOT_FOUND
+      - SRC_HANDOVER_LOCATION_NOT_FOUND
+      - DEST_HANDOVER_LOCATION_NOT_FOUND
+      - DEST_NOT_REACHABLE_FROM_SRC
+      type: string
+    GetSubsystemExit:
+      required:
+      - requests
+      type: object
+      properties:
+        requests:
+          description: A list of requests to get subsystem exits for.
+          minItems: 1
+          type: array
+          items:
+            $ref: "#/components/schemas/GetSubsystemExitDto"
+    GetSubsystemExitDto:
+      required:
+      - requestId
+      - sourceSubsystemBid
+      - destinationSubsystemBid
+      type: object
+      properties:
+        requestId:
+          description: The unique id of the request for the response.
+          minLength: 1
+          type: string
+          example: REQ100
+        sourceSubsystemBid:
+          description: The source subsystem bid to get the exit location for routing
+            to the destination.
+          minLength: 1
+          type: string
+          example: PTRANS
+        destinationSubsystemBid:
+          description: The destination subsystem bid.
+          minLength: 1
+          type: string
+          example: PHB
+        handlingUnitTypeBid:
+          description: The type of handling unit.
+          type: string
+          example: EP1
+    GetSubsystemExitErrorCode:
+      enum:
+      - OK
+      - SRC_SUBSYSTEM_NOT_FOUND
+      - DEST_SUBSYSTEM_NOT_FOUND
+      - SRC_HANDOVER_LOCATION_NOT_FOUND
+      - DEST_HANDOVER_LOCATION_NOT_FOUND
+      - DEST_NOT_REACHABLE_FROM_SRC
+      type: string
+    GroupAssignmentGto:
+      description: "Assigns a certain menu entry with a (FBS) user group. When this\
+        \ is evaluated the group, the dialog permission and the group to permission\
+        \ assignment will be created if not yet there"
+      type: object
+      properties:
+        groupName:
+          description: name of user group in FBS
+          type: string
+        write:
+          description: writable yes or no
+          type: boolean
+    GtoAttributeMetadataGto:
+      description: 'metadata of a single domain entity representing GTO attribute. '
+      type: object
+      properties:
+        softReferences:
+          description: |-
+            When linking data across SCMs or beyond their lifecycle soft references are used.
+            The AttributeId list defines the context to which other attribute in the domain model the soft reference points to
+          type: array
+          items:
+            $ref: "#/components/schemas/AttributeId"
+        array:
+          description: attribute is an array
+          type: boolean
+        additionalClassName:
+          description: |-
+            Optional class name giving additional type information for the base type
+            is required for ENUM, REFERENCE and EMBEDDABLE
+          type: string
+          deprecated: true
+        additionalClassId:
+          description: |-
+            optional class info giving additional type information for the base type.
+            It is required for ENUM, REFERENCE and EMBEDDABLE
+          type: object
+          allOf:
+          - $ref: "#/components/schemas/ClassId"
+        mandatory:
+          type: boolean
+          deprecated: true
+        type:
+          description: base data type of the attribute
+          type: string
+          allOf:
+          - $ref: "#/components/schemas/AttributeType"
+        attributeConstraints:
+          description: ""
+          type: array
+          items:
+            $ref: "#/components/schemas/ConstraintMetadataGto"
+        attributeName:
+          description: name of the described attribute within the GTO
+          type: string
+        logicalIdIndex:
+          format: int32
+          description: "attribute to be used to identify a domain entity. if more\
+            \ then one attribute is part of the logical ID the index gives the position\
+            \ the attribute is used in table columns and reference displays. Usually,\
+            \ logical IDs related to parent domain entities have lower index"
+          type: integer
+        features:
+          description: gives a list of features where the attribute is used. currently
+            not used
+          type: array
+          items:
+            type: string
+        notSortable:
+          description: In default are all attributes sortable. If this flag is set
+            to true then is the attribute not can not be used for sorting on sql queries.
+          type: boolean
+        notFilterable:
+          description: In default are all attributes filterable. If this flag is set
+            to true then is the attribute not can not be used for filtering on sql
+            queries.
+          type: boolean
+        hiddenField:
+          description: "attribute is not visible in the ui, default is visible (not\
+            \ hidden)"
+          type: boolean
+        readOnly:
+          type: boolean
+          deprecated: true
+        relationType:
+          description: defines the relation of a reference in the current GTO context
+          type: string
+          allOf:
+          - $ref: "#/components/schemas/RelationType"
+        definedInType:
+          description: "simple class name of the class defining the attribute. see\
+            \ also: GtoMetadataGto.baseTypeNames"
+          type: string
+    GtoMetadataGto:
+      description: provides metadata for a complete GTO
+      type: object
+      properties:
+        horizonModule:
+          description: horizon module name defining a private name space
+          type: string
+        runtimeId:
+          description: horizon runtime ID. Non Horizon systems should use the horizonModule
+            value
+          type: string
+        typeName:
+          description: Java simple class name of the GTO class
+          type: string
+        extendedGto:
+          description: the Java simple class name of the extended GTO if the current
+            GTO is a so-called 1:1 extension to the extended GTO
+          type: string
+          deprecated: true
+        menuEntry:
+          description: describes menu entries for GTO's (for operative screens) as
+            a root and associate it with a menu path.
+          type: object
+          allOf:
+          - $ref: "#/components/schemas/MenuEntryGto"
+        extendedGtoClassId:
+          description: the Java simple class name with their HorizonModule of the
+            extended GTO if the current GTO is a so-called 1:1 extension to the extended
+            GTO
+          type: object
+          allOf:
+          - $ref: "#/components/schemas/ClassId"
+        isSurrogate:
+          description: makes the current GTO a surrogate domain entity GTO
+          type: boolean
+        surrogateHorizonModule:
+          description: horizon module name of the master GTO
+          type: string
+        surrogateTypeName:
+          description: Java simple class name of the master GTO
+          type: string
+        surrogateFilter:
+          description: The filter criteria which is used to select the data from the
+            surrogate source
+          type: string
+        isArchivable:
+          type: boolean
+        isDomainModelType:
+          description: the current GTO is part of a global domain entity model
+          type: boolean
+        attributes:
+          description: metadata of all GTO attributes
+          type: array
+          items:
+            $ref: "#/components/schemas/GtoAttributeMetadataGto"
+        baseTypeNames:
+          description: Java simple class names list of all base classes
+          type: array
+          items:
+            type: string
+        constraints:
+          description: array of all constraint on GTO level
+          type: array
+          items:
+            $ref: "#/components/schemas/ConstraintMetadataGto"
+    HandlingUnitErrorCode:
+      enum:
+      - OK
+      - MANUAL_OPERATION
+      - PLACE_OCC
+      - PLACE_FREE
+      - SOURCE_PLACE_NOT_REACHABLE
+      - DEST_PLACE_NOT_REACHABLE
+      - ABORT_DELETED
+      - CANCEL_NOT_ACCEPTED
+      - DROPSTATION_OCCUPIED
+      - DEST_NOT_REACHABLE
+      - FORK_OCC
+      - FALSE_NUMBER
+      - LOAD_TOO_HIGH
+      - LOAD_TOO_WIDE
+      - LOAD_TOO_HEAVY
+      - CONTOUR
+      - NOREAD
+      - MAX_LOOP
+      - WRONG_DEST
+      - UNKNOWN_HANDLINGUNIT
+      - UNKNOWN_HANDLINGUNIT_TYPE
+      - LEVEL_OCCUPIED
+      - SEQUENCE_ERROR
+      - GENERAL_ERROR
+      - CANCEL_REDIRECT
+      - SHUTTLE_BROKEN
+      - UNKNOWN_SKU
+      - WRONG_SKU
+      - MISSING_QUANTITY
+      type: string
+    HandlingUnitLockStatus:
+      enum:
+      - FREE
+      - LOCKED_INVENTORYAUDIT
+      - LOCKED_RESOLUTION
+      - LOCKED_INVENTORY_MISSING
+      - LOCKED_COMPARTMENTS
+      - CONSOLIDATION
+      - DECANTING
+      - CONFIRMATION_PENDING
+      type: string
+    HandlingUnitLockStatus1:
+      enum:
+      - FREE
+      - LOCKED_INVENTORYAUDIT
+      - LOCKED_RESOLUTION
+      - LOCKED_INVENTORY_MISSING
+      - LOCKED_COMPARTMENTS
+      - CONSOLIDATION
+      - DECANTING
+      - CONFIRMATION_PENDING
+      type: string
+    HandlingUnitRemovedDurableEvent:
+      description: Notifies about the removal of a load unit.
+      required:
+      - handlingUnits
+      type: object
+      properties:
+        handlingUnits:
+          description: The list of announced handling units.
+          minItems: 1
+          type: array
+          items:
+            $ref: "#/components/schemas/HandlingUnitWithInventoryDto"
+    HandlingUnitRequestInfoCommand:
+      required:
+      - handlingUnits
+      - confirmationChannel
+      type: object
+      properties:
+        handlingUnits:
+          description: The list of handling units to request info for.
+          minItems: 1
+          type: array
+          items:
+            $ref: "#/components/schemas/HandlingUnitRequestInfoDto"
+        confirmationChannel:
+          description: The messaging channel to send confirmations to.
+          minLength: 1
+          type: string
+          example: ftc.confirm.cmd.in
+    HandlingUnitRequestInfoDto:
+      required:
+      - handlingUnitBid
+      type: object
+      properties:
+        handlingUnitBid:
+          description: The unique business id of the handling unit. This is typically
+            the handling unit barcode.
+          minLength: 1
+          type: string
+          example: HU001
+    HandlingUnitRequestInfoStatus:
+      enum:
+      - TRANSPORT
+      - NO_TRANSPORT
+      - STORED
+      - NOT_AVAILABLE_STORED
+      - NOT_FOUND
+      - MULTIPLE
+      type: string
+    HandlingUnitWithInventoryDto:
+      required:
+      - handlingUnitBid
+      - length
+      - width
+      - height
+      - errorCode
+      - handlingUnitTypeBid
+      type: object
+      properties:
+        handlingUnitBid:
+          description: The unique business id of the handling unit. This is typically
+            the handling unit barcode.
+          type: string
+          example: "40023"
+        alternativeId:
+          description: "The alternative ID is an optional alternative ID of the handling\
+            \ unit. For example, one that is used to reference the handling unit from\
+            \ an external system."
+          type: string
+          example: "40023"
+        length:
+          description: "The length of the handling unit. Static HU dimension: length\
+            \ of the longest edge (different from the height). A value of 0 represents\
+            \ an unspecified length. Has to be defined for storage in ASRS or DMS,\
+            \ when there is no dimension check within the subsystem."
+          minimum: 0
+          type: number
+          allOf:
+          - $ref: "#/components/schemas/LengthSimpleType"
+          example: 649
+        width:
+          description: "The width of the handling unit. Static HU dimension: length\
+            \ of the smallest edge (different from the height). A value of 0 represents\
+            \ an unspecified width.Has to be defined for storage in ASRS or DMS, when\
+            \ there is no dimension check within the subsystem."
+          minimum: 0
+          type: number
+          allOf:
+          - $ref: "#/components/schemas/LengthSimpleType"
+          example: 449
+        height:
+          description: "The height of the handling unit. Static HU dimension: length\
+            \ of the smallest edge (different from the height). A value of 0 represents\
+            \ an unspecified height.(different from the height). A value of 0 represents\
+            \ an unspecified width.Has to be defined for storage in ASRS or DMS, when\
+            \ there is no dimension check within the subsystem."
+          minimum: 0
+          type: number
+          allOf:
+          - $ref: "#/components/schemas/LengthSimpleType"
+          example: 330
+        xExtension:
+          description: "Dynamic dimension: HandlingUnit extension along X-Axis of\
+            \ the equipment system, usually in the base unit of measure. Has to be\
+            \ defined for storage in ASRS or DMS, when there is no dimension check\
+            \ within the subsystem."
+          type: number
+          allOf:
+          - $ref: "#/components/schemas/LengthSimpleType"
+        yExtension:
+          description: "Dynamic dimension: HandlingUnit extension along Y-Axis of\
+            \ the equipment system, usually in the base unit of measure. Dynamic dimension:\
+            \ HandlingUnit extension along Y-Axis of the equipment system, usually\
+            \ in the base unit of measure. Has to be defined for storage in ASRS or\
+            \ DMS, when there is no dimension check within the subsystem."
+          type: number
+          allOf:
+          - $ref: "#/components/schemas/LengthSimpleType"
+        zExtension:
+          description: "Dynamic dimension: HandlingUnit extension along Z-Axis of\
+            \ the equipment system, usually in the base unit of measure.Dynamic dimension:\
+            \ HandlingUnit extension along Z-Axis of the equipment system, usually\
+            \ in the base unit of measure. Has to be defined for storage in ASRS or\
+            \ DMS, when there is no dimension check within the subsystem."
+          type: number
+          allOf:
+          - $ref: "#/components/schemas/LengthSimpleType"
+        weight:
+          description: The measured weight of the handling unit. The weight may be
+            measured or calculated. A value of 0 represents an unspecified weight.
+          type: number
+          allOf:
+          - $ref: "#/components/schemas/WeightSimpleType"
+        contourState:
+          description: The byte pattern that is filled when the error code is ME (measurement
+            error).
+          type: string
+        errorCode:
+          description: "The error code identifies the last transport related error\
+            \ which occurred with this handling unit. default: OK"
+          type: string
+          allOf:
+          - $ref: "#/components/schemas/ErrorCode1"
+          example: OK
+        logisticErrorCode:
+          description: The logistics error code identifies the last transport related
+            error which occurred with this handling unit.
+          type: string
+          allOf:
+          - $ref: "#/components/schemas/LogisticsErrorCode"
+        errorReason:
+          description: The error reason provides a free text to explain the reason
+            of the error.
+          type: string
+          deprecated: true
+        handlingUnitTypeBid:
+          description: "The business id of the handling unit type, which represents\
+            \ the physical attributes of the handling unit."
+          type: string
+          example: CS01
+        locationBid:
+          description: The business id of the location where the handling unit currently
+            resides. In case of handling unit stack only the lowest handling unit
+            in the stack (the base handling unit) has the location. The location is
+            mandatory for the base handling unit.
+          type: string
+          example: AUTO.RCV.0.0.0
+        locationArrivalDate:
+          format: date-time
+          description: The time when the handling unit arrived at the current location.
+            This date is e.g. required to determine the handling unit from which inventory
+            has been picked if only a location is given.
+          type: string
+          example: 2023-02-09T18:00:00.000Z
+        lockStatus:
+          description: The lock status of the HandlingUnit object. The Lock Status
+            specifies if the handling unit has been locked for specific operations.
+            When the lock status is not specified FREE is assumed.
+          type: string
+          allOf:
+          - $ref: "#/components/schemas/HandlingUnitLockStatus1"
+          example: FREE
+        inventoryUnits:
+          description: The list of inventory units in the handling unit.
+          type: array
+          items:
+            $ref: "#/components/schemas/InventoryUnitDto"
+        childHandlingUnits:
+          description: The list of load units or compartments within the load unit.
+          type: array
+          items:
+            $ref: "#/components/schemas/ChildHandlingUnitDto"
+        compartments:
+          description: "The list of compartments, which is only specified, when compartments\
+            \ are used. "
+          type: array
+          items:
+            $ref: "#/components/schemas/CompartmentDto"
+          example: []
+        functionProcessingStatus:
+          description: "The functional processing status can be used to track the\
+            \ progress of additional processing at function locations, like for example\
+            \ lid closing, in the handling unit. When undefined, no additional processing\
+            \ has been applied."
+          type: string
+          allOf:
+          - $ref: "#/components/schemas/FunctionProcessingStatus"
+        orientation:
+          format: int32
+          description: Orientation in degrees. 0 means no adjustment.
+          type: integer
+          example: 1
+        orientationCharacter:
+          description: The orientation character extracted from the barcode.
+          type: string
+          example: A
+        logisticErrorReason:
+          description: The logistic error reason provides a free text to explain the
+            reason of the logistic error.
+          type: string
+    HorizonModule:
+      type: string
+    InventoryAvailabilityDto:
+      required:
+      - ownerBid
+      - skuBidPart
+      type: object
+      properties:
+        ownerBid:
+          description: The business id of the owner of the SKU.
+          type: string
+        skuBidPart:
+          description: "The business id part of the SKU, which identified the SKU\
+            \ uniquely within the owner."
+          type: string
+        batch:
+          description: The batch of the inventory snapshot.
+          type: string
+        expiryDate:
+          format: date
+          description: The expiry date of the inventory snapshot.
+          type: string
+          example: 2022-03-10
+        countryOfOrigin:
+          description: The country of origin of the changed inventory.
+          type: string
+        packagingLevel:
+          description: The packaging level of the changed inventory.
+          type: string
+        holdReasons:
+          description: "The list of business ids of the hold reason, when the corrected\
+            \ inventory quantity is on hold."
+          type: array
+          items:
+            type: string
+        storageQualifier:
+          description: The storage qualifier recommends to the subsystem where to
+            store inventory. For example the storage qualifier could be RESERVE to
+            indicate that the inventory shall be stored in the reserve part of the
+            warehouse and not in the direct fulfillment buffer. An undefined storage
+            qualifier means no preferences for storage.
+          type: string
+          allOf:
+          - $ref: "#/components/schemas/StorageQualifier"
+        quantityUnavailable:
+          description: "The (delta) quantity, which became unavailable due to equipment\
+            \ locks."
+          type: number
+          allOf:
+          - $ref: "#/components/schemas/QuantitySimpleType"
+    InventoryHoldDto:
+      required:
+      - holdReasonBid
+      - ownerBid
+      - skuBid
+      type: object
+      properties:
+        holdReasonBid:
+          description: The hold reason id specifies the configuration for the inventory
+            hold.
+          type: string
+        ownerBid:
+          description: The business identification of the owner associated to the
+            SKU of the inventory unit. In a 3rd party warehouse the products owned
+            by different vendors are assigned to different owners for example
+          type: string
+        skuBid:
+          description: The unique business identification of the SKU (within the owner
+            of the order) requested by the line.
+          type: string
+        batch:
+          description: The batch to hold.
+          type: string
+        expiryDate:
+          format: date
+          description: The expire date to hold.
+          type: string
+          example: 2022-03-10
+        handlingUnitBid:
+          description: In order to restrict the hold on the inventory within a load
+            unit the business identified of the load unit can be specified.
+          type: string
+        receivingBid:
+          description: Used to map a receiving Bid to specific inventory.
+          type: string
+        comment:
+          description: A comment for the InventoryHold. This field is <b>optional</b>.
+          type: string
+        originator:
+          description: The originator of the inventory hold.
+          type: string
+          allOf:
+          - $ref: "#/components/schemas/Originator"
+        packagingLevel:
+          description: "Inventory hold only for a certain SKU and packaging level.\
+            \ {@link #skuBid} <b>required </b> if this is set. This field is <b>optional</b>."
+          type: string
+    InventorySnapshotDto:
+      required:
+      - ownerBid
+      - skuBidPart
+      - quantity
+      - quantityUnavailable
+      type: object
+      properties:
+        ownerBid:
+          description: The business id of the owner of the SKU.
+          type: string
+        skuBidPart:
+          description: "The business id part of the SKU, which identified the SKU\
+            \ uniquely within the owner."
+          type: string
+        batch:
+          description: The batch of the inventory snapshot.
+          type: string
+        expiryDate:
+          format: date
+          description: The expiry date of the inventory snapshot.
+          type: string
+          example: 2022-03-10
+        countryOfOrigin:
+          description: The country of origin of the changed inventory.
+          type: string
+        packagingLevel:
+          description: The packaging level of the changed inventory.
+          type: string
+        holdReasons:
+          description: "The list of business ids of the hold reason, when the corrected\
+            \ inventory quantity is on hold."
+          type: array
+          items:
+            type: string
+        storageQualifier:
+          description: The storage qualifier recommends to the subsystem where to
+            store inventory. For example the storage qualifier could be RESERVE to
+            indicate that the inventory shall be stored in the reserve part of the
+            warehouse and not in the direct fulfillment buffer. An undefined storage
+            qualifier means no preferences for storage.
+          type: string
+          allOf:
+          - $ref: "#/components/schemas/StorageQualifier"
+        quantity:
+          description: "The total quantity related to the SKU, the inventory attributes\
+            \ and the inventory status."
+          maximum: 1
+          type: number
+          allOf:
+          - $ref: "#/components/schemas/QuantitySimpleType"
+        quantityUnavailable:
+          description: "The quantity, which is currently unavailable due to equipment\
+            \ locks."
+          minimum: 0
+          type: number
+          allOf:
+          - $ref: "#/components/schemas/QuantitySimpleType"
+    InventoryUnitDto:
+      required:
+      - quantity
+      type: object
+      properties:
+        ownerBid:
+          description: The business identification of the owner associated to the
+            SKU of the inventory unit. In a 3rd party warehouse the products owned
+            by different vendors are assigned to different owners for example
+          type: string
+        skuBid:
+          description: The unique business identification of the SKU (within the owner
+            of the order) requested by the line.
+          type: string
+        quantity:
+          description: The total quantity expressed in the base quantity unit of the
+            SKU.
+          type: number
+          allOf:
+          - $ref: "#/components/schemas/QuantitySimpleType"
+        fifoDate:
+          format: date
+          description: By default the FIFO date is the expire date and if the expire
+            date is undefined it will be the date of receipt plus shelf life of SKU.
+          type: string
+          example: 2022-03-10
+        packagingLevelBid:
+          description: "The business id of the quantity unit that represents the packaging\
+            \ the inventory unit. E.g. this defines, if the inventory packaged in\
+            \ 6-packs of 12-packs."
+          type: string
+        batch:
+          description: "If the inventory is batch/lot controlled, the batch the inventory\
+            \ belongs to."
+          type: string
+        expiryDate:
+          format: date
+          description: The date in which it is recommended to consume the inventory
+            before.
+          type: string
+          example: 2022-03-10
+        countryOfOrigin:
+          description: The country of origin defines where the inventory was produced.
+          type: string
+        specialInventoryMark:
+          description: A special inventory mark can classify an inventory unit to
+            have special requirements for the usage for customer orders. An inventory
+            unit without a special inventory mark can be used freely to satisfy customer
+            orders. An example for a special inventory mark is 'inventory on commission'.
+          type: string
+          allOf:
+          - $ref: "#/components/schemas/SpecialInventoryMark"
+        specialInventoryReferenceBid:
+          description: "The special inventory reference id can be used to link the\
+            \ inventory marked as special inventory to a corresponding object. Example:\
+            \ Inventory on commission can be needs to be identified by the commission\
+            \ id."
+          type: string
+        compartmentPosition:
+          format: int32
+          description: The compartment position of the inventory. When no compartments
+            are used the compartment position is not set.
+          type: integer
+          deprecated: true
+        trayLoadingSingleRow:
+          format: int32
+          description: The number of cases loaded in a single row during tray loading.
+            In case the cases were not loaded in a single row (e.g. they are loaded
+            more compact) this value is not defined.
+          type: integer
+        holdReasons:
+          description: The list of business ids of the hold reasons associated with
+            the inventory.
+          type: array
+          items:
+            type: string
+        receivingBid:
+          description: The business id associated with the original receiving of this
+            inventory.
+          type: string
+        lastStocktakingDate:
+          format: date
+          description: The date when the inventory unit was last counted for stocktaking
+            purposes.
+          type: string
+          example: 2022-03-10
+          deprecated: true
+        lastStocktakingOperator:
+          description: The business id of the operator who last counted this inventory
+            unit for stocktaking purposes.
+          type: string
+          deprecated: true
+        storageQualifier:
+          description: The storage qualifier recommends to the subsystem where to
+            store inventory. For example the storage qualifier could be RESERVE to
+            indicate that the inventory shall be stored in the reserve part of the
+            warehouse and not in the direct fulfillment buffer. An undefined storage
+            qualifier means no preferences for storage.
+          type: string
+          allOf:
+          - $ref: "#/components/schemas/StorageQualifier"
+        packagingVariantBid:
+          description: "The business of the packaging variant, which further specifies\
+            \ the packaging variant within the packaging level. "
+          type: string
+        ownerId:
+          description: The business identification of the owner associated to the
+            SKU of the inventory unit. The owner is the the originator of the products
+            in the warehouse. In a 3rd party warehouse the products owned by different
+            vendors are assigned to different owners for example.
+          type: string
+          deprecated: true
+        skuBidPart:
+          description: The unique business identification of the SKU (within the owner
+            of the order) requested by the line.
+          type: string
+          deprecated: true
+        dateOfManufacture:
+          format: date
+          description: The data of manufacture is the date and time when the inventory
+            was manufactured.
+          type: string
+          example: 2022-03-10
+        dateOfReceipt:
+          format: date
+          description: "Date when this inventory was received. In the event of a return,\
+            \ it is not updated."
+          type: string
+          example: 2022-03-10
+        receivingReferenceTypeId:
+          description: "The type of the receiving reference, typically an ADVICE."
+          type: string
+          allOf:
+          - $ref: "#/components/schemas/ReceivingReferenceType"
+        receivingReferenceLineId:
+          description: "Reference to the receiving object, typically an advice line."
+          type: string
+        lastInventoryAuditDate:
+          format: date
+          description: The last inventory audit date offers the cycle counting component
+            to store the date when this the last cycle count has been done for this
+            inventory unit.
+          type: string
+          example: 2022-03-10
+        lastInventoryAuditOperator:
+          description: The username of operator who did the last cycle count.
+          type: string
+        fulfillmentBidPart:
+          description: The business id part of the fulfillment request.
+          type: string
+          deprecated: true
+        fulfillmentLineBidPart:
+          description: The business id part of fulfillment request line.
+          type: string
+          deprecated: true
+        packingTaskBid:
+          description: The Business ID of the packing task
+          type: string
+          example: PackingTask01
+          deprecated: true
+        packingTaskLineBid:
+          description: The Business ID of the packing task line
+          type: string
+          example: PackingTaskLine01
+          deprecated: true
+    Issuer:
+      type: string
+    JsonSimpleType:
+      type: string
+    LengthSimpleType:
+      type: number
+    LogisticErrorCode:
+      enum:
+      - BREAKAGE
+      - DAMAGED_INVENTORY
+      - DAMAGED_SKU
+      - DECANTING_DIRTY_TOTE
+      - DECANTING_NOT_EMPTY
+      - DECANTING_UNEXPECTED_TOTE
+      - HANDLING_UNIT_DAMAGED
+      - MISSING_QUANTITY
+      - PUTAWAY_ERROR
+      - RECEIVING_ERROR
+      - TEMPERATURE_EXCEEDED
+      - WRONG_EXPIRY_DATE
+      - WRONG_HU
+      - WRONG_INVENTORY
+      - WRONG_SKU
+      type: string
+    LogisticsErrorCode:
+      enum:
+      - PUTAWAY_ERROR
+      - RECEIVING_ERROR
+      - DECANTING_UNEXPECTED_TOTE
+      - DECANTING_DIRTY_TOTE
+      - DECANTING_NOT_EMPTY
+      - WRONG_INVENTORY
+      - DAMAGED_INVENTORY
+      - WRONG_SKU
+      - MISSING_QUANTITY
+      - HANDLING_UNIT_DAMAGED
+      - DAMAGED_SKU
+      - TEMPERATURE_EXCEEDED
+      - BREAKAGE
+      - WRONG_HU
+      - WRONG_EXPIRY_DATE
+      type: string
+    MenuEntryGto:
+      description: describes menu entries for GTO's or service methods (for operative
+        screens) as a root and associate it with a menu path.
+      type: object
+      properties:
+        menuId:
+          description: "This is the globally unique ID of the menu, which must never\
+            \ change. Typical format is \"horizonModule-ServiceName/GtoName\"."
+          type: string
+        menuLocations:
+          description: Multiple locations of the menu entry.
+          type: array
+          items:
+            $ref: "#/components/schemas/MenuLocationGto"
+        groups:
+          description: Menu entry with a (FBS) user group.
+          type: array
+          items:
+            $ref: "#/components/schemas/GroupAssignmentGto"
+    MenuLocationGto:
+      description: describes the location of menu entries for GTO's or service methods
+        (for operative screens) as a root and associate it with a menu path.
+      type: object
+      properties:
+        menuNodePath:
+          description: string based IDs with meaningful prefixes.
+          type: array
+          items:
+            type: string
+        category:
+          format: int32
+          description: Menu entries will be sorted DESC by the category.
+          type: integer
+        importance:
+          format: int32
+          description: Within a category entries will be sorted DESC by importance.
+          type: integer
+    MetadataGto:
+      description: root class for metadata encapsulating all metadata coming from
+        a single metadata source
+      type: object
+      properties:
+        services:
+          description: all service metadata
+          type: array
+          items:
+            $ref: "#/components/schemas/ServiceMetadataGto"
+        gtos:
+          description: all GTO metadata
+          type: array
+          items:
+            $ref: "#/components/schemas/GtoMetadataGto"
+        enums:
+          description: all enum like metadata
+          type: array
+          items:
+            $ref: "#/components/schemas/EnumMetadataGto"
+        runtimeId:
+          description: identifies the source of the metadata. In Horizon it is the
+            runtimeID of a subsystem
+          type: string
+    MultilineSimpleType:
+      type: string
+    NotifyInventoryAvailabilityDurableEvent:
+      description: Notifies the warehouse orchestrator about inventory availability
+        changes due (e.g. due to equipment locks or locks due to resolution).
+      required:
+      - changeInventory
+      - subsystemBid
+      - eventTime
+      type: object
+      properties:
+        changeInventory:
+          description: 'The list of changed inventory snapshot lines. For the orchestrator
+            mainly the changed unavailable quantity is relevant. '
+          minItems: 1
+          type: array
+          items:
+            $ref: "#/components/schemas/InventoryAvailabilityDto"
+        subsystemBid:
+          description: The unique business id of the subsystem where the inventory
+            availability was changed.
+          type: string
+        eventTime:
+          format: date-time
+          description: 'The time and date. '
+          type: string
+          example: 2022-03-10T16:15:50Z
+    NotifyInventoryCorrectionDto:
+      required:
+      - ownerBid
+      - skuBid
+      - subsystemBid
+      - handlingUnitBid
+      - unavailable
+      - quantityDifference
+      - bookingQualifier
+      type: object
+      properties:
+        ownerBid:
+          description: The business identification of the owner associated to the
+            order. In a 3rd party warehouse the products owned by different vendors
+            are assigned to different owners for example.
+          type: string
+        skuBid:
+          description: The unique business identifier of the SKU within the owner.
+          type: string
+        subsystemBid:
+          description: The unique business id of the subsystem where the inventory
+            was corrected.
+          type: string
+        handlingUnitBid:
+          description: The unique business identifier of the handling unit withe the
+            changed inventory.
+          type: string
+        unavailable:
+          description: Indicates whether the inventory is unavailable (e.g. due to
+            equipment locks or a handling unit lock).
+          type: boolean
+        batch:
+          description: The batch of the changed inventory.
+          type: string
+        expiryDate:
+          format: date
+          description: The expiry date of the changed inventory.
+          type: string
+          example: 2022-03-10
+        countryOfOrigin:
+          description: The country of origin of the changed inventory.
+          type: string
+        holdReasons:
+          description: "The list of business ids of the hold reason, when the corrected\
+            \ inventory quantity is on hold."
+          type: array
+          items:
+            type: string
+        quantityDifference:
+          description: The delta quantity for this inventory. A negative value means
+            that quantity has been reduced. This quantity is in the base sku quantity
+            unit
+          type: number
+          allOf:
+          - $ref: "#/components/schemas/QuantitySimpleType"
+        packagingLevel:
+          description: The packaging level of the changed inventory.
+          type: string
+        storageQualifier:
+          description: The storage qualifier recommends to the subsystem where to
+            store the inventory.For example the storage qualifier could be RESERVE
+            to indicate that the inventory shall be stored in the reserve part of
+            the warehouse and not in the direct fulfillment buffer. An undefined storage
+            qualifier means no preferences for storage.
+          type: string
+          allOf:
+          - $ref: "#/components/schemas/StorageQualifier"
+        bookingQualifier:
+          description: The qualification of the booking in order to provide the host
+            a reason to apply the appropriate booking.
+          type: string
+        bookingQualifierReason:
+          description: A textual reason for the booking.
+          type: string
+        operatorBid:
+          description: "The operator, which performed the quantity change."
+          type: string
+        eventTime:
+          format: date-time
+          description: The time and date when this correction was booked.
+          type: string
+          example: 2022-03-10T16:15:50Z
+        packagingVariantBid:
+          description: "The business of the packaging variant, which further specifies\
+            \ the packaging variant within the packaging level. "
+          type: string
+    NotifyInventoryCorrectionsDurableEvent:
+      description: Informs the warehouse orchestrator about a quantity correction.
+      required:
+      - corrections
+      type: object
+      properties:
+        corrections:
+          description: The inventory corrections the orchestrator needs to be informed
+            about.
+          minItems: 1
+          type: array
+          items:
+            $ref: "#/components/schemas/NotifyInventoryCorrectionDto"
+    NotifyInventoryHoldDto:
+      required:
+      - ownerBid
+      - skuBid
+      - subsystemBid
+      - bookingQualifier
+      type: object
+      properties:
+        ownerBid:
+          description: The business ID of the owner associated to the order
+          type: string
+          example: HUB1.PTG-AMB.0001.0101.01011001010000
+        skuBid:
+          description: The unique business identifier of the SKU within the owner
+          type: string
+          example: SKU01
+        subsystemBid:
+          description: The unique business id of the subsystem where the inventory
+            was corrected.
+          type: string
+          example: RECEIVING
+        handlingUnitBid:
+          description: "The unique business identifier of the load unit with the changed\
+            \ inventory. When a handling unit bid is specified, the hold is related\
+            \ to a handling unit. All inventory attribute are then set according to\
+            \ the inventory on the handling unit so that the orchestrator can then\
+            \ identify the appropriate inventory bucket to change. "
+          type: string
+        batch:
+          description: "The batch of  of the changed inventory. If quantity is not\
+            \ specified and batch is specified, all inventory of the sku with that\
+            \ batch is held/unheld. If inventory is not tracked by batch within orchestrator\
+            \ level ( SKUBlueprintLine.mandatoryOnStorage is true ), orchestrator\
+            \ will treat this field as NULL"
+          type: string
+        unavailable:
+          description: 'Indicates whether the handling unit is unavailable (e.g. due
+            to equipment locks or a handling unit lock). '
+          type: boolean
+        expiryDate:
+          format: date
+          description: "The expire date of the changed inventory. If quantity is not\
+            \ specified and expiryDate is specified, all inventory of the sku with\
+            \ that expiryDate is held/unheld. If inventory is not tracked by expiryDate\
+            \ within orchestrator level ( SKUBlueprintLine.mandatoryOnStorage is true\
+            \ ), orchestrator will treat this field as NULL."
+          type: string
+          example: 2022-03-10
+        countryOfOrigin:
+          description: "TThe country of origin of the changed inventory. If quantity\
+            \ is not specified and countryOfOrigin is specified, all inventory of\
+            \ the sku with that countryOfOrigin is held/unheld. If inventory is not\
+            \ tracked by countryOfOrigin within orchestrator level ( SKUBlueprintLine.mandatoryOnStorage\
+            \ is true ), orchestrator will treat this field as NULL"
+          type: string
+        oldHoldReasons:
+          description: "The list of business ids of the old hold reasons, when the\
+            \ corrected inventory quantity is on hold."
+          type: array
+          items:
+            type: string
+        newHoldReasons:
+          description: "The list of business ids of the new hold reasons, when the\
+            \ corrected inventory quantity is on hold."
+          type: array
+          items:
+            type: string
+        quantity:
+          description: "not null, when handlingUnitBid is not null.The quantity for\
+            \ this inventory which has been held/unheld. This quantity is in the base\
+            \ sku quantity unit."
+          type: number
+          allOf:
+          - $ref: "#/components/schemas/QuantitySimpleType"
+        packagingLevel:
+          description: The packaging level of the changed inventory.
+          type: string
+        storageQualifier:
+          description: |-
+            The storage qualifier recommends to the subsystem where to store inventory. For example the storage qualifier could be RESERVE to indicate that the inventory shall be stored in the reserve part of the warehouse and not in the direct fulfillment buffer.
+            An undefined storage qualifier means no preferences for storage.
+          type: string
+          allOf:
+          - $ref: "#/components/schemas/StorageQualifier"
+        bookingQualifier:
+          description: The qualification of the booking in order to provide the host
+            a reason to apply the appropriate booking.
+          type: string
+        bookingQualifierReason:
+          description: A textual reason for the booking
+          type: string
+        operatorBid:
+          description: "The operator, which performed the quantity change"
+          type: string
+        eventTime:
+          format: date-time
+          description: The time and date when this hold change was booked
+          type: string
+          example: 2022-03-10T16:15:50Z
+    NotifyInventoryHoldDurableEvent:
+      description: "Informs the warehouse orchestrator about a quantity of inventory\
+        \ which is held or unheld. Note - even if the warehouse orchestrator requests\
+        \ inventory to be held, it still requires the event to move inventory within\
+        \ aggregation buckets"
+      required:
+      - holds
+      type: object
+      properties:
+        holds:
+          description: |
+            The inventory hold bookings the orchestrator needs to be informed about.
+          minItems: 1
+          type: array
+          items:
+            $ref: "#/components/schemas/NotifyInventoryHoldDto"
+    NotifyInventoryRequalifyDto:
+      required:
+      - ownerBid
+      - skuBid
+      - subsystemBid
+      - handlingUnitBid
+      - quantity
+      - bookingQualifier
+      - unavailable
+      type: object
+      properties:
+        ownerBid:
+          description: The business identification of the owner associated to the
+            order. In a 3rd party warehouse the products owned by different vendors
+            are assigned to different owners for example.
+          type: string
+          example: CL001
+        skuBid:
+          description: The unique business identifier of the SKU within the owner.
+          type: string
+          example: SKU01
+        subsystemBid:
+          description: The unique business id of the subsystem where the inventory
+            was requalified.
+          type: string
+        handlingUnitBid:
+          description: 'The unique business identifier of the load unit with the requalified
+            inventory. '
+          type: string
+        holdReasons:
+          description: "The list of business ids of the hold reason, when the corrected\
+            \ inventory quantity is on hold."
+          type: array
+          items:
+            type: string
+        quantity:
+          description: "The quantity, which has been changed."
+          type: number
+          allOf:
+          - $ref: "#/components/schemas/QuantitySimpleType"
+        storageQualifier:
+          description: The storage qualifier recommends to the subsystem where to
+            store the inventory.
+          type: string
+          allOf:
+          - $ref: "#/components/schemas/StorageQualifier"
+          example: RESERVE
+        bookingQualifier:
+          description: The qualification of the booking in order to provide the host
+            a reason to apply the appropriate booking.
+          type: string
+        bookingQualifierReason:
+          description: A textual reason for the booking.
+          type: string
+        unavailable:
+          description: Indicates whether the inventory is unavailable (e.g. due to
+            equipment locks or a handling unit lock).
+          type: boolean
+        batch:
+          description: The batch of the changed inventory.
+          type: string
+        expiryDate:
+          format: date
+          description: The expire date of the changed inventory.
+          type: string
+          example: 2022-03-10
+        countryOfOrigin:
+          description: The country of origin of the changed inventory.
+          type: string
+        packagingLevel:
+          description: The packaging level of the changed inventory.
+          type: string
+        newBatch:
+          description: "The new batch of the inventory. If not defined, the batch\
+            \ is not changed. "
+          type: string
+        newExpiryDate:
+          format: date
+          description: "The new expire date of the inventory. If not defined, the\
+            \ expire date is not changed. "
+          type: string
+          example: 2022-01-01
+        newCountryOfOrigin:
+          description: "The new country of origin of the inventory. If not defined,\
+            \ the country of origin is not changed. "
+          type: string
+        newPackagingLevel:
+          description: "The new packaging level of the inventory. If not defined,\
+            \ the packaging level is not changed."
+          type: string
+        operatorBid:
+          description: "The operator, which performed the quantity change."
+          type: string
+        eventTime:
+          format: date-time
+          description: The time and date when this requalify was booked.
+          type: string
+          example: 2022-03-10T16:15:50Z
+        packagingVariantBid:
+          description: "The business of the packaging variant, which further specifies\
+            \ the packaging variant within the packaging level. "
+          type: string
+        trayLoadingSingleRow:
+          format: int32
+          description: The number of cases loaded in a single row during tray loading.
+            In case the cases were not loaded in a single row (e.g. they are loaded
+            more compact) this value is not defined.
+          type: integer
+    NotifyInventoryRequalifyDurableEvent:
+      description: Informs the warehouse orchestrator about a quantity requalification.
+      required:
+      - requalifications
+      type: object
+      properties:
+        requalifications:
+          description: The inventory requalify bookings the orchestrator needs to
+            be informed about.
+          minItems: 1
+          type: array
+          items:
+            $ref: "#/components/schemas/NotifyInventoryRequalifyDto"
+    Originator:
+      enum:
+      - HOST
+      - OPERATOR
+      - SYSTEM
+      - FOUR_WALLS
+      - ORCHESTRATOR
+      - SUBSYSTEM
+      type: string
+    PercentSimpleType:
+      type: number
+    QuantitySimpleType:
+      type: number
+    ReceivingReferenceType:
+      enum:
+      - ADVICE
+      - RECEIPT
+      type: string
+    RelationType:
+      description: describes all relation types between two GTOs
+      enum:
+      - EMBEDDED
+      - ManyToOne
+      - ManyToMany
+      - OneToOne
+      - OneToMany
+      type: string
+    RemovalFailureReason:
+      enum:
+      - NOT_FOUND
+      - STORED
+      type: string
+    RemovalStatus:
+      enum:
+      - OK
+      - 'REJECTED '
+      type: string
+    RemoveHandlingUnitsCommand:
+      required:
+      - handlingUnitBids
+      type: object
+      properties:
+        handlingUnitBids:
+          description: The list of business id of the load unit to be removed.
+          type: array
+          items:
+            type: string
+        confirmationChannel:
+          type: string
+          deprecated: true
+    RemoveInventoryHoldsCommand:
+      required:
+      - inventoryHolds
+      type: object
+      properties:
+        confirmationChannel:
+          type: string
+        inventoryHolds:
+          description: The inventory holds to be remove.
+          minItems: 1
+          type: array
+          items:
+            $ref: "#/components/schemas/InventoryHoldDto"
+    ResolutionInfoConfirmationDto:
+      required:
+      - handlingUnitBid
+      - status
+      - handlingUnitDtos
+      type: object
+      properties:
+        handlingUnitBid:
+          description: The bid of the handling unit.
+          type: string
+        status:
+          description: The status of the handling unit for resolution purposes.
+          type: string
+          allOf:
+          - $ref: "#/components/schemas/ResolutionInfoStatus"
+        handlingUnitDtos:
+          description: "A list of Handling Unit Dtos with information about the handling\
+            \ unit. In case of ResolutionInfoStatus=MULTIPLE, the list includes a\
+            \ dto for each subsystem where the handling unit was found. In case of\
+            \ ResolutionInfoStatus=NOT_FOUND, the list is empty. In every other case\
+            \ the list includes only one dto."
+          type: array
+          items:
+            $ref: "#/components/schemas/HandlingUnitWithInventoryDto"
+    ResolutionInfoStatus:
+      enum:
+      - TRANSPORT
+      - NO_TRANSPORT
+      - STORED
+      - NOT_AVAILABLE_STORED
+      - NOT_FOUND
+      - MULTIPLE
+      type: string
+    RetrievalRequestResult:
+      enum:
+      - OK
+      - NOT_FOUND
+      - 'FAILED_UNAVAILABLE '
+      type: string
+    ServiceCategoryType:
+      description: |-
+        Enum describing the type of UI services.
+        Each UI service can be associated with a service category that helps to group the generated commands in the client.
+      enum:
+      - INTERNAL
+      - MAINTENANCE
+      - CONTROL
+      - FAULT_RECOVERY
+      type: string
+    ServiceMetadataGto:
+      description: ' describes a single service.'
+      type: object
+      properties:
+        horizonModule:
+          description: horizon module name defining a private name space
+          type: string
+        runtimeId:
+          description: horizon runtime ID. Non Horizon systems should use the horizonModule
+            value
+          type: string
+        gtoContext:
+          description: the service should be used in context of this Gto
+          type: object
+          allOf:
+          - $ref: "#/components/schemas/ClassId"
+        serviceType:
+          description: "service type like 'PUT', 'GET' for REST based services"
+          type: string
+          allOf:
+          - $ref: "#/components/schemas/UiServiceType"
+        serviceName:
+          description: name of the service within the SCM (usually the base URL of
+            the HTTP request)
+          type: string
+        version:
+          format: int32
+          description: if the service name/path has a version number then its stored
+            in this attribute
+          type: integer
+        resultType:
+          description: what data the service returns
+          type: object
+          allOf:
+          - $ref: "#/components/schemas/AttributeMetadataGto"
+        menuEntry:
+          description: describes menu entries for service methods (for operative screens)
+            as a root and associate it with a menu path.
+          type: object
+          allOf:
+          - $ref: "#/components/schemas/MenuEntryGto"
+        parameters:
+          description: |-
+            list of parameters needed by the service.
+            Technical details how the parameters are handled on the wire
+            are part of the descriptions, too
+          type: array
+          items:
+            $ref: "#/components/schemas/ServiceParameterMetadataGto"
+        responseMimeType:
+          description: response mime type of the call. Can be used in generic service
+            call facades to prepare the return data.
+          type: string
+        requestMimeType:
+          description: request mime type of the call. Can be used for file upload
+            or in generic service call facades to prepare the return data.
+          type: string
+        serviceCategoryType:
+          description: ' defines how the service is used in generic mechanisms (e.g.
+            automatic screens'
+          type: string
+          allOf:
+          - $ref: "#/components/schemas/ServiceCategoryType"
+        uploadService:
+          description: optional flag which defines if the service is used for file
+            uploads
+          type: boolean
+        dangerousService:
+          description: flag for services changing data in a way that cannot be easily
+            be reverted and therefore needs special handling the UI
+          type: boolean
+        constraints:
+          description: |-
+            optional array of constraints that have to be met
+             as a precondition for a successful service execution
+          type: array
+          items:
+            $ref: "#/components/schemas/ConstraintMetadataGto"
+    ServiceParameterMetadataGto:
+      description: describes all attributes of a UI service
+      type: object
+      properties:
+        serviceParameterType:
+          description: technical type how the parameter is handled in the HTTP request
+          type: string
+          allOf:
+          - $ref: "#/components/schemas/UiServiceParameterType"
+        parameterName:
+          description: for serviceParameterType HEADER_PARAM and QUERY_PARAM the name
+            of the parameter has to be defined
+          type: string
+        typeMetadata:
+          description: the parameter metadata
+          type: object
+          allOf:
+          - $ref: "#/components/schemas/AttributeMetadataGto"
+        parameterIndex:
+          format: int32
+          description: for serviceParameterType PATH_PARA the index of the parameter
+            in the path has to be defined
+          type: integer
+    SetInventoryHoldsCommand:
+      required:
+      - inventoryHolds
+      type: object
+      properties:
+        confirmationChannel:
+          type: string
+        inventoryHolds:
+          description: The inventory holds to be set.
+          minItems: 1
+          type: array
+          items:
+            $ref: "#/components/schemas/InventoryHoldDto"
+    SpecialInventoryMark:
+      enum:
+      - REQUEST
+      - ORDER
+      - ON_COMMISSION
+      type: string
+    StorageQualifier:
+      enum:
+      - RESERVE
+      - FULFILLMENT
+      type: string
+    TransportFunctionRequirement:
+      enum:
+      - LID_CLOSER
+      - LPA
+      - EMPTY_HU_STACKER
+      - EMPTY_HU
+      - FULL_WASTE
+      type: string
+    TransportHandlingUnitsCommand:
+      required:
+      - handlingUnits
+      - confirmationChannel
+      type: object
+      properties:
+        handlingUnits:
+          description: The list of handling units to announce.
+          minItems: 1
+          type: array
+          items:
+            $ref: "#/components/schemas/TransportHandlingUnitsDto"
+        confirmationChannel:
+          description: The messaging channel to send confirmations to.
+          minLength: 1
+          type: string
+          example: ftc.confirm.cmd.in
+    TransportHandlingUnitsDto:
+      required:
+      - transportTaskId
+      - handlingUnitBid
+      - locationBid
+      - errorCode
+      type: object
+      properties:
+        transportTaskId:
+          description: The unique id to identify the transport task to other orchestrator
+            scms.
+          minLength: 1
+          type: string
+          example: TT100
+        handlingUnitBid:
+          description: The unique business id of the handling unit. This is typically
+            the handling unit barcode.
+          minLength: 1
+          type: string
+          example: HU001
+        transportTaskReason:
+          description: The reason for the transport
+          type: string
+          allOf:
+          - $ref: "#/components/schemas/TransportTaskReason"
+          example: REPLENISHMENT
+        transportTaskReferenceId:
+          description: The transport task reference
+          type: string
+        handlingUnitTypeId:
+          description: Deprecated. Use handlingUnitTypeBid.
+          type: string
+          example: EP
+          deprecated: true
+        handlingUnitTypeBid:
+          description: "The business id of the handling unit type, which represents\
+            \ the physical attributes of the handling unit."
+          type: string
+          example: EP
+        alternativeId:
+          description: "The alternative ID is an optional alternative ID of the handling\
+            \ unit. For example, one that is used to reference the handling unit from\
+            \ an external system."
+          type: string
+          example: ALT001
+        validationCode:
+          description: "With the validation code it can be checked, if the handling\
+            \ unit with that code matches the expected handling unit. The code is\
+            \ typically not unique and can be a product code on a case for example."
+          type: string
+        xExtension:
+          description: "The Dynamic dimension: HandlingUnit extension along X-Axis\
+            \ of the equipment system, usually in the base unit of measure. Has to\
+            \ be defined for storage in ASRS or DMS, when there is no dimension check\
+            \ within the subsystem."
+          type: number
+          allOf:
+          - $ref: "#/components/schemas/LengthSimpleType"
+          example: 10
+        yExtension:
+          description: "The Dynamic dimension: HandlingUnit extension along Y-Axis\
+            \ of the equipment system, usually in the base unit of measure. Has to\
+            \ be defined for storage in ASRS or DMS, when there is no dimension check\
+            \ within the subsystem."
+          type: number
+          allOf:
+          - $ref: "#/components/schemas/LengthSimpleType"
+          example: 10
+        zExtension:
+          description: "The Dynamic dimension: HandlingUnit extension along Z-Axis\
+            \ of the equipment system, usually in the base unit of measure. Has to\
+            \ be defined for storage in ASRS or DMS, when there is no dimension check\
+            \ within the subsystem."
+          type: number
+          allOf:
+          - $ref: "#/components/schemas/LengthSimpleType"
+          example: 10
+        transportGroup:
+          description: The groups of transports which belongs together e.g. transports
+            of a picklist.
+          type: string
+          example: TG001
+        transportGroupSequence:
+          format: int64
+          description: The sequence between groups e.g. the transports of group 'A'
+            shall be handled before transports of group 'B
+          type: integer
+          example: 1
+        transportGroupInternalSequence:
+          format: int64
+          description: The sequence of transports inside a group e.g. if we have a
+            strict sequence between transports inside a group.
+          type: integer
+          example: 5
+        requiresNotifyUponDeparture:
+          description: This is set to true if the orchestrator needs to be notified
+            when the handling unit has left the global source location. This can be
+            used to potentially update capacity or inventory
+          type: boolean
+          example: true
+        destinationSubsystemLocationBid:
+          description: The business id of the destination subsystem location to transport
+            the handling unit to.
+          type: string
+          example: PTRANS_PHB_OUT
+        destinationSubsystemBid:
+          description: The business id of the destination subsystem to transport the
+            handling unit to.
+          type: string
+          example: PHB
+        locationBid:
+          description: The business id of the location where the handling unit currently
+            resides. In case of handling unit stack only the lowest handling unit
+            in the stack (the base handling unit) has the location. The location is
+            mandatory for the base handling unit.
+          minLength: 1
+          type: string
+          example: FFC20_DEMO.DEC.0.0.PCTA50NP54
+        length:
+          description: "The length of the handling unit. Static HU dimension: length\
+            \ of the smallest edge (different from the height). A value of 0 represents\
+            \ an unspecified height. Has to be defined for storage in ASRS or DMS,\
+            \ when there is no dimension check within the subsystem."
+          type: number
+          allOf:
+          - $ref: "#/components/schemas/LengthSimpleType"
+          example: 10
+        height:
+          description: "The height of the handling unit. Static HU dimension: length\
+            \ of the smallest edge (different from the height). A value of 0 represents\
+            \ an unspecified height. Has to be defined for storage in ASRS or DMS,\
+            \ when there is no dimension check within the subsystem."
+          type: number
+          allOf:
+          - $ref: "#/components/schemas/LengthSimpleType"
+          example: 10
+        width:
+          description: "The width of the handling unit. Static HU dimension: length\
+            \ of the smallest edge (different from the height). A value of 0 represents\
+            \ an unspecified height. Has to be defined for storage in ASRS or DMS,\
+            \ when there is no dimension check within the subsystem."
+          type: number
+          allOf:
+          - $ref: "#/components/schemas/LengthSimpleType"
+          example: 10
+        weight:
+          description: The measured weight of the handling unit. The weight may be
+            measured or calculated. A value of 0 represents an unspecified weight.
+          type: number
+          allOf:
+          - $ref: "#/components/schemas/WeightSimpleType"
+          example: 20
+        locationArrivalTime:
+          format: date-time
+          description: The time when the handling unit arrived at the current location.
+            This date is e.g. required to determine the handling unit from which inventory
+            has been picked if only a location is given.
+          type: string
+          example: 2022-03-10T16:15:50Z
+        urgency:
+          format: int64
+          description: The urgency defines the sequence in which the system attempts
+            to process the transport. The urgency value is calculated by the system
+            and this calculation includes all of the factors that influence the sequence
+            in which the transports are to be processed.
+          type: integer
+          example: 5
+        contourState:
+          description: The byte pattern that is filled when the error code is ME (measurement
+            error).
+          type: string
+          nullable: true
+        errorCode:
+          description: "The error code identifies the last transport related error\
+            \ which occurred with this handling unit. default: OK"
+          type: string
+          allOf:
+          - $ref: "#/components/schemas/ErrorCode"
+          example: OK
+        handlingUnitErrorCode:
+          description: "The error code which occurred with this handling unit. default:\
+            \ OK"
+          type: string
+          allOf:
+          - $ref: "#/components/schemas/HandlingUnitErrorCode"
+          example: OK
+        logisticErrorCode:
+          description: The logistic error code identifies the last transport related
+            error which occurred with this handling unit.
+          type: string
+          allOf:
+          - $ref: "#/components/schemas/LogisticErrorCode"
+          example: OK
+        lockStatus:
+          description: The lock state of the handlingUnit specifies if a handling
+            unit has been locked for specific operations.
+          type: string
+          allOf:
+          - $ref: "#/components/schemas/HandlingUnitLockStatus"
+          example: FREE
+        errorReason:
+          description: The error reason provides a free text to explain the reason
+            of the error.
+          type: string
+          example: Damaged HU
+        orientationCharacter:
+          description: This is passed through from the conveyor PLC and tells about
+            the handling unit's orientation at the scanner location. It can be used
+            to highlight compartments on a screen.
+          type: string
+          example: A
+        transportFunctionRequirement:
+          description: If a function is required as part of the transport of the handling
+            unit
+          type: string
+          allOf:
+          - $ref: "#/components/schemas/TransportFunctionRequirement"
+        logisticErrorReason:
+          description: The logistic error reason provides a free text to explain the
+            reason of the logistic error.
+          type: string
+    TransportTaskReason:
+      enum:
+      - REPLENISHMENT
+      - STORAGE
+      - EMPTY
+      - FULFILLMENT
+      - FULFILLMENT_BUFFERING
+      - PACKING
+      - PALLETIZING
+      type: string
+    UiServiceParameterType:
+      description: Enum describing the parameter type of REST request.
+      enum:
+      - HEADER_PARAM
+      - QUERY_PARAM
+      - PATH_PARAM
+      - MULTIPART_FORM_PARAM
+      type: string
+    UiServiceType:
+      description: Enum describing the REST or GraphQL request type.
+      enum:
+      - QUERY
+      - MUTATION
+      - PUT
+      - GET
+      - POST
+      type: string
+    WeightSimpleType:
+      type: number

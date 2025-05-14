@@ -1,0 +1,2566 @@
+---
+openapi: 3.0.3
+info:
+  title: inb-api
+  description: Public API for inb-api
+  version: @project.version@
+tags:
+- name: ASN
+- name: Delivery
+- name: Facility Advice
+paths:
+  /inb/asn/close:
+    post:
+      tags:
+      - ASN
+      operationId: closeAsn
+      summary: Closes open ASNs.
+      description: Closes open ASNs.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CloseAsnsCommand"
+      responses:
+        "204":
+          description: Successfully processed the closing of the ASNs.
+  /inb/asn/create:
+    post:
+      tags:
+      - ASN
+      operationId: createAsn
+      summary: Create ASNs.
+      description: Create ASNs to create handling units and inventory in the system.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateAsnCommand"
+      responses:
+        "204":
+          description: Successfully processed the creation of the ASNs.
+  /inb/asn/open:
+    post:
+      tags:
+      - ASN
+      operationId: openAsn
+      summary: Opens Expected ASNs / Reopens part delivered ASNs.
+      description: Opens Expected ASNs / Reopens part delivered ASNs.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/OpenAsnsCommand"
+      responses:
+        "204":
+          description: Successfully processed the opening of the ASNs.
+  /inb/delivery/create-delivered-handling-units:
+    post:
+      tags:
+      - Delivery
+      operationId: createDeliveredHandlingUnitsCommand
+      summary: Create Delivered Handling Units
+      description: Create Delivered Handling Units.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateDeliveredHandlingUnitsCommand"
+      responses:
+        "204":
+          description: Successfully processed the creation of the delivery handling
+            units.
+  /inb/facility-advice/cancel:
+    post:
+      tags:
+      - Facility Advice
+      operationId: cancelFacilityAdvice
+      summary: Cancel facility advices.
+      description: Cancel facility advices.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CancelAdvicesCommand"
+      responses:
+        "204":
+          description: Successfully processed the cancellation of the facility advices.
+  /inb/facility-advice/cancel-advice-lines:
+    post:
+      tags:
+      - Facility Advice
+      operationId: cancelFacilityAdviceLine
+      summary: Cancel Facility Advice Lines
+      description: Cancel Facility Advice Lines.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CancelAdviceLinesCommand"
+      responses:
+        "204":
+          description: Successfully processed the cancellation of the facility advice
+            lines.
+  /inb/facility-advice/cancel-handling-units:
+    post:
+      tags:
+      - Facility Advice
+      operationId: cancelFacilityAdviceHandlingUnits
+      summary: Cancel handling units from Facility Advices.
+      description: Cancel handling units from Facility Advices.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CancelAdviceHandlingUnitsCommand"
+      responses:
+        "204":
+          description: Successfully processed the cancellation of the facility advice
+            handling units.
+  /inb/facility-advice/close:
+    post:
+      tags:
+      - Facility Advice
+      operationId: closeAdvice
+      summary: Closes Advices.
+      description: Closes Advices.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CloseAdvicesCommand"
+      responses:
+        "204":
+          description: Successfully processed the closing of the advices.
+  /inb/facility-advice/create:
+    post:
+      tags:
+      - Facility Advice
+      operationId: createFacilityAdvice
+      summary: Create facility advices.
+      description: Create facility advices to create handling units and inventory
+        in the system.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateAdvicesCommand"
+      responses:
+        "204":
+          description: Successfully processed the creation of the facility advices.
+  /inb/facility-advice/open:
+    post:
+      tags:
+      - Facility Advice
+      operationId: openAdvice
+      summary: Opens Advices.
+      description: Opens Advices.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/OpenAdvicesCommand"
+      responses:
+        "204":
+          description: Successfully processed the opening of the advices.
+  /inb/facility-advice/release/{adviceBid}:
+    post:
+      tags:
+      - Facility Advice
+      operationId: releaseFacilityAdvice
+      summary: Release a Facility Advice
+      description: Release a facility advice to a Receiving Subsystem to process.
+      parameters:
+      - name: adviceBid
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "201":
+          description: Created
+components:
+  schemas:
+    AdviceCompleteDto:
+      x-horizon-no-equals-hashcode: true
+      description: Confirmation DTO for a completed Facility Advice.
+      required:
+      - adviceBid
+      - ownerBid
+      - adviceLines
+      type: object
+      properties:
+        adviceBid:
+          description: The facility advice business ID uniquely identifies the facility
+            advice within the owner.
+          minLength: 1
+          type: string
+          example: ADV001
+        ownerBid:
+          description: The business id of the owner associated to the advice.
+          minLength: 1
+          type: string
+          example: CL001
+        adviceLines:
+          description: The list of facility advice lines.
+          minItems: 1
+          type: array
+          items:
+            $ref: "#/components/schemas/AdviceLineCompleteDto"
+    AdviceCompleteEaiDto:
+      x-horizon-no-equals-hashcode: true
+      description: EAI Host Confirmation DTO for a completed Facility Advice.
+      required:
+      - adviceBid
+      - owner
+      - adviceLines
+      type: object
+      properties:
+        adviceBid:
+          description: The facility advice business ID uniquely identifies the facility
+            advice within the owner.
+          minLength: 1
+          type: string
+          example: ADV001
+        owner:
+          description: The business id of the owner associated to the advice.
+          minLength: 1
+          type: string
+          example: CL001
+        adviceLines:
+          description: The list of facility advice lines.
+          minItems: 1
+          type: array
+          items:
+            $ref: "#/components/schemas/AdviceLineCompleteEaiDto"
+    AdviceHandlingUnitEaiDto:
+      x-horizon-no-equals-hashcode: true
+      description: DTO to create a Facility Advice Handling Unit.
+      required:
+      - handlingUnitBid
+      - handlingUnitType
+      type: object
+      properties:
+        handlingUnitBid:
+          description: The ID of the handling unit that contains the inventory received
+            in the advice line handling unit.
+          minLength: 1
+          type: string
+          example: HU001
+        handlingUnitBidBase:
+          description: Handling unit ID for the base handling unit. The base handling
+            unit is the handling unit which is typically the lowest in a handling
+            unit stack and which is stored or transported.
+          type: string
+        handlingUnitBidParent:
+          description: "Handling unit ID of the parent handling unit. In a stack,\
+            \ the parent handling unit hierarchically directly contains the handling\
+            \ unit."
+          type: string
+        handlingUnitParentPosition:
+          format: int64
+          description: Position of the parent handling unit on its parent handling
+            unit.
+          minimum: 0
+          type: integer
+        handlingUnitPosition:
+          format: int64
+          description: The position of the handling unit on its parent handling unit.
+          minimum: 0
+          type: integer
+        handlingUnitTypeBase:
+          description: Type of the base handling unit.
+          type: string
+        handlingUnitType:
+          description: Type of the handling unit.
+          minLength: 1
+          type: string
+          example: EP
+        handlingUnitTypeParent:
+          description: Type of the parent handling unit.
+          type: string
+        handlingUnitInventory:
+          description: The list of inventory on the handling unit.
+          type: array
+          items:
+            $ref: "#/components/schemas/AdviceLineEaiDto"
+    AdviceLineCompleteDto:
+      x-horizon-no-equals-hashcode: true
+      description: Confirmation DTO for Facility Advice Handling Units.
+      required:
+      - adviceLineBid
+      - skuBid
+      - ownerBid
+      - quantityTarget
+      - adviceLineInventory
+      type: object
+      properties:
+        adviceLineBid:
+          description: The facility advice handling unit business ID.
+          minLength: 1
+          type: string
+          example: ADV001-AL01
+        handlingUnitBid:
+          description: The business ID of the facility advice handling unit.
+          type: string
+          example: HU001
+        skuBid:
+          description: Unique identifier of the announced SKU within the owner..
+          minLength: 1
+          type: string
+          example: SKU01
+        ownerBid:
+          description: The business id of the owner associated to the SKU. The owner
+            is the the owner of the SKUs in the warehouse. In a 3rd party warehouse
+            the SKUs owned by different vendors are assigned to different owners for
+            example.
+          minLength: 1
+          type: string
+          example: CL001
+        quantityTarget:
+          description: "The total quantity of inventory expected to be received, expressed\
+            \ in base quantity units."
+          type: number
+          allOf:
+          - $ref: "./types-api.yaml#/components/schemas/QuantitySimpleType"
+        receiptTime:
+          format: date-time
+          description: The date and time of receipt when the inventory was received
+            in the warehouse.
+          type: string
+          example: 2022-03-10T16:15:50Z
+        adviceLineInventory:
+          description: The list of inventory on the handling unit.
+          minItems: 1
+          type: array
+          items:
+            $ref: "#/components/schemas/AdviceLineCompleteInventoryDto"
+    AdviceLineCompleteEaiDto:
+      x-horizon-no-equals-hashcode: true
+      description: EAI Host Confirmation DTO for a Facility Advice Line.
+      required:
+      - adviceLineBid
+      - sku
+      - owner
+      - quantityTarget
+      - adviceLineInventory
+      type: object
+      properties:
+        adviceLineBid:
+          description: The facility advice handling unit business ID.
+          minLength: 1
+          type: string
+          example: ADV001-AL01
+        handlingUnitBid:
+          description: The business ID of the facility advice handling unit.
+          type: string
+          example: HU001
+        sku:
+          description: Unique identifier of the announced SKU within the owner..
+          minLength: 1
+          type: string
+          example: SKU01
+        owner:
+          description: The business id of the owner associated to the SKU. The owner
+            is the the owner of the SKUs in the warehouse. In a 3rd party warehouse
+            the SKUs owned by different vendors are assigned to different owners for
+            example.
+          minLength: 1
+          type: string
+          example: CL001
+        quantityTarget:
+          description: "The total quantity of inventory expected to be received, expressed\
+            \ in base quantity units."
+          type: number
+          allOf:
+          - $ref: "./types-api.yaml#/components/schemas/QuantitySimpleType"
+        receiptTime:
+          format: date-time
+          description: The date and time of receipt when the inventory was received
+            in the warehouse.
+          type: string
+          example: 2022-03-10T16:15:50Z
+        adviceLineInventory:
+          description: The list of inventory on the handling unit.
+          minItems: 1
+          type: array
+          items:
+            $ref: "#/components/schemas/AdviceLineInventoryEaiDto"
+    AdviceLineCompleteInventoryDto:
+      x-horizon-no-equals-hashcode: true
+      description: Confirmation DTO for Facility Advice Lines.
+      type: object
+      properties:
+        quantityCurrent:
+          description: "The total quantity received, expressed in base quantity units."
+          type: number
+          allOf:
+          - $ref: "./types-api.yaml#/components/schemas/QuantitySimpleType"
+        quantityCancelled:
+          description: "The total quantity cancelled, expressed in base quantity units."
+          type: number
+          allOf:
+          - $ref: "./types-api.yaml#/components/schemas/QuantitySimpleType"
+        quantityUnit:
+          description: The quantity unit used to receive the inventory.
+          type: string
+        batchId:
+          description: The batch ID of the advice line.
+          type: string
+        expiryDate:
+          format: date
+          description: The recommended date by which the inventory is consumed or
+            used.
+          type: string
+          example: 2022-12-31
+        specialInventoryMark:
+          description: "The special inventory mark is used to indicate if the inventory\
+            \ unit has special requirements for customer orders. Even if the inventory\
+            \ unit doesn't have a special inventory mark, it can still be used to\
+            \ fulfill customer orders."
+          type: string
+          allOf:
+          - $ref: "#/components/schemas/SpecialInventoryMark"
+          example: ORDER
+        specialInventoryReferenceBid:
+          description: "The special inventory reference links inventory that has been\
+            \ marked as special inventory to a corresponding object. Example: inventory\
+            \ marked as \"inventory on commission\" can be identified by the commission\
+            \ bid."
+          type: string
+        countryOfOrigin:
+          description: The country of origin defines where the inventory was produced
+          type: string
+          example: US
+        holdReasons:
+          description: The hold reasons associated with the inventory
+          type: array
+          items:
+            $ref: "#/components/schemas/InventoryHoldReasonDto"
+    AdviceLineDto:
+      x-horizon-no-equals-hashcode: true
+      description: DTO to create Facility Advice Line.
+      required:
+      - adviceLineBid
+      - ownerBid
+      - skuBid
+      - quantityTarget
+      type: object
+      properties:
+        adviceLineBid:
+          description: The facility advice line business ID
+          minLength: 1
+          type: string
+        ownerBid:
+          description: The business ID of the owner of the SKU.
+          minLength: 1
+          type: string
+          example: CL001
+        supplierBidPart:
+          description: The business ID part of the supplier which identifies the supplier
+            uniquely within the owner.
+          type: string
+        skuBid:
+          description: Unique identifier of the announced SKU within the owner.
+          minLength: 1
+          type: string
+          example: SKU01
+        quantityTarget:
+          description: The total quantity of inventory expressed in base quantity
+            units.
+          type: number
+          allOf:
+          - $ref: "./types-api.yaml#/components/schemas/QuantitySimpleType"
+        quantityUnit:
+          description: "Quantity unit is used to define the package size that represents\
+            \ the quantityTarget specific quantity of SKU. If not supplied, the SKU\
+            \ base quantity unit is used."
+          type: string
+          example: PCE
+        packagingLevel:
+          description: The quantityUnit that represents the package size that is expected
+            to be delivered in.
+          type: string
+          example: CASE
+        batchId:
+          description: The batch ID Of the advice line.
+          type: string
+        expiryDate:
+          format: date
+          description: The recommended date by which the inventory is consumed or
+            used.
+          type: string
+          example: 2025-12-31
+        specialInventoryMark:
+          description: "The special inventory mark is used to indicate if the inventory\
+            \ unit has special requirements for customer orders. Even if the inventory\
+            \ unit doesn't have a special inventory mark, it can still be used to\
+            \ fulfill customer orders."
+          type: string
+          allOf:
+          - $ref: "#/components/schemas/SpecialInventoryMark"
+          example: ORDER
+        specialInventoryReferenceBid:
+          description: "The special inventory reference links inventory that has been\
+            \ marked as special inventory to a corresponding object. Example: inventory\
+            \ marked as \"inventory on commission\" can be identified by the commission\
+            \ bid."
+          type: string
+        dateOfReceipt:
+          format: date-time
+          description: "The date of receipt specifies the original date when the inventory\
+            \ was received in the warehouse. If there is a value in this field, it\
+            \ is used instead of the arrival date as the date of receipt when creating\
+            \ inventory."
+          type: string
+          example: 2022-03-10T16:15:50Z
+        dateOfManufacture:
+          format: date
+          description: The date that the inventory in the advice line was manufactured.
+          type: string
+          example: 2022-12-31
+        countryOfOrigin:
+          description: The country of origin defines where the inventory was produced
+          type: string
+          example: US
+        holdReasons:
+          description: The hold reasons associated with the inventory
+          type: array
+          items:
+            $ref: "#/components/schemas/InventoryHoldReasonDto"
+    AdviceLineEaiDto:
+      x-horizon-no-equals-hashcode: true
+      description: EAI Host Message to create Facility Advice Line.
+      required:
+      - adviceLineBid
+      - owner
+      - sku
+      - quantityTarget
+      type: object
+      properties:
+        adviceLineBid:
+          description: The facility advice line business ID
+          minLength: 1
+          type: string
+        owner:
+          description: Unique identifier of the owner.
+          minLength: 1
+          type: string
+          example: CL001
+        supplier:
+          description: The business ID part of the supplier which identifies the supplier
+            uniquely within the owner.
+          type: string
+        sku:
+          description: Unique identifier of the announced SKU within the owner.
+          minLength: 1
+          type: string
+          example: SKU01
+        quantityTarget:
+          description: The total quantity of inventory expressed in base quantity
+            units.
+          type: number
+          allOf:
+          - $ref: "./types-api.yaml#/components/schemas/QuantitySimpleType"
+        quantityUnit:
+          description: "Quantity unit is used to define the package size that represents\
+            \ the quantityTarget specific quantity of SKU. If not supplied, the SKU\
+            \ base quantity unit is used."
+          type: string
+          example: PCE
+        packagingLevel:
+          description: The quantityUnit that represents the package size that is expected
+            to be delivered in.
+          type: string
+          example: CASE
+        batch:
+          description: The batch ID Of the advice line.
+          type: string
+        expiryDate:
+          format: date
+          description: The recommended date by which the inventory is consumed or
+            used.
+          type: string
+          example: 2025-12-31
+        holdReasons:
+          description: The hold reasons associated with the inventory
+          type: array
+          items:
+            $ref: "#/components/schemas/InventoryHoldReasonEaiDto"
+    AdviceLineInventoryEaiDto:
+      x-horizon-no-equals-hashcode: true
+      description: EAI Host Confirmation DTO for Facility Advice Line.
+      type: object
+      properties:
+        quantityCurrent:
+          description: "The total quantity received, expressed in base quantity units."
+          type: number
+          allOf:
+          - $ref: "./types-api.yaml#/components/schemas/QuantitySimpleType"
+        quantityCancelled:
+          description: "The total quantity cancelled, expressed in base quantity units."
+          type: number
+          allOf:
+          - $ref: "./types-api.yaml#/components/schemas/QuantitySimpleType"
+        quantityUnit:
+          description: The quantity unit used to receive the inventory.
+          type: string
+        batch:
+          description: The batch ID of the advice line.
+          type: string
+        expiryDate:
+          format: date
+          description: The recommended date by which the inventory is consumed or
+            used.
+          type: string
+          example: 2022-12-31
+        holdReasons:
+          description: The hold reasons associated with the inventory
+          type: array
+          items:
+            $ref: "#/components/schemas/InventoryHoldReasonEaiDto"
+    AdviceLineUpdateDto:
+      x-horizon-no-equals-hashcode: true
+      description: Confirmation DTO for Facility Advice Lines.
+      required:
+      - adviceLineBid
+      - skuBid
+      - ownerBid
+      - quantityTarget
+      - adviceLineInventory
+      type: object
+      properties:
+        adviceLineBid:
+          description: The facility advice handling unit business ID.
+          minLength: 1
+          type: string
+          example: ADV001-AL01
+        handlingUnitBid:
+          description: The business ID of the facility advice handling unit.
+          type: string
+          example: HU001
+        skuBid:
+          description: Unique identifier of the announced SKU within the owner..
+          minLength: 1
+          type: string
+          example: SKU01
+        ownerBid:
+          description: The business id of the owner associated to the SKU. The owner
+            is the the owner of the SKUs in the warehouse. In a 3rd party warehouse
+            the SKUs owned by different vendors are assigned to different owners for
+            example.
+          minLength: 1
+          type: string
+          example: CL001
+        quantityTarget:
+          description: "The total quantity of inventory expected to be received, expressed\
+            \ in base quantity units."
+          type: number
+          allOf:
+          - $ref: "./types-api.yaml#/components/schemas/QuantitySimpleType"
+        receiptTime:
+          format: date-time
+          description: The date and time of receipt when the inventory was received
+            in the warehouse.
+          type: string
+          example: 2022-03-10T16:15:50Z
+        adviceLineInventory:
+          description: The list of inventory on the handling unit.
+          minItems: 1
+          type: array
+          items:
+            $ref: "#/components/schemas/AdviceLineUpdateInventoryDto"
+    AdviceLineUpdateEaiDto:
+      x-horizon-no-equals-hashcode: true
+      description: EAI Host Confirmation DTO for Facility Advice Lines.
+      required:
+      - adviceLineBid
+      - sku
+      - owner
+      - quantityTarget
+      - adviceLineInventory
+      type: object
+      properties:
+        adviceLineBid:
+          description: The facility advice handling unit business ID.
+          minLength: 1
+          type: string
+          example: ADV001-AL01
+        handlingUnitBid:
+          description: The business ID of the facility advice handling unit.
+          type: string
+          example: HU001
+        sku:
+          description: Unique identifier of the announced SKU within the owner..
+          minLength: 1
+          type: string
+          example: SKU01
+        owner:
+          description: The business id of the owner associated to the SKU. The owner
+            is the the owner of the SKUs in the warehouse. In a 3rd party warehouse
+            the SKUs owned by different vendors are assigned to different owners for
+            example.
+          minLength: 1
+          type: string
+          example: CL001
+        quantityTarget:
+          description: "The total quantity of inventory expected to be received, expressed\
+            \ in base quantity units."
+          type: number
+          allOf:
+          - $ref: "./types-api.yaml#/components/schemas/QuantitySimpleType"
+        receiptTime:
+          format: date-time
+          description: The date and time of receipt when the inventory was received
+            in the warehouse.
+          type: string
+          example: 2022-03-10T16:15:50Z
+        adviceLineInventory:
+          description: The list of inventory on the handling unit.
+          minItems: 1
+          type: array
+          items:
+            $ref: "#/components/schemas/AdviceLineInventoryEaiDto"
+    AdviceLineUpdateInventoryDto:
+      x-horizon-no-equals-hashcode: true
+      description: Confirmation DTO for Facility Advice Handling Unit Line.
+      type: object
+      properties:
+        quantityCurrent:
+          description: "The total quantity received, expressed in base quantity units."
+          type: number
+          allOf:
+          - $ref: "./types-api.yaml#/components/schemas/QuantitySimpleType"
+        quantityCancelled:
+          description: "The total quantity cancelled, expressed in base quantity units."
+          type: number
+          allOf:
+          - $ref: "./types-api.yaml#/components/schemas/QuantitySimpleType"
+        quantityUnit:
+          description: The quantity unit used to receive the inventory.
+          type: string
+        batchId:
+          description: The batch ID of the advice line.
+          type: string
+        expiryDate:
+          format: date
+          description: The recommended date by which the inventory is consumed or
+            used.
+          type: string
+          example: 2022-12-31
+        specialInventoryMark:
+          description: "The special inventory mark is used to indicate if the inventory\
+            \ unit has special requirements for customer orders. Even if the inventory\
+            \ unit doesn't have a special inventory mark, it can still be used to\
+            \ fulfill customer orders."
+          type: string
+          allOf:
+          - $ref: "#/components/schemas/SpecialInventoryMark"
+          example: ORDER
+        specialInventoryReferenceBid:
+          description: "The special inventory reference links inventory that has been\
+            \ marked as special inventory to a corresponding object. Example: inventory\
+            \ marked as \"inventory on commission\" can be identified by the commission\
+            \ bid."
+          type: string
+        countryOfOrigin:
+          description: The country of origin defines where the inventory was produced
+          type: string
+          example: US
+        holdReasons:
+          description: The hold reasons associated with the inventory
+          type: array
+          items:
+            $ref: "#/components/schemas/InventoryHoldReasonDto"
+    AdviceType:
+      x-horizon-domainvalue: true
+      x-horizon-module-definition: inb
+      enum:
+      - SUPPLIER
+      - PRODUCTION
+      - RETURN
+      type: string
+    AdviceUpdateDto:
+      x-horizon-no-equals-hashcode: true
+      description: Confirmation DTO for a completed Facility Advice.
+      required:
+      - adviceBid
+      - ownerBid
+      - adviceLines
+      type: object
+      properties:
+        adviceBid:
+          description: The facility advice business ID uniquely identifies the facility
+            advice within the owner.
+          minLength: 1
+          type: string
+          example: ADV001
+        ownerBid:
+          description: The business id of the owner associated to the advice.
+          minLength: 1
+          type: string
+          example: CL001
+        adviceLines:
+          description: The list of advice handling units.
+          minItems: 1
+          type: array
+          items:
+            $ref: "#/components/schemas/AdviceLineUpdateDto"
+    AdviceUpdateEaiDto:
+      x-horizon-no-equals-hashcode: true
+      description: EAI Host Confirmation DTO for an updated Facility Advice.
+      required:
+      - adviceBid
+      - owner
+      - adviceLines
+      type: object
+      properties:
+        adviceBid:
+          description: The facility advice business ID uniquely identifies the facility
+            advice within the owner.
+          minLength: 1
+          type: string
+          example: ADV001
+        owner:
+          description: The business id of the owner associated to the advice.
+          minLength: 1
+          type: string
+          example: CL001
+        adviceLines:
+          description: The list of facility advice lines.
+          minItems: 1
+          type: array
+          items:
+            $ref: "#/components/schemas/AdviceLineUpdateEaiDto"
+    AdvicesCompleteConfirmation:
+      description: Confirmation sent when facility advices are completed.
+      required:
+      - advices
+      type: object
+      properties:
+        advices:
+          description: The list of completed facility advices.
+          minItems: 1
+          type: array
+          items:
+            $ref: "#/components/schemas/AdviceCompleteDto"
+    AdvicesUpdateConfirmation:
+      description: Confirmation sent when facility advices are updated.
+      required:
+      - advices
+      type: object
+      properties:
+        advices:
+          description: The list of updated facility advices.
+          minItems: 1
+          type: array
+          items:
+            $ref: "#/components/schemas/AdviceUpdateDto"
+    AsnCompleteDto:
+      x-horizon-no-equals-hashcode: true
+      description: Confirmation DTO for a completed ASN.
+      required:
+      - asnBid
+      - ownerBid
+      - asnLines
+      type: object
+      properties:
+        asnBid:
+          description: The asn business ID uniquely identifies the asn within the
+            owner.
+          minLength: 1
+          type: string
+          example: ADV001
+        ownerBid:
+          description: The business id of the owner associated to the advice.
+          minLength: 1
+          type: string
+          example: CL001
+        asnLines:
+          description: The list of asn lines.
+          minItems: 1
+          type: array
+          items:
+            $ref: "#/components/schemas/AsnLineCompleteDto"
+    AsnCompleteEaiDto:
+      x-horizon-no-equals-hashcode: true
+      description: EAI Host Confirmation DTO for a completed Asn.
+      required:
+      - asnBid
+      - owner
+      - asnLines
+      type: object
+      properties:
+        asnBid:
+          description: The asn business ID uniquely identifies the asn within the
+            owner.
+          minLength: 1
+          type: string
+          example: ADV001
+        owner:
+          description: The business id of the owner associated to the asn.
+          minLength: 1
+          type: string
+          example: CL001
+        asnLines:
+          description: The list of asn lines.
+          minItems: 1
+          type: array
+          items:
+            $ref: "#/components/schemas/AsnLineCompleteEaiDto"
+    AsnLineCompleteDto:
+      x-horizon-no-equals-hashcode: true
+      description: Confirmation DTO for Asn Handling Units.
+      required:
+      - asnLineBid
+      - skuBid
+      - ownerBid
+      - quantityTarget
+      - asnLineInventory
+      type: object
+      properties:
+        asnLineBid:
+          description: The asn handling unit business ID.
+          minLength: 1
+          type: string
+          example: ADV001-AL01
+        handlingUnitBid:
+          description: The business ID of the asn handling unit.
+          type: string
+          example: HU001
+        skuBid:
+          description: Unique identifier of the announced SKU within the owner..
+          minLength: 1
+          type: string
+          example: SKU01
+        ownerBid:
+          description: The business id of the owner associated to the SKU. The owner
+            is the the owner of the SKUs in the warehouse. In a 3rd party warehouse
+            the SKUs owned by different vendors are assigned to different owners for
+            example.
+          minLength: 1
+          type: string
+          example: CL001
+        quantityTarget:
+          description: "The total quantity of inventory expected to be received, expressed\
+            \ in base quantity units."
+          type: number
+          allOf:
+          - $ref: "./types-api.yaml#/components/schemas/QuantitySimpleType"
+        receiptTime:
+          format: date-time
+          description: The date and time of receipt when the inventory was received
+            in the warehouse.
+          type: string
+          example: 2022-03-10T16:15:50Z
+        asnLineInventory:
+          description: The list of inventory on the handling unit.
+          minItems: 1
+          type: array
+          items:
+            $ref: "#/components/schemas/AsnLineCompleteInventoryDto"
+    AsnLineCompleteEaiDto:
+      x-horizon-no-equals-hashcode: true
+      description: EAI Host Confirmation DTO for a Asn Line.
+      required:
+      - asnLineBid
+      - sku
+      - owner
+      - quantityTarget
+      - asnLineInventory
+      type: object
+      properties:
+        asnLineBid:
+          description: The asn handling unit business ID.
+          minLength: 1
+          type: string
+          example: ADV001-AL01
+        handlingUnitBid:
+          description: The business ID of the asn handling unit.
+          type: string
+          example: HU001
+        sku:
+          description: Unique identifier of the announced SKU within the owner..
+          minLength: 1
+          type: string
+          example: SKU01
+        owner:
+          description: The business id of the owner associated to the SKU. The owner
+            is the the owner of the SKUs in the warehouse. In a 3rd party warehouse
+            the SKUs owned by different vendors are assigned to different owners for
+            example.
+          minLength: 1
+          type: string
+          example: CL001
+        quantityTarget:
+          description: "The total quantity of inventory expected to be received, expressed\
+            \ in base quantity units."
+          type: number
+          allOf:
+          - $ref: "./types-api.yaml#/components/schemas/QuantitySimpleType"
+        receiptTime:
+          format: date-time
+          description: The date and time of receipt when the inventory was received
+            in the warehouse.
+          type: string
+          example: 2022-03-10T16:15:50Z
+        asnLineInventory:
+          description: The list of inventory on the handling unit.
+          minItems: 1
+          type: array
+          items:
+            $ref: "#/components/schemas/AsnLineInventoryEaiDto"
+    AsnLineCompleteInventoryDto:
+      x-horizon-no-equals-hashcode: true
+      description: Confirmation DTO for Asn Lines.
+      type: object
+      properties:
+        quantityCurrent:
+          description: "The total quantity received, expressed in base quantity units."
+          type: number
+          allOf:
+          - $ref: "./types-api.yaml#/components/schemas/QuantitySimpleType"
+        quantityCancelled:
+          description: "The total quantity cancelled, expressed in base quantity units."
+          type: number
+          allOf:
+          - $ref: "./types-api.yaml#/components/schemas/QuantitySimpleType"
+        quantityUnit:
+          description: The quantity unit used to receive the inventory.
+          type: string
+        batchId:
+          description: The batch ID of the asn line.
+          type: string
+        expiryDate:
+          format: date
+          description: The recommended date by which the inventory is consumed or
+            used.
+          type: string
+          example: 2022-12-31
+        specialInventoryMark:
+          description: "The special inventory mark is used to indicate if the inventory\
+            \ unit has special requirements for customer orders. Even if the inventory\
+            \ unit doesn't have a special inventory mark, it can still be used to\
+            \ fulfill customer orders."
+          type: string
+          allOf:
+          - $ref: "#/components/schemas/SpecialInventoryMark"
+          example: ORDER
+        specialInventoryReferenceBid:
+          description: "The special inventory reference links inventory that has been\
+            \ marked as special inventory to a corresponding object. Example: inventory\
+            \ marked as \"inventory on commission\" can be identified by the commission\
+            \ bid."
+          type: string
+        countryOfOrigin:
+          description: The country of origin defines where the inventory was produced
+          type: string
+          example: US
+        holdReasons:
+          description: The hold reasons associated with the inventory
+          type: array
+          items:
+            $ref: "#/components/schemas/InventoryHoldReasonDto"
+    AsnLineInventoryEaiDto:
+      x-horizon-no-equals-hashcode: true
+      description: EAI Host Confirmation DTO for asn Line.
+      type: object
+      properties:
+        quantityCurrent:
+          description: "The total quantity received, expressed in base quantity units."
+          type: number
+          allOf:
+          - $ref: "./types-api.yaml#/components/schemas/QuantitySimpleType"
+        quantityCancelled:
+          description: "The total quantity cancelled, expressed in base quantity units."
+          type: number
+          allOf:
+          - $ref: "./types-api.yaml#/components/schemas/QuantitySimpleType"
+        quantityUnit:
+          description: The quantity unit used to receive the inventory.
+          type: string
+        batch:
+          description: The batch ID of the asn line.
+          type: string
+        expiryDate:
+          format: date
+          description: The recommended date by which the inventory is consumed or
+            used.
+          type: string
+          example: 2022-12-31
+        holdReasons:
+          description: The hold reasons associated with the inventory
+          type: array
+          items:
+            $ref: "#/components/schemas/InventoryHoldReasonEaiDto"
+    AsnLineUpdateDto:
+      x-horizon-no-equals-hashcode: true
+      description: Confirmation DTO for Asn Lines.
+      required:
+      - asnLineBid
+      - skuBid
+      - ownerBid
+      - quantityTarget
+      - asnLineInventory
+      type: object
+      properties:
+        asnLineBid:
+          description: The asn handling unit business ID.
+          minLength: 1
+          type: string
+          example: ADV001-AL01
+        handlingUnitBid:
+          description: The business ID of the asn handling unit.
+          type: string
+          example: HU001
+        skuBid:
+          description: Unique identifier of the announced SKU within the owner..
+          minLength: 1
+          type: string
+          example: SKU01
+        ownerBid:
+          description: The business id of the owner associated to the SKU. The owner
+            is the the owner of the SKUs in the warehouse. In a 3rd party warehouse
+            the SKUs owned by different vendors are assigned to different owners for
+            example.
+          minLength: 1
+          type: string
+          example: CL001
+        quantityTarget:
+          description: "The total quantity of inventory expected to be received, expressed\
+            \ in base quantity units."
+          type: number
+          allOf:
+          - $ref: "./types-api.yaml#/components/schemas/QuantitySimpleType"
+        receiptTime:
+          format: date-time
+          description: The date and time of receipt when the inventory was received
+            in the warehouse.
+          type: string
+          example: 2022-03-10T16:15:50Z
+        asnLineInventory:
+          description: The list of inventory on the handling unit.
+          minItems: 1
+          type: array
+          items:
+            $ref: "#/components/schemas/AsnLineUpdateInventoryDto"
+    AsnLineUpdateEaiDto:
+      x-horizon-no-equals-hashcode: true
+      description: EAI Host Confirmation DTO for Asn Lines.
+      required:
+      - asnLineBid
+      - sku
+      - owner
+      - quantityTarget
+      - asnLineInventory
+      type: object
+      properties:
+        asnLineBid:
+          description: The Asn handling unit business ID.
+          minLength: 1
+          type: string
+          example: ADV001-AL01
+        handlingUnitBid:
+          description: The business ID of the Asn handling unit.
+          type: string
+          example: HU001
+        sku:
+          description: Unique identifier of the announced SKU within the owner..
+          minLength: 1
+          type: string
+          example: SKU01
+        owner:
+          description: The business id of the owner associated to the SKU. The owner
+            is the the owner of the SKUs in the warehouse. In a 3rd party warehouse
+            the SKUs owned by different vendors are assigned to different owners for
+            example.
+          minLength: 1
+          type: string
+          example: CL001
+        quantityTarget:
+          description: "The total quantity of inventory expected to be received, expressed\
+            \ in base quantity units."
+          type: number
+          allOf:
+          - $ref: "./types-api.yaml#/components/schemas/QuantitySimpleType"
+        receiptTime:
+          format: date-time
+          description: The date and time of receipt when the inventory was received
+            in the warehouse.
+          type: string
+          example: 2022-03-10T16:15:50Z
+        asnLineInventory:
+          description: The list of inventory on the handling unit.
+          minItems: 1
+          type: array
+          items:
+            $ref: "#/components/schemas/AsnLineInventoryEaiDto"
+    AsnLineUpdateInventoryDto:
+      x-horizon-no-equals-hashcode: true
+      description: Confirmation DTO for Asn Handling Unit Line.
+      type: object
+      properties:
+        quantityCurrent:
+          description: "The total quantity received, expressed in base quantity units."
+          type: number
+          allOf:
+          - $ref: "./types-api.yaml#/components/schemas/QuantitySimpleType"
+        quantityCancelled:
+          description: "The total quantity cancelled, expressed in base quantity units."
+          type: number
+          allOf:
+          - $ref: "./types-api.yaml#/components/schemas/QuantitySimpleType"
+        quantityUnit:
+          description: The quantity unit used to receive the inventory.
+          type: string
+        batchId:
+          description: The batch ID of the asn line.
+          type: string
+        expiryDate:
+          format: date
+          description: The recommended date by which the inventory is consumed or
+            used.
+          type: string
+          example: 2022-12-31
+        specialInventoryMark:
+          description: "The special inventory mark is used to indicate if the inventory\
+            \ unit has special requirements for customer orders. Even if the inventory\
+            \ unit doesn't have a special inventory mark, it can still be used to\
+            \ fulfill customer orders."
+          type: string
+          allOf:
+          - $ref: "#/components/schemas/SpecialInventoryMark"
+          example: ORDER
+        specialInventoryReferenceBid:
+          description: "The special inventory reference links inventory that has been\
+            \ marked as special inventory to a corresponding object. Example: inventory\
+            \ marked as \"inventory on commission\" can be identified by the commission\
+            \ bid."
+          type: string
+        countryOfOrigin:
+          description: The country of origin defines where the inventory was produced
+          type: string
+          example: US
+        holdReasons:
+          description: The hold reasons associated with the inventory
+          type: array
+          items:
+            $ref: "#/components/schemas/InventoryHoldReasonDto"
+    AsnType:
+      x-horizon-domainvalue: true
+      x-horizon-module-definition: inb
+      enum:
+      - SUPPLIER
+      - REPLEN
+      - PRODUCTION
+      - RETURN
+      type: string
+    AsnUpdateDto:
+      x-horizon-no-equals-hashcode: true
+      description: Confirmation DTO for a completed Asn.
+      required:
+      - asnBid
+      - ownerBid
+      - asnLines
+      type: object
+      properties:
+        asnBid:
+          description: The asn business ID uniquely identifies the asn within the
+            owner.
+          minLength: 1
+          type: string
+          example: ADV001
+        ownerBid:
+          description: The business id of the owner associated to the asn.
+          minLength: 1
+          type: string
+          example: CL001
+        asnLines:
+          description: The list of asn handling units.
+          minItems: 1
+          type: array
+          items:
+            $ref: "#/components/schemas/AsnLineUpdateDto"
+    AsnUpdateEaiDto:
+      x-horizon-no-equals-hashcode: true
+      description: EAI Host Confirmation DTO for a updated Asn.
+      required:
+      - asnBid
+      - owner
+      - asnLines
+      type: object
+      properties:
+        asnBid:
+          description: The asn business ID uniquely identifies the asn within the
+            owner.
+          minLength: 1
+          type: string
+          example: ADV001
+        owner:
+          description: The business id of the owner associated to the asn.
+          minLength: 1
+          type: string
+          example: CL001
+        asnLines:
+          description: The list of asn lines.
+          minItems: 1
+          type: array
+          items:
+            $ref: "#/components/schemas/AsnLineUpdateEaiDto"
+    AsnsCompleteConfirmation:
+      description: Confirmation sent when Asns are completed.
+      required:
+      - asns
+      type: object
+      properties:
+        asns:
+          description: The list of completed asns.
+          minItems: 1
+          type: array
+          items:
+            $ref: "#/components/schemas/AsnCompleteDto"
+    AsnsUpdateConfirmation:
+      description: Confirmation sent when Asns are updated.
+      required:
+      - asns
+      type: object
+      properties:
+        asns:
+          description: The list of updated asns.
+          minItems: 1
+          type: array
+          items:
+            $ref: "#/components/schemas/AsnUpdateDto"
+    CancelAdviceDto:
+      x-horizon-no-equals-hashcode: true
+      description: DTO to cancel a facility advice.
+      required:
+      - adviceBid
+      - ownerBid
+      type: object
+      properties:
+        adviceBid:
+          description: The business ID of the facility advice to cancel.
+          minLength: 1
+          type: string
+          example: ADV001
+        ownerBid:
+          description: The business ID of the owner associated to the advice to cancel.
+          minLength: 1
+          type: string
+          example: CL001
+    CancelAdviceEaiDto:
+      x-horizon-no-equals-hashcode: true
+      description: Host EAI Message to cancel a facility advice.
+      required:
+      - adviceBid
+      - owner
+      type: object
+      properties:
+        adviceBid:
+          description: The business ID of the facility advice to cancel.
+          minLength: 1
+          type: string
+          example: ADV001
+        owner:
+          description: The business ID of the owner associated to the advice to cancel.
+          minLength: 1
+          type: string
+          example: CL001
+    CancelAdviceHandlingUnitDto:
+      x-horizon-no-equals-hashcode: true
+      description: DTO to cancel a facility advice handling unit.
+      required:
+      - adviceBid
+      - ownerBid
+      - adviceHandlingUnitBid
+      type: object
+      properties:
+        adviceBid:
+          description: The business ID of the facility advice to cancel.
+          minLength: 1
+          type: string
+          example: ADV001
+        ownerBid:
+          description: The business ID of the owner associated to the advice to cancel.
+          minLength: 1
+          type: string
+          example: CL001
+        adviceHandlingUnitBid:
+          description: The business ID of the facility advice handling unit to cancel.
+          minLength: 1
+          type: string
+          example: HU001
+    CancelAdviceHandlingUnitEaiDto:
+      x-horizon-no-equals-hashcode: true
+      description: Host EAI Message to cancel a facility advice handling unit.
+      required:
+      - adviceBid
+      - owner
+      - adviceHandlingUnitBid
+      type: object
+      properties:
+        adviceBid:
+          description: The business ID of the facility advice to cancel.
+          minLength: 1
+          type: string
+          example: ADV001
+        owner:
+          description: The business ID of the owner associated to the advice to cancel.
+          minLength: 1
+          type: string
+          example: CL001
+        adviceHandlingUnitBid:
+          description: The business ID of the facility advice handling unit to cancel.
+          minLength: 1
+          type: string
+          example: HU001
+    CancelAdviceHandlingUnitsCommand:
+      x-horizon-topic-name: "cancelAdviceHandlingUnit"
+      x-horizon-no-equals-hashcode: true
+      required:
+      - adviceHandlingUnitCancellations
+      type: object
+      properties:
+        adviceHandlingUnitCancellations:
+          description: The list of facility advice handling units to cancel.
+          minItems: 1
+          type: array
+          items:
+            $ref: "#/components/schemas/CancelAdviceHandlingUnitDto"
+    CancelAdviceLineDto:
+      x-horizon-no-equals-hashcode: true
+      description: DTO to cancel a facility advice line.
+      required:
+      - adviceBid
+      - ownerBid
+      - adviceLineBid
+      type: object
+      properties:
+        adviceBid:
+          description: The business ID of the facility advice to cancel.
+          minLength: 1
+          type: string
+          example: ADV001
+        ownerBid:
+          description: The business ID of the owner associated to the advice to cancel.
+          minLength: 1
+          type: string
+          example: CL001
+        adviceLineBid:
+          description: The business ID of the facility advice line to cancel.
+          minLength: 1
+          type: string
+          example: HU001
+    CancelAdviceLineEaiDto:
+      x-horizon-no-equals-hashcode: true
+      description: Host EAI Message to cancel a facility advice line.
+      required:
+      - adviceBid
+      - owner
+      - adviceLineBid
+      type: object
+      properties:
+        adviceBid:
+          description: The business ID of the facility advice to cancel.
+          minLength: 1
+          type: string
+          example: ADV001
+        owner:
+          description: The business ID of the owner associated to the advice to cancel.
+          minLength: 1
+          type: string
+          example: CL001
+        adviceLineBid:
+          description: The business ID of the facility advice line to cancel.
+          minLength: 1
+          type: string
+          example: HU001
+    CancelAdviceLinesCommand:
+      x-horizon-topic-name: "cancelAdviceLine"
+      x-horizon-no-equals-hashcode: true
+      required:
+      - adviceLineCancellations
+      type: object
+      properties:
+        adviceLineCancellations:
+          description: The list of facility advice lines to cancel.
+          minItems: 1
+          type: array
+          items:
+            $ref: "#/components/schemas/CancelAdviceLineDto"
+    CancelAdvicesCommand:
+      x-horizon-topic-name: "cancelAdvice"
+      x-horizon-no-equals-hashcode: true
+      required:
+      - adviceCancellations
+      type: object
+      properties:
+        adviceCancellations:
+          description: The list of facility advices to cancel.
+          minItems: 1
+          type: array
+          items:
+            $ref: "#/components/schemas/CancelAdviceDto"
+    CloseAdviceDto:
+      x-horizon-no-equals-hashcode: true
+      description: DTO to close a Facility Advice.
+      required:
+      - adviceBid
+      - ownerBid
+      type: object
+      properties:
+        adviceBid:
+          description: The business id of the advice to close
+          minLength: 1
+          type: string
+          example: ADV001
+        ownerBid:
+          description: The business id of the owner associated to the advice.
+          minLength: 1
+          type: string
+          example: CL001
+    CloseAdviceEaiDto:
+      x-horizon-no-equals-hashcode: true
+      description: DTO to close a Facility Advice.
+      required:
+      - adviceBid
+      - owner
+      type: object
+      properties:
+        adviceBid:
+          description: The business id of the advice to open.
+          minLength: 1
+          type: string
+          example: ADV001
+        owner:
+          description: The business id of the owner associated to the advice.
+          minLength: 1
+          type: string
+          example: CL001
+    CloseAdvicesCommand:
+      x-horizon-topic-name: "closeAdvice"
+      x-horizon-no-equals-hashcode: true
+      required:
+      - advices
+      type: object
+      properties:
+        advices:
+          description: The list of Facility Advices to close.
+          minItems: 1
+          type: array
+          items:
+            $ref: "#/components/schemas/CloseAdviceDto"
+    CloseAdvicesEaiDto:
+      x-horizon-no-equals-hashcode: true
+      description: Host EAI Message for closing Facility Advices.
+      required:
+      - advices
+      type: object
+      properties:
+        advices:
+          description: The list of advices to close.
+          minItems: 1
+          type: array
+          items:
+            $ref: "#/components/schemas/CloseAdviceEaiDto"
+    CloseAsnDto:
+      x-horizon-no-equals-hashcode: true
+      description: DTO to close an ASN.
+      required:
+      - asnBid
+      - ownerBid
+      type: object
+      properties:
+        asnBid:
+          description: The ASN business ID uniquely identifies the ASN within the
+            owner.
+          minLength: 1
+          type: string
+          example: ASN001
+        ownerBid:
+          description: The business id of the owner associated to the ASN.
+          minLength: 1
+          type: string
+          example: CL001
+    CloseAsnEaiDto:
+      x-horizon-no-equals-hashcode: true
+      description: DTO to close an ASN.
+      required:
+      - asnBid
+      - owner
+      type: object
+      properties:
+        asnBid:
+          description: The ASN business ID uniquely identifies the ASN within the
+            owner.
+          minLength: 1
+          type: string
+          example: ASN001
+        owner:
+          description: The business id of the owner associated to the ASN.
+          minLength: 1
+          type: string
+          example: CL001
+    CloseAsnsCommand:
+      x-horizon-topic-name: "createAsn"
+      x-horizon-no-equals-hashcode: true
+      required:
+      - asns
+      type: object
+      properties:
+        asns:
+          description: The list of ASNs to close.
+          minItems: 1
+          type: array
+          items:
+            $ref: "#/components/schemas/CloseAsnDto"
+    CloseAsnsEaiDto:
+      x-horizon-no-equals-hashcode: true
+      description: Host EAI Message for closing Asns.
+      required:
+      - asns
+      type: object
+      properties:
+        asns:
+          description: The list of asns to close.
+          minItems: 1
+          type: array
+          items:
+            $ref: "#/components/schemas/CloseAsnEaiDto"
+    CreateAdviceDto:
+      x-horizon-no-equals-hashcode: true
+      description: DTO to create a Facility Advice.
+      required:
+      - adviceBid
+      - ownerBid
+      type: object
+      properties:
+        adviceBid:
+          description: The facility advice business ID uniquely identifies the facility
+            advice within the owner.
+          minLength: 1
+          type: string
+          example: ADV001
+        ownerBid:
+          description: The business id of the owner associated to the advice.
+          minLength: 1
+          type: string
+          example: CL001
+        adviceHandlingUnits:
+          description: The list of facility advice handling units with inventory and
+            quantity descriptions.
+          type: array
+          items:
+            $ref: "#/components/schemas/CreateAdviceHandlingUnitDto"
+        adviceLines:
+          description: The list of advice lines with inventory and quantity descriptions.
+            One of the Advice Lines or Advice Handling Units must be not null and
+            length greater than 0.
+          type: array
+          items:
+            $ref: "#/components/schemas/AdviceLineDto"
+        expectedDate:
+          format: date-time
+          description: The date and time when the goods are expected to arrive in
+            the facility.
+          type: string
+          example: 2022-03-10T16:15:50Z
+        adviceType:
+          description: Host system type designation for the advice. Default of SUPPLIER
+            is used if not specified
+          type: string
+          allOf:
+          - $ref: "#/components/schemas/AdviceType"
+        referenceBarcode:
+          description: Contains a generic code used in a barcode which can be used
+            to identify a specific advice.
+          type: string
+        defaultDestinationBid:
+          description: The default destination location to which the received handling
+            units are routed to by default.
+          type: string
+    CreateAdviceEaiDto:
+      x-horizon-no-equals-hashcode: true
+      description: DTO to create a Facility Advice.
+      required:
+      - adviceBid
+      - owner
+      type: object
+      properties:
+        adviceBid:
+          description: The facility advice business ID uniquely identifies the facility
+            advice within the owner.
+          minLength: 1
+          type: string
+          example: ADV001
+        owner:
+          description: The business id of the owner associated to the advice.
+          minLength: 1
+          type: string
+          example: CL001
+        adviceHandlingUnits:
+          description: The list of facility advice handling units with inventory and
+            quantity descriptions.
+          type: array
+          items:
+            $ref: "#/components/schemas/AdviceHandlingUnitEaiDto"
+        adviceLines:
+          description: The list of advice lines with inventory and quantity descriptions.
+            One of the Advice Lines or Advice Handling Units must be not null and
+            length greater than 0.
+          type: array
+          items:
+            $ref: "#/components/schemas/AdviceLineEaiDto"
+        expectedDate:
+          format: date-time
+          description: The date and time when the goods are expected to arrive in
+            the facility.
+          type: string
+          example: 2022-03-10T16:15:50Z
+        adviceType:
+          description: Host system type designation for the advice. Default of SUPPLIER
+            is used if not specified
+          type: string
+          allOf:
+          - $ref: "#/components/schemas/AdviceType"
+        referenceBarcode:
+          description: Contains a generic code used in a barcode which can be used
+            to identify a specific advice.
+          type: string
+        defaultDestinationBid:
+          description: The default destination location to which the received handling
+            units are routed to by default.
+          type: string
+    CreateAdviceHandlingUnitDto:
+      x-horizon-no-equals-hashcode: true
+      description: DTO to create a Facility Advice Handling Unit.
+      required:
+      - handlingUnitBid
+      - handlingUnitTypeBid
+      type: object
+      properties:
+        handlingUnitBid:
+          description: The ID of the handling unit that contains the inventory received
+            in the advice line handling unit.
+          minLength: 1
+          type: string
+          example: HU001
+        handlingUnitBidBase:
+          description: Handling unit ID for the base handling unit. The base handling
+            unit is the handling unit which is typically the lowest in a handling
+            unit stack and which is stored or transported.
+          type: string
+        handlingUnitBidParent:
+          description: "Handling unit ID of the parent handling unit. In a stack,\
+            \ the parent handling unit hierarchically directly contains the handling\
+            \ unit."
+          type: string
+        handlingUnitParentPosition:
+          format: int64
+          description: Position of the parent handling unit on its parent handling
+            unit.
+          minimum: 0
+          type: integer
+        handlingUnitPosition:
+          format: int64
+          description: The position of the handling unit on its parent handling unit.
+          minimum: 0
+          type: integer
+        handlingUnitTypeBaseBid:
+          description: Type of the base handling unit.
+          type: string
+        handlingUnitTypeBid:
+          description: Type of the handling unit.
+          minLength: 1
+          type: string
+          example: EP
+        handlingUnitTypeParentBid:
+          description: Type of the parent handling unit.
+          type: string
+        handlingUnitInventory:
+          description: The list of inventory on the handling unit.
+          type: array
+          items:
+            $ref: "#/components/schemas/AdviceLineDto"
+    CreateAdvicesCommand:
+      x-horizon-topic-name: "inb.advice.create.cmd"
+      x-horizon-no-equals-hashcode: true
+      required:
+      - confirmationChannel
+      - advices
+      type: object
+      properties:
+        confirmationChannel:
+          description: The messaging channel to send facility advice related confirmations
+            to. This channel applies to cancellations as well.
+          minLength: 1
+          type: string
+        advices:
+          description: The list of facility advices to create.
+          minItems: 1
+          type: array
+          items:
+            $ref: "#/components/schemas/CreateAdviceDto"
+    CreateAdvicesEaiDto:
+      x-horizon-no-equals-hashcode: true
+      description: Host EAI Message for creating Facility Advices.
+      required:
+      - advices
+      type: object
+      properties:
+        advices:
+          description: The list of facility advices to create.
+          minItems: 1
+          type: array
+          items:
+            $ref: "#/components/schemas/CreateAdviceEaiDto"
+    CreateAsnCommand:
+      x-horizon-topic-name: "inb.asn.create.cmd"
+      x-horizon-no-equals-hashcode: true
+      required:
+      - confirmationChannel
+      - asns
+      type: object
+      properties:
+        confirmationChannel:
+          description: The messaging channel to send ASN related confirmations to.
+            This channel applies to cancellations as well.
+          minLength: 1
+          type: string
+        asns:
+          description: The list of ASNs to create.
+          minItems: 1
+          type: array
+          items:
+            $ref: "#/components/schemas/CreateAsnDto"
+    CreateAsnDto:
+      x-horizon-no-equals-hashcode: true
+      description: DTO to create an ASN.
+      required:
+      - asnBid
+      - ownerBid
+      - asnType
+      type: object
+      properties:
+        asnBid:
+          description: The ASN business ID uniquely identifies the ASN within the
+            owner.
+          minLength: 1
+          type: string
+          example: ASN001
+        ownerBid:
+          description: The business id of the owner associated to the ASN.
+          minLength: 1
+          type: string
+          example: CL001
+        asnLines:
+          description: The list of ASN lines. One of the ASN Lines or ASN Handling
+            Units must be not null and length greater than 0. They are mutually exclusive.
+          type: array
+          items:
+            $ref: "#/components/schemas/CreateAsnLineDto"
+        asnHandlingUnits:
+          description: The list of ASN handling units with inventory and quantity
+            descriptions.
+          type: array
+          items:
+            $ref: "#/components/schemas/CreateAsnHandlingUnitDto"
+        asnReference:
+          description: "Alternative reference to the ASN, which can be used to identify\
+            \ the ASN."
+          type: string
+        poReference:
+          description: Reference to purchase order.
+          type: string
+        asnType:
+          description: Type of the ASN. The type can be used to distinguish different
+            origins of advised goods.
+          type: string
+          allOf:
+          - $ref: "#/components/schemas/AsnType"
+        expectedDate:
+          format: date-time
+          description: The date and time when goods are expected to arrive in the
+            facility.
+          type: string
+          example: 2022-03-10T16:15:50Z
+    CreateAsnEaiDto:
+      x-horizon-no-equals-hashcode: true
+      description: DTO to create an ASN.
+      required:
+      - asnBid
+      - owner
+      - asnType
+      type: object
+      properties:
+        asnBid:
+          description: The ASN business ID uniquely identifies the ASN within the
+            owner.
+          minLength: 1
+          type: string
+          example: ASN001
+        owner:
+          description: The business id of the owner associated to the ASN.
+          minLength: 1
+          type: string
+          example: CL001
+        asnLines:
+          description: The list of ASN lines. One of the ASN Lines or ASN Handling
+            Units must be not null and length greater than 0. They are mutually exclusive.
+          type: array
+          items:
+            $ref: "#/components/schemas/CreateAsnLineEaiDto"
+        asnHandlingUnits:
+          description: The list of ASN handling units with inventory and quantity
+            descriptions.
+          type: array
+          items:
+            $ref: "#/components/schemas/CreateAsnHandlingUnitEaiDto"
+        asnReference:
+          description: "Alternative reference to the ASN, which can be used to identify\
+            \ the ASN."
+          type: string
+        poReference:
+          description: Reference to purchase order.
+          type: string
+        asnType:
+          description: Type of the ASN. The type can be used to distinguish different
+            origins of advised goods.
+          type: string
+          allOf:
+          - $ref: "#/components/schemas/AsnType"
+        expectedDate:
+          format: date-time
+          description: The date and time when goods are expected to arrive in the
+            facility.
+          type: string
+          example: 2022-03-10T16:15:50Z
+    CreateAsnHandlingUnitDto:
+      x-horizon-no-equals-hashcode: true
+      description: DTO to create an ASN Handling Unit.
+      required:
+      - handlingUnitBid
+      - handlingUnitTypeBid
+      - handlingUnitInventory
+      type: object
+      properties:
+        handlingUnitBid:
+          description: The ID of the handling unit that contains the inventory received
+            in the asn line handling unit.
+          minLength: 1
+          type: string
+          example: HU001
+        handlingUnitBidBase:
+          description: Handling unit ID for the base handling unit. The base handling
+            unit is the handling unit which is typically the lowest in a handling
+            unit stack and which is stored or transported.
+          type: string
+        handlingUnitBidParent:
+          description: "Handling unit ID of the parent handling unit. In a stack,\
+            \ the parent handling unit hierarchically directly contains the handling\
+            \ unit."
+          type: string
+        handlingUnitParentPosition:
+          format: int64
+          description: Position of the parent handling unit on its parent handling
+            unit.
+          minimum: 0
+          type: integer
+        handlingUnitPosition:
+          format: int64
+          description: The position of the handling unit on its parent handling unit.
+          minimum: 0
+          type: integer
+        handlingUnitTypeBaseBid:
+          description: Type of the base handling unit.
+          type: string
+        handlingUnitTypeBid:
+          description: Type of the handling unit.
+          minLength: 1
+          type: string
+          example: EP
+        handlingUnitTypeParentBid:
+          description: Type of the parent handling unit.
+          type: string
+        handlingUnitInventory:
+          description: The list of inventory on the handling unit.
+          type: array
+          items:
+            $ref: "#/components/schemas/CreateAsnLineDto"
+    CreateAsnHandlingUnitEaiDto:
+      x-horizon-no-equals-hashcode: true
+      description: DTO to create an ASN Handling Unit.
+      required:
+      - handlingUnitBid
+      - handlingUnitType
+      - handlingUnitInventory
+      type: object
+      properties:
+        handlingUnitBid:
+          description: The ID of the handling unit that contains the inventory received
+            in the asn line handling unit.
+          minLength: 1
+          type: string
+          example: HU001
+        handlingUnitBidBase:
+          description: Handling unit ID for the base handling unit. The base handling
+            unit is the handling unit which is typically the lowest in a handling
+            unit stack and which is stored or transported.
+          type: string
+        handlingUnitBidParent:
+          description: "Handling unit ID of the parent handling unit. In a stack,\
+            \ the parent handling unit hierarchically directly contains the handling\
+            \ unit."
+          type: string
+        handlingUnitParentPosition:
+          format: int64
+          description: Position of the parent handling unit on its parent handling
+            unit.
+          minimum: 0
+          type: integer
+        handlingUnitPosition:
+          format: int64
+          description: The position of the handling unit on its parent handling unit.
+          minimum: 0
+          type: integer
+        handlingUnitTypeBase:
+          description: Type of the base handling unit.
+          type: string
+        handlingUnitType:
+          description: Type of the handling unit.
+          minLength: 1
+          type: string
+          example: EP
+        handlingUnitTypeParent:
+          description: Type of the parent handling unit.
+          type: string
+        handlingUnitInventory:
+          description: The list of inventory on the handling unit.
+          type: array
+          items:
+            $ref: "#/components/schemas/CreateAsnLineEaiDto"
+    CreateAsnLineDto:
+      x-horizon-no-equals-hashcode: true
+      description: DTO to create an ASN Line.
+      required:
+      - asnLineBid
+      - ownerBid
+      - skuBid
+      - quantityTarget
+      type: object
+      properties:
+        asnLineBid:
+          description: The ASN line business ID
+          minLength: 1
+          type: string
+        ownerBid:
+          description: The business ID of the owner of the SKU.
+          minLength: 1
+          type: string
+          example: CL001
+        supplierBidPart:
+          description: The business ID part of the supplier which identifies the supplier
+            uniquely within the owner.
+          type: string
+        skuBid:
+          description: Unique identifier of the announced SKU within the owner.
+          minLength: 1
+          type: string
+          example: SKU01
+        quantityTarget:
+          description: The total quantity of inventory expressed in base quantity
+            units.
+          type: number
+          allOf:
+          - $ref: "./types-api.yaml#/components/schemas/QuantitySimpleType"
+        quantityUnit:
+          description: "Quantity unit is used to define the package size that represents\
+            \ the quantityTarget specific quantity of SKU. If not supplied, the SKU\
+            \ base quantity unit is used."
+          type: string
+          example: PCE
+        packagingLevel:
+          description: The quantityUnit that represents the package size that is expected
+            to be delivered in.
+          type: string
+          example: CASE
+        overdeliveryTolerance:
+          description: Percentage (fraction) of the quantityTarget that is allowed
+            to be over received. Zero means it is not permitted. Defaults to 0 when
+            not specified
+          type: number
+          allOf:
+          - $ref: "./types-api.yaml#/components/schemas/PercentSimpleType"
+          example: 0.15
+        batchId:
+          description: The batch ID Of the ASN line.
+          type: string
+        expiryDate:
+          format: date
+          description: The recommended date by which the inventory is consumed or
+            used.
+          type: string
+          example: 2025-12-31
+        countryOfOrigin:
+          description: The country of origin defines where the inventory was produced
+          type: string
+          example: US
+        dateOfManufacture:
+          format: date
+          description: The date that the inventory in the advice line was manufactured.
+          type: string
+          example: 2022-12-31
+        deliveryText:
+          description: Information or load instructions which can be shown in receiving
+            screens.
+          type: string
+        poLineReference:
+          description: Reference to purchase order line
+          type: string
+    CreateAsnLineEaiDto:
+      x-horizon-no-equals-hashcode: true
+      description: DTO to create an ASN Line.
+      required:
+      - asnLineBid
+      - owner
+      - sku
+      - quantityTarget
+      type: object
+      properties:
+        asnLineBid:
+          description: The ASN line business ID
+          minLength: 1
+          type: string
+        owner:
+          description: The business ID of the owner of the SKU.
+          minLength: 1
+          type: string
+          example: CL001
+        supplier:
+          description: The business ID part of the supplier which identifies the supplier
+            uniquely within the owner.
+          type: string
+        sku:
+          description: Unique identifier of the announced SKU within the owner.
+          minLength: 1
+          type: string
+          example: SKU01
+        quantityTarget:
+          description: The total quantity of inventory expressed in base quantity
+            units.
+          type: number
+          allOf:
+          - $ref: "./types-api.yaml#/components/schemas/QuantitySimpleType"
+        quantityUnit:
+          description: "Quantity unit is used to define the package size that represents\
+            \ the quantityTarget specific quantity of SKU. If not supplied, the SKU\
+            \ base quantity unit is used."
+          type: string
+          example: PCE
+        packagingLevel:
+          description: The quantityUnit that represents the package size that is expected
+            to be delivered in.
+          type: string
+          example: CASE
+        overdeliveryTolerance:
+          description: Percentage (fraction) of the quantityTarget that is allowed
+            to be over received. Zero means it is not permitted. Defaults to 0 when
+            not specified
+          type: number
+          allOf:
+          - $ref: "./types-api.yaml#/components/schemas/PercentSimpleType"
+          example: 0.15
+        batch:
+          description: The batch ID Of the ASN line.
+          type: string
+        expiryDate:
+          format: date
+          description: The recommended date by which the inventory is consumed or
+            used.
+          type: string
+          example: 2025-12-31
+        countryOfOrigin:
+          description: The country of origin defines where the inventory was produced
+          type: string
+          example: US
+        dateOfManufacture:
+          format: date
+          description: The date that the inventory in the advice line was manufactured.
+          type: string
+          example: 2022-12-31
+        deliveryText:
+          description: Information or load instructions which can be shown in receiving
+            screens.
+          type: string
+        poLineReference:
+          description: Reference to purchase order line
+          type: string
+    CreateAsnsEaiDto:
+      x-horizon-no-equals-hashcode: true
+      description: Host EAI Message for creating Asns.
+      required:
+      - asns
+      type: object
+      properties:
+        asns:
+          description: The list of asns to create.
+          minItems: 1
+          type: array
+          items:
+            $ref: "#/components/schemas/CreateAsnEaiDto"
+    CreateDeliveredHandlingUnitDto:
+      x-horizon-no-equals-hashcode: true
+      description: DTO to create Delivered Handling Units.
+      required:
+      - handlingUnitId
+      - handlingUnitTypeBid
+      type: object
+      properties:
+        handlingUnitId:
+          description: The Handling Unit ID
+          minLength: 1
+          type: string
+          example: HU001
+        handlingUnitIdBase:
+          description: The Handling Unit ID Base
+          type: string
+        handlingUnitIdParent:
+          description: The Handling Unit ID Parent
+          type: string
+        handlingUnitParentPosition:
+          format: int64
+          description: Position of the parent handling unit on its parent handling
+            unit.
+          minimum: 0
+          type: integer
+          example: 1
+        handlingUnitPosition:
+          format: int64
+          description: The position of the handling unit on its parent handling unit.
+          minimum: 0
+          type: integer
+          example: 1
+        handlingUnitTypeBaseBid:
+          description: Type of the base handling unit.
+          type: string
+        handlingUnitTypeBid:
+          description: Type of the handling unit.
+          minLength: 1
+          type: string
+          example: EP
+        handlingUnitTypeParentBid:
+          description: Type of the parent handling unit.
+          type: string
+        deliveredLocationBid:
+          description: The delivered location.
+          type: string
+        handlingUnitInventory:
+          description: The list of inventory on the handling unit.
+          type: array
+          items:
+            $ref: "#/components/schemas/InventoryUnitDto"
+    CreateDeliveredHandlingUnitsCommand:
+      x-horizon-topic-name: "inb.create.delivered.handling.units"
+      x-horizon-no-equals-hashcode: true
+      required:
+      - confirmationChannel
+      - deliveredHandlingUnits
+      type: object
+      properties:
+        confirmationChannel:
+          description: 'The messaging channel to send delivered handling unit confirmations
+            to. '
+          minLength: 1
+          type: string
+        deliveredHandlingUnits:
+          description: The list of delivered handling units.
+          minItems: 1
+          type: array
+          items:
+            $ref: "#/components/schemas/CreateDeliveredHandlingUnitDto"
+    InventoryHoldReasonDto:
+      x-horizon-no-equals-hashcode: true
+      description: DTO describing the hold reason.
+      required:
+      - holdReasonBid
+      type: object
+      properties:
+        holdReasonBid:
+          description: The hold reason ID specifies the configuration for the inventory
+            hold.
+          minLength: 1
+          type: string
+    InventoryHoldReasonEaiDto:
+      x-horizon-no-equals-hashcode: true
+      description: DTO describing the hold reason.
+      required:
+      - holdReason
+      type: object
+      properties:
+        holdReason:
+          description: The hold reason ID specifies the configuration for the inventory
+            hold.
+          minLength: 1
+          type: string
+    InventoryUnitDto:
+      x-horizon-no-equals-hashcode: true
+      description: DTO to create Inventory Units.
+      required:
+      - ownerBid
+      - skuBid
+      - quantityTarget
+      type: object
+      properties:
+        ownerBid:
+          description: The business ID of the owner associated to the SKU of the inventory
+            unit.
+          minLength: 1
+          type: string
+          example: CL001
+        supplierBidPart:
+          description: The Supplier part
+          type: string
+          example: Dematic
+        skuBid:
+          description: The unique business ID of the SKU within the owner.
+          minLength: 1
+          type: string
+          example: SKU01
+        quantityTarget:
+          description: The total quantity expressed in the base quantity unit of the
+            SKU.
+          type: number
+          allOf:
+          - $ref: "./types-api.yaml#/components/schemas/QuantitySimpleType"
+          example: 100
+        inventoryQuantityUnit:
+          description: The inventory quantity unit
+          type: string
+          example: PCE
+        batchId:
+          description: The batch the inventory belongs to.
+          type: string
+          example: B001
+        expiryDate:
+          format: date
+          description: The date in which it is recommended to consume the inventory
+            before.
+          type: string
+          example: 2023-12-31
+        specialInventoryMark:
+          description: A special inventory mark can classify an inventory unit to
+            have special requirements for the usage for customer orders. An inventory
+            unit without a special inventory mark can be used freely to satisfy customer
+            orders. An example for a special inventory mark is 'inventory on commission'.
+          type: string
+          allOf:
+          - $ref: "#/components/schemas/SpecialInventoryMark"
+        specialInventoryReferenceBid:
+          description: The special inventory reference id can be used to link the
+            inventory marked as special inventory to a corresponding object.
+          type: string
+        dateOfReceipt:
+          format: date
+          description: "Date when this inventory was received. In the event of a return,\
+            \ it is not updated."
+          type: string
+          example: 2022-03-10
+        dateOfManufacture:
+          format: date
+          description: The data of manufacture is the date and time when the inventory
+            was manufactured.
+          type: string
+          example: 2022-03-10
+        countryOfOrigin:
+          description: The country of origin defines where the inventory was produced.
+          type: string
+          example: US
+        holdReasons:
+          description: List of hold states associated with the inventory.
+          type: array
+          items:
+            $ref: "#/components/schemas/InventoryHoldReasonDto"
+    LogisticErrorCode:
+      x-horizon-domainvalue: true
+      x-horizon-module-definition: inb
+      enum:
+      - BREAKAGE
+      - DAMAGED_INVENTORY
+      - DAMAGED_SKU
+      - DECANTING_DIRTY_TOTE
+      - DECANTING_NOT_EMPTY
+      - DECANTING_UNEXPECTED_TOTE
+      - HANDLING_UNIT_DAMAGED
+      - MISSING_QUANTITY
+      - PUTAWAY_ERROR
+      - RECEIVING_ERROR
+      - TEMPERATURE_EXCEEDED
+      - WRONG_EXPIRY_DATE
+      - WRONG_HU
+      - WRONG_INVENTORY
+      - WRONG_SKU
+      type: string
+    OpenAdviceDto:
+      x-horizon-no-equals-hashcode: true
+      description: DTO to open a Facility Advice.
+      required:
+      - adviceBid
+      - ownerBid
+      - locationBid
+      type: object
+      properties:
+        adviceBid:
+          description: The business id of the advice to open.
+          minLength: 1
+          type: string
+          example: ADV001
+        ownerBid:
+          description: The business id of the owner associated to the advice.
+          minLength: 1
+          type: string
+          example: CL001
+        locationBid:
+          description: The dock door/receiving location for the advice.
+          minLength: 1
+          type: string
+    OpenAdviceEaiDto:
+      x-horizon-no-equals-hashcode: true
+      description: DTO to open a Facility Advice.
+      required:
+      - adviceBid
+      - owner
+      - locationBid
+      type: object
+      properties:
+        adviceBid:
+          description: The business id of the advice to open.
+          minLength: 1
+          type: string
+          example: ADV001
+        owner:
+          description: The business id of the owner associated to the advice.
+          minLength: 1
+          type: string
+          example: CL001
+        locationBid:
+          description: The dock door/receiving location for the advice.
+          minLength: 1
+          type: string
+    OpenAdvicesCommand:
+      x-horizon-topic-name: "inb.advice.open.cmd"
+      x-horizon-no-equals-hashcode: true
+      required:
+      - advices
+      type: object
+      properties:
+        advices:
+          description: The list of Facility Advices to open.
+          minItems: 1
+          type: array
+          items:
+            $ref: "#/components/schemas/OpenAdviceDto"
+    OpenAdvicesEaiDto:
+      x-horizon-no-equals-hashcode: true
+      description: Host EAI Message for opening Facility Advices.
+      required:
+      - advices
+      type: object
+      properties:
+        advices:
+          description: The list of Facility Advices to open.
+          minItems: 1
+          type: array
+          items:
+            $ref: "#/components/schemas/OpenAdviceEaiDto"
+    OpenAsnDto:
+      x-horizon-no-equals-hashcode: true
+      description: DTO to open an ASN.
+      required:
+      - asnBid
+      - ownerBid
+      - locationBid
+      type: object
+      properties:
+        asnBid:
+          description: The ASN business ID uniquely identifies the ASN within the
+            owner.
+          minLength: 1
+          type: string
+          example: ASN001
+        ownerBid:
+          description: The business id of the owner associated to the ASN.
+          minLength: 1
+          type: string
+          example: CL001
+        locationBid:
+          description: The dock door/receiving location for the ASN.
+          minLength: 1
+          type: string
+    OpenAsnEaiDto:
+      x-horizon-no-equals-hashcode: true
+      description: DTO to open an ASN.
+      required:
+      - asnBid
+      - owner
+      - locationBid
+      type: object
+      properties:
+        asnBid:
+          description: The ASN business ID uniquely identifies the ASN within the
+            owner.
+          minLength: 1
+          type: string
+          example: ASN001
+        owner:
+          description: The business id of the owner associated to the ASN.
+          minLength: 1
+          type: string
+          example: CL001
+        locationBid:
+          description: The dock door/receiving location for the ASN.
+          minLength: 1
+          type: string
+    OpenAsnsCommand:
+      x-horizon-topic-name: "inb.asn.open.cmd"
+      x-horizon-no-equals-hashcode: true
+      required:
+      - asns
+      type: object
+      properties:
+        asns:
+          description: The list of ASNs to open.
+          minItems: 1
+          type: array
+          items:
+            $ref: "#/components/schemas/OpenAsnDto"
+    OpenAsnsEaiDto:
+      x-horizon-no-equals-hashcode: true
+      description: Host EAI Message for opening ASNs.
+      required:
+      - asns
+      type: object
+      properties:
+        asns:
+          description: The list of asns to open.
+          minItems: 1
+          type: array
+          items:
+            $ref: "#/components/schemas/OpenAsnEaiDto"
+    ReceivingReferenceType:
+      x-horizon-domainvalue: true
+      x-horizon-module-definition: inb
+      enum:
+      - ADVICE
+      - RECEIPT
+      type: string
+    SpecialInventoryMark:
+      x-horizon-domainvalue: true
+      x-horizon-module-definition: inb
+      enum:
+      - ORDER
+      - ON_COMMISSION
+      type: string
+    InbModule:
+      x-horizon-horizonmodule: true
+      x-horizon-horizonmodule-value: inb 

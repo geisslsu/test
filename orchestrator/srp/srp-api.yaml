@@ -1,0 +1,1225 @@
+---
+openapi: 3.0.3
+info:
+  title: srp-api
+  description: Public API for srp-api
+  version: @project.version@
+tags:
+- name: Depalletizing
+- name: Retrieval
+- name: Storage
+paths:
+  /srp/depalletizing/get-available-depal-capacity/{subsystemBid}:
+    get:
+      tags:
+      - depalletizing
+      operationId: get-available-depalletizing-capacity
+      summary: Returns available capacity for a given depalletizing subsystem.
+      description: Available capacity is the capacity in subsystem minus pending handling
+        units that need depalletizing.
+      parameters:
+      - name: subsystemBid
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: The given subsystem capacity result for depalletizing capacity.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DepalletizingCapacityResultDto"
+        "400":
+          description: If an invalid request was made.
+  /srp/depalletizing/get-depal-capacity/{subsystemBid}:
+    get:
+      tags:
+      - depalletizing
+      operationId: get-depalletizing-capacity
+      summary: Returns capacity for a given depalletizing subsystem.
+      description: A list of DepalletizingCapacityDtos.
+      parameters:
+      - name: subsystemBid
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: The given subsystem result for depalletizing capacity.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/DepalletizingCapacityDto"
+        "400":
+          description: If an invalid request was made.
+  /srp/depalletizing/get-total-depal-capacity:
+    get:
+      tags:
+      - depalletizing
+      operationId: get-total-depalletizing-capacity
+      summary: Returns capacity for all depalletizing subsystems.
+      description: A list of DepalletizingCapacityDtos for every depalletizing subsystem.
+      responses:
+        "200":
+          description: Total depalletizing capacity.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/DepalletizingCapacityDto"
+        "400":
+          description: If an invalid request was made.
+  /srp/retrieval/handlingUnit:
+    post:
+      tags:
+      - retrieval
+      operationId: retrieve-handling-unit
+      summary: Retrieves a handling unit.
+      description: Retrieves a handling unit.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/HandlingUnitsRetrievalRequestCommand"
+      responses:
+        "200":
+          description: The processing of the command was successful.
+          content:
+            application/json: {}
+  /srp/retrieval/inventory:
+    post:
+      tags:
+      - retrieval
+      operationId: retrieve-inventory
+      summary: Retrieves the requested inventory.
+      description: Retrieves the inventory to the specified destination.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/InventoryRetrievalRequestCommand"
+      responses:
+        "200":
+          description: The processing of the command was successful.
+          content:
+            application/json: {}
+  /srp/storage/get-destination:
+    post:
+      tags:
+      - storage
+      operationId: get-destination
+      summary: Request Destination for Storage or Replenishment.
+      description: Requests Destination For Storage or Replenishment for Handling
+        Units.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GetDestination"
+      responses:
+        "200":
+          description: The processing of the load units was successful.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetDestinationResponse"
+components:
+  schemas:
+    AnnounceStoreReplenHandlingUnitsCommand:
+      x-horizon-topic-name: "srp.handlingunits.cmd"
+      x-horizon-message-type: "srp.announce.store.replen.handlingunits"
+      x-horizon-no-equals-hashcode: true
+      description: An announcement of handling units to be stored or replenished.
+      required:
+        - handlingUnits
+      type: object
+      properties:
+        handlingUnits:
+          description: The handling units to be stored/replenished.
+          minItems: 1
+          type: array
+          items:
+            $ref: "#/components/schemas/HandlingUnitWithInventoryDto"
+    BaseInventoryRetrievalRequestCommand:
+      x-horizon-topic-name: "srp.inventory.retrieval.request.cmd"
+      x-horizon-message-type: "srp.inventory.retrieval.request"
+      x-horizon-no-equals-hashcode: true
+      description: Instructs the SRP to process the InventoryRetrievalRequestCommand
+        and retrieve the inventory to the destination.
+      required:
+        - inventoryRetrievals
+      type: object
+      properties:
+        inventoryRetrievals:
+          description: The list of inventory retrieval requests
+          minItems: 1
+          type: array
+          items:
+            $ref: "#/components/schemas/InventoryRetrievalRequestDto"
+    BaseStoreReplenHandlingUnitsCommand:
+      x-horizon-topic-name: "srp.handlingunits.cmd"
+      x-horizon-message-type: "srp.handlingunits"
+      x-horizon-no-equals-hashcode: true
+      description: Communicates to the SRP the arrival of handling units at a specific
+        handover locations.
+      required:
+        - handlingUnits
+      type: object
+      properties:
+        handlingUnits:
+          description: The handling units to be stored/replenished.
+          minItems: 1
+          type: array
+          items:
+            $ref: "#/components/schemas/HandlingUnitWithInventoryDto"
+    ChildHandlingUnitDto:
+      x-parent: true
+      x-horizon-no-equals-hashcode: true
+      required:
+        - handlingUnitBid
+        - handlingUnitTypeBid
+        - inventoryUnits
+        - childHandlingUnits
+        - compartments
+      type: object
+      properties:
+        handlingUnitBid:
+          description: The unique business ID of the handling unit.
+          minLength: 1
+          type: string
+          example: LU001
+        alternativeBid:
+          description: The alternative ID is an optional alternative ID of the handling
+            unit.
+          type: string
+        handlingUnitTypeBid:
+          description: "The business id of the handling unit type, which represents\
+            \ the physical attributes of the handling unit."
+          minLength: 1
+          type: string
+          example: EP
+        positionOnParent:
+          format: int64
+          description: The position on parent represents where the handling unit is
+            placed relative to the parent handling unit. In case of compartments the
+            position may be related to raster size x and raster size y of the parent
+            handling unit type.
+          type: integer
+          example: 1
+        inventoryUnits:
+          description: The list of inventory units in the child handling unit.
+          type: array
+          items:
+            $ref: "#/components/schemas/InventoryUnitDto"
+        childHandlingUnits:
+          description: The list of handling units within the child handling unit
+          type: array
+          items:
+            $ref: "#/components/schemas/ChildHandlingUnitDto"
+        compartments:
+          description: The list of compartments within the child handling unit
+          type: array
+          items:
+            $ref: "#/components/schemas/CompartmentDto"
+    CompartmentDto:
+      x-parent: true
+      x-horizon-no-equals-hashcode: true
+      required:
+        - position
+        - handlingUnitTypeBid
+        - inventoryUnits
+      type: object
+      properties:
+        position:
+          format: int32
+          description: The position in the raster of the handling unit.
+          minimum: 1
+          type: integer
+        handlingUnitTypeBid:
+          description: The business ID of the handling unit type. The load unit type
+            specifies with the rasterSizeX and rasterSizeY the positions covered by
+            the compartment.
+          minLength: 1
+          type: string
+        logisticErrorCode:
+          description: Logistic error code assigned to the compartment
+          type: string
+          allOf:
+            - $ref: "#/components/schemas/LogisticErrorCode"
+        inventoryUnits:
+          description: The inventory units located on the compartment.
+          type: array
+          items:
+            $ref: "#/components/schemas/InventoryUnitDto"
+    DepalletizingCapacityDto:
+      x-parent: true
+      x-horizon-no-equals-hashcode: true
+      required:
+      - depalletizationType
+      - capacity
+      type: object
+      properties:
+        depalletizationType:
+          description: The type of depalletization provided by the depalletization
+            subsystem.
+          type: string
+          allOf:
+          - $ref: "#/components/schemas/DepalletizingMode"
+        capacity:
+          format: int32
+          description: The number of workstations available for this depalletization
+            type.
+          type: integer
+    DepalletizingCapacityResultDto:
+      x-parent: true
+      x-horizon-no-equals-hashcode: true
+      type: object
+      properties:
+        manualCapacity:
+          format: int32
+          description: The manual depalletizing capacity.
+          type: integer
+        autoCapacity:
+          format: int32
+          description: The automated depalletizing capacity.
+          type: integer
+        subsystem:
+          description: The subsystem name.
+          type: string
+    DepalletizingDestinationsUpdateConfirmation:
+      x-horizon-topic-name: "srp.depalletizing.destinations.update.cnf"
+      x-horizon-message-type: "srp.depalletizing.destinations.update"
+      description: SRP confirms the handling units destination updates.
+      required:
+        - confirmations
+      type: object
+      properties:
+        confirmations:
+          description: The depalletizing handling unit updates confirmation.
+          minItems: 1
+          type: array
+          items:
+            $ref: "#/components/schemas/DepalletizingDestinationsUpdateConfirmationDto"
+    DepalletizingDestinationsUpdateConfirmationDto:
+      x-parent: true
+      x-horizon-no-equals-hashcode: true
+      description: DTO containing the handling unit destination updates
+      required:
+        - handlingUnitBid
+        - depalletizationType
+      type: object
+      properties:
+        handlingUnitBid:
+          description: The business id of the handling unit.
+          type: string
+        depalletizationType:
+          description: The type of depalletization provided by the depalletization
+            subsystem.This is so the depalletizing subsystem can confirm to the orchestrator
+            which depalletizationType it has chosen in case it has overridden the
+            specified depalletizationType so the orchestrator can manage capacities
+          type: string
+          allOf:
+            - $ref: "#/components/schemas/DepalletizingMode"
+        destination:
+          description: 'The destination determined by the depalletizing subsystem.
+            When the request specified ''concrete location needed'' this is a concrete
+            handover location. Otherwise this could be a logical destination representing
+            several handover locations as well. A logical destination be refined later
+            by a RefineDepalletizingDestinationCommand. The destination is not set
+            in this message. when a handover of the handling unit is currently not
+            possible. '
+          type: string
+        reason:
+          description: The reason classifies why a the handover of the handling unit
+            is currently not possible.
+          type: string
+    DepalletizingMode:
+      x-horizon-domainvalue: true
+      x-horizon-module-definition: srp
+      enum:
+      - AUTO
+      - MANUAL
+      type: string
+    ErrorCode:
+      x-horizon-domainvalue: true
+      x-horizon-module-definition: srp
+      enum:
+      - OK
+      - LOAD_TOO_HIGH
+      - LOAD_TOO_WIDE
+      - LOAD_TOO_HEAVY
+      - CONTOUR
+      type: string
+    FunctionProcessingStatus:
+      x-horizon-domainvalue: true
+      x-horizon-module-definition: srp
+      enum:
+      - LID_CLOSED
+      - LPA
+      type: string
+    GetDestination:
+      required:
+      - handlingUnits
+      type: object
+      properties:
+        handlingUnits:
+          description: The handling units to get storage and replenishment destinations
+            for.
+          minItems: 1
+          type: array
+          items:
+            $ref: "#/components/schemas/HandlingUnitWithInventoryDto"
+    GetDestinationResponse:
+      required:
+      - handlingUnits
+      type: object
+      properties:
+        handlingUnits:
+          description: The list of storage/replenishment destinations for the requested
+            handling units.
+          minItems: 1
+          type: array
+          items:
+            $ref: "#/components/schemas/HandlingUnitResponseDto"
+    HandlingUnitConfirmationDto:
+      x-parent: true
+      x-horizon-no-equals-hashcode: true
+      description: DTO containing the handling unit and storage/replenishment confirmation
+        code.
+      required:
+        - handlingUnitBid
+        - storageConfirmationCode
+      type: object
+      properties:
+        handlingUnitBid:
+          description: The unique business ID of the handling unit.
+          minLength: 1
+          type: string
+          example: LU001
+        storageConfirmationCode:
+          description: The storage confirmation code describes the storage event that
+            is confirmed.
+          type: string
+          allOf:
+            - $ref: "#/components/schemas/StorageConfirmationCode"
+          example: STORED
+    HandlingUnitLockStatus:
+      x-horizon-domainvalue: true
+      x-horizon-module-definition: srp
+      description: The lock state of the HandlingUnit specifies if a load unit has
+        been locked for specific operations.
+      enum:
+      - FREE
+      - LOCKED_CLARIFICATION
+      - LOCKED_RESOLUTION
+      - CONSOLIDATION
+      - DECANTING
+      - CONFIRMATION_PENDING
+      type: string
+    HandlingUnitResponseDto:
+      x-parent: true
+      x-horizon-no-equals-hashcode: true
+      required:
+      - handlingUnitBid
+      - storageConfirmationCode
+      type: object
+      properties:
+        handlingUnitBid:
+          description: The unique business id of the handling unit.
+          minLength: 1
+          type: string
+          example: LU001
+        locationBid:
+          description: The business id of the location where the handling unit will
+            be stored/replenished.
+          type: string
+        storageConfirmationCode:
+          description: The storage confirmation code describes the storage event that
+            is confirmed.
+          type: string
+          allOf:
+          - $ref: "#/components/schemas/StorageConfirmationCode"
+    HandlingUnitRetrievalRequestDto:
+      x-parent: true
+      x-horizon-no-equals-hashcode: true
+      required:
+      - ownerBid
+      - retrievalRequestBid
+      - handlingUnitBid
+      - destinationBid
+      type: object
+      properties:
+        ownerBid:
+          description: The bid of the owner associated to the retrieval request.
+          minLength: 1
+          type: string
+          example: CL001
+        retrievalRequestBid:
+          description: The unique business ID of the retrieval request.
+          minLength: 1
+          type: string
+          example: R101
+        handlingUnitBid:
+          description: The unique business ID of the handling unit to be retrieved.
+          minLength: 1
+          type: string
+          example: LU001
+        destinationBid:
+          description: The unique business identifier of the destination location
+            for the retrieval request.
+          minLength: 1
+          type: string
+    HandlingUnitStoredDto:
+      x-parent: true
+      x-horizon-no-equals-hashcode: true
+      description: DTO containing the properties of a handling unit and where it was
+        stored.
+      required:
+        - handlingUnitBid
+        - subsystemBid
+      type: object
+      properties:
+        handlingUnitBid:
+          description: The business ID of the handling unit that was stored.
+          minLength: 1
+          type: string
+          example: HU001
+        subsystemBid:
+          description: The business ID of the subsystem the handling unit was stored
+            in.
+          minLength: 1
+          type: string
+          example: PHP
+    HandlingUnitStoredDurableEvent:
+      description: Durable event sent when Handling Units are stored.
+      x-horizon-topic-name: "srp.handlingunit.stored.devt"
+      x-horizon-message-type: "srp.handlingunit.stored"
+      x-horizon-no-equals-hashcode: true
+      required:
+        - handlingUnits
+      type: object
+      properties:
+        handlingUnits:
+          description: The handling units that were stored.
+          minItems: 1
+          type: array
+          items:
+            $ref: "#/components/schemas/HandlingUnitStoredDto"
+    HandlingUnitWithInventoryDto:
+      x-parent: true
+      x-horizon-no-equals-hashcode: true
+      required:
+      - handlingUnitBid
+      - errorCode
+      - inventoryUnits
+      - childHandlingUnits
+      - compartments
+      type: object
+      properties:
+        handlingUnitBid:
+          description: The unique business ID of the handling unit.
+          minLength: 1
+          type: string
+          example: LU001
+        alternativeId:
+          description: The alternative ID is an optional alternative ID of the  handling
+            unit.
+          type: string
+        length:
+          description: The length of the  handling unit. Length is the longest edge
+            (different from height) of the  handling unit. A value of 0 represents
+            an unspecified length
+          type: number
+          allOf:
+          - $ref: "./types-api.yaml#/components/schemas/LengthSimpleType"
+          example: 1000
+        width:
+          description: The width of the  handling unit. Width is the smallest edge
+            (different from height) of the  handling unit. A value of 0 represents
+            an unspecified width
+          type: number
+          allOf:
+          - $ref: "./types-api.yaml#/components/schemas/LengthSimpleType"
+          example: 800
+        height:
+          description: The height of the  handling unit. A value of 0 represents an
+            unspecified height
+          type: number
+          allOf:
+          - $ref: "./types-api.yaml#/components/schemas/LengthSimpleType"
+          example: 1800
+        xExtension:
+          description: "Dynamic dimension: handling unit extension along X-Axis of\
+            \ the equipment system, usually in the base unit of measure."
+          type: number
+          allOf:
+          - $ref: "./types-api.yaml#/components/schemas/LengthSimpleType"
+          example: 800
+        yExtension:
+          description: "Dynamic dimension: handling unit extension along Y-Axis of\
+            \ the equipment system, usually in the base unit of measure."
+          type: number
+          allOf:
+          - $ref: "./types-api.yaml#/components/schemas/LengthSimpleType"
+          example: 1800
+        zExtension:
+          description: "Dynamic dimension: handling unit extension along Z-Axis of\
+            \ the equipment system, usually in the base unit of measure."
+          type: number
+          allOf:
+          - $ref: "./types-api.yaml#/components/schemas/LengthSimpleType"
+          example: 1200
+        weight:
+          description: The measured weight of the  handling unit. The weight may be
+            measured or calculated. A value of 0 represents an unspecified weight.
+          type: number
+          allOf:
+          - $ref: "./types-api.yaml#/components/schemas/WeightSimpleType"
+          example: 200000
+        contourState:
+          description: The byte pattern that is filled when the error code is ME (measurement
+            error).
+          type: string
+        errorCode:
+          description: The error code identifies the last transport related error
+            which occurred with this  handling unit.
+          type: string
+          allOf:
+          - $ref: "#/components/schemas/ErrorCode"
+          example: OK
+        logisticErrorCode:
+          description: The logistics error code identifies the last transport related
+            error which occurred with this  handling unit.
+          type: string
+          allOf:
+          - $ref: "#/components/schemas/LogisticErrorCode"
+        errorReason:
+          description: The error reason provides a free text to explain the reason
+            of the error.
+          type: string
+        handlingUnitTypeBid:
+          description: "The business id of the  handling unit type, which represents\
+            \ the physical attributes of the  handling unit."
+          type: string
+          example: EP
+        locationBid:
+          description: The business id of the location where the handling unit currently
+            resides. In case of handling unit stack only the lowest handling unit
+            in the stack (the base handling unit) has the location. The location is
+            mandatory for the base handling unit.
+          type: string
+        locationArrivalDate:
+          format: date-time
+          description: The time when the handling unit arrived at the current location.
+            This date is e.g. required to determine the handling unit from which inventory
+            has been picked if only a location is given.
+          type: string
+          example: 2022-12-18T16:00:00.000Z
+        lockStatus:
+          description: The lock status of the handling unit object. The Lock Status
+            specifies if the handling unit has been locked for specific operations.
+            When the lock status is not specified FREE is assumed.
+          type: string
+          allOf:
+          - $ref: "#/components/schemas/HandlingUnitLockStatus"
+          example: FREE
+        inventoryUnits:
+          description: The list of inventory units in the handling unit.
+          type: array
+          items:
+            $ref: "#/components/schemas/InventoryUnitDto"
+        childHandlingUnits:
+          description: The list of handling units or compartments within the handling
+            unit.
+          type: array
+          items:
+            $ref: "#/components/schemas/ChildHandlingUnitDto"
+        compartments:
+          description: "The list of compartments, which is only specified, when compartments\
+            \ are used."
+          type: array
+          items:
+            $ref: "#/components/schemas/CompartmentDto"
+        functionProcessingStatus:
+          description: "The functional processing status can be used to track the\
+            \ progress of additional processing at function locations, like for example\
+            \ lid closing, in the handling unit. When undefined, no additional processing\
+            \ has been applied processing."
+          type: string
+          allOf:
+          - $ref: "#/components/schemas/FunctionProcessingStatus"
+        logisticErrorReason:
+          description: The logistic error reason provides a free text to explain the
+            reason of the logistic error.
+          type: string
+    HandlingUnitsRetrievalRequestCommand:
+      description: Requests the retrieval of handling units to a destination handover point.
+      x-horizon-topic-name: "srp.handlingunits.retrieval.request.cmd"
+      x-horizon-message-type: "srp.handlingunits.retrieval.request"
+      x-horizon-no-equals-hashcode: true
+      required:
+      - confirmationChannel
+      - handlingUnitRetrievals
+      type: object
+      properties:
+        confirmationChannel:
+          description: The messaging channel to send confirmations related to this
+            retrieval.
+          minLength: 1
+          type: string
+        handlingUnitRetrievals:
+          description: The handling units to be retrieved.
+          minItems: 1
+          type: array
+          items:
+            $ref: "#/components/schemas/HandlingUnitRetrievalRequestDto"
+    HandoverHandlingUnitsWithInventoryConfirmation:
+      description: SRP confirms the handover of handling unit and inventory at a location.
+      required:
+        - handlingUnits
+      type: object
+      properties:
+        handlingUnits:
+          description: TThe list of handling units and inventory handed over at a
+            location.
+          minItems: 1
+          type: array
+          items:
+            $ref: "#/components/schemas/HandoverHandlingUnitWithInventoryConfirmationDto"
+    InventoryHoldReasonDto:
+      x-parent: true
+      x-horizon-no-equals-hashcode: true
+      required:
+      - holdReasonBid
+      type: object
+      properties:
+        holdReasonBid:
+          description: The hold reason ID specifies the configuration for the inventory
+            hold.
+          minLength: 1
+          type: string
+    HandoverHandlingUnitWithInventoryConfirmationDto:
+      x-parent: true
+      x-horizon-no-equals-hashcode: true
+      description: DTO containing the handling unit and inventory handover result.
+      required:
+        - handlingUnitBid
+        - errorCode
+        - handoverReferenceBid
+        - inventoryUnits
+        - childHandlingUnits
+        - compartments
+      type: object
+      properties:
+        handlingUnitBid:
+          description: The unique business ID of the handling unit.
+          minLength: 1
+          type: string
+          example: LU001
+        alternativeId:
+          description: The alternative ID is an optional alternative ID of the  handling
+            unit.
+          type: string
+        length:
+          description: The length of the  handling unit. Length is the longest edge
+            (different from height) of the  handling unit. A value of 0 represents
+            an unspecified length
+          type: number
+          allOf:
+            - $ref: "./types-api.yaml#/components/schemas/LengthSimpleType"
+          example: 1000
+        width:
+          description: The width of the  handling unit. Width is the smallest edge
+            (different from height) of the  handling unit. A value of 0 represents
+            an unspecified width
+          type: number
+          allOf:
+            - $ref: "./types-api.yaml#/components/schemas/LengthSimpleType"
+          example: 800
+        height:
+          description: The height of the  handling unit. A value of 0 represents an
+            unspecified height
+          type: number
+          allOf:
+            - $ref: "./types-api.yaml#/components/schemas/LengthSimpleType"
+          example: 1800
+        xExtension:
+          description: "Dynamic dimension: handling unit extension along X-Axis of\
+            \ the equipment system, usually in the base unit of measure."
+          type: number
+          allOf:
+            - $ref: "./types-api.yaml#/components/schemas/LengthSimpleType"
+          example: 800
+        yExtension:
+          description: "Dynamic dimension: handling unit extension along Y-Axis of\
+            \ the equipment system, usually in the base unit of measure."
+          type: number
+          allOf:
+            - $ref: "./types-api.yaml#/components/schemas/LengthSimpleType"
+          example: 1800
+        zExtension:
+          description: "Dynamic dimension: handling unit extension along Z-Axis of\
+            \ the equipment system, usually in the base unit of measure."
+          type: number
+          allOf:
+            - $ref: "./types-api.yaml#/components/schemas/LengthSimpleType"
+          example: 1200
+        weight:
+          description: The measured weight of the  handling unit. The weight may be
+            measured or calculated. A value of 0 represents an unspecified weight.
+          type: number
+          allOf:
+            - $ref: "./types-api.yaml#/components/schemas/WeightSimpleType"
+          example: 200000
+        contourState:
+          description: The byte pattern that is filled when the error code is ME (measurement
+            error).
+          type: string
+        errorCode:
+          description: The error code identifies the last transport related error
+            which occurred with this  handling unit.
+          type: string
+          allOf:
+            - $ref: "#/components/schemas/ErrorCode"
+          example: OK
+        logisticErrorCode:
+          description: The logistics error code identifies the last transport related
+            error which occurred with this  handling unit.
+          type: string
+          allOf:
+            - $ref: "#/components/schemas/LogisticErrorCode"
+        errorReason:
+          description: The error reason provides a free text to explain the reason
+            of the error.
+          type: string
+        handlingUnitTypeBid:
+          description: "The business id of the  handling unit type, which represents\
+            \ the physical attributes of the  handling unit."
+          type: string
+          example: EP
+        locationBid:
+          description: The business id of the location where the handling unit currently
+            resides. In case of handling unit stack only the lowest handling unit
+            in the stack (the base handling unit) has the location. The location is
+            mandatory for the base handling unit.
+          type: string
+        locationArrivalDate:
+          format: date-time
+          description: The time when the handling unit arrived at the current location.
+            This date is e.g. required to determine the handling unit from which inventory
+            has been picked if only a location is given.
+          type: string
+          example: 2022-12-18T16:00:00.000Z
+        lockStatus:
+          description: The lock status of the handling unit object. The Lock Status
+            specifies if the handling unit has been locked for specific operations.
+            When the lock status is not specified FREE is assumed.
+          type: string
+          allOf:
+            - $ref: "#/components/schemas/HandlingUnitLockStatus"
+          example: FREE
+        inventoryUnits:
+          description: The list of inventory units in the handling unit.
+          type: array
+          items:
+            $ref: "#/components/schemas/InventoryUnitDto"
+        childHandlingUnits:
+          description: The list of handling units or compartments within the handling
+            unit.
+          type: array
+          items:
+            $ref: "#/components/schemas/ChildHandlingUnitDto"
+        compartments:
+          description: "The list of compartments, which is only specified, when compartments\
+            \ are used."
+          type: array
+          items:
+            $ref: "#/components/schemas/CompartmentDto"
+        functionProcessingStatus:
+          description: "The functional processing status can be used to track the\
+            \ progress of additional processing at function locations, like for example\
+            \ lid closing, in the handling unit. When undefined, no additional processing\
+            \ has been applied processing."
+          type: string
+          allOf:
+            - $ref: "#/components/schemas/FunctionProcessingStatus"
+        logisticErrorReason:
+          description: The logistic error reason provides a free text to explain the
+            reason of the logistic error.
+          type: string
+        handoverReferenceBid:
+          description: The handover retrieval request business id related to the host
+            retrieval request. Can be null if retrieval was internal.
+          type: string
+          example: R101
+    InventoryRetrievalRequestCommand:
+      description: Instructs the SRP to process the InventoryRetrievalRequestCommand and retrieve the inventory
+        to the destination. The SRP should validate the inventory, determine the best subsystem, and validate the retrieval
+        destination. If possible, the SRP should retrieve and handover the inventory.
+      x-horizon-topic-name: "srp.inventory.retrieval.request.cmd"
+      x-horizon-message-type: "srp.inventory.retrieval.request"
+      x-horizon-no-equals-hashcode: true
+      required:
+      - inventoryRetrievals
+      - confirmationChannel
+      type: object
+      properties:
+        inventoryRetrievals:
+          description: The list of inventory retrieval requests
+          minItems: 1
+          type: array
+          items:
+            $ref: "#/components/schemas/InventoryRetrievalRequestDto"
+        confirmationChannel:
+          description: The messaging channel to send confirmations related to this
+            retrieval.
+          minLength: 1
+          type: string
+    InventoryRetrievalRequestDto:
+      x-parent: true
+      x-horizon-no-equals-hashcode: true
+      required:
+      - retrievalRequestBid
+      - destinationBid
+      - ownerBid
+      - skuBid
+      - quantity
+      type: object
+      properties:
+        retrievalRequestBid:
+          description: The retrieval request business id.
+          type: string
+        destinationBid:
+          description: The unique business identifier of the destination location
+            for the retrieval request.
+          type: string
+        ownerBid:
+          description: "The business identification of the owner associated to the\
+            \ SKU. The owner is the owner of the products in the warehouse. In a 3rd\
+            \ party warehouse the products owned by different vendors are assigned\
+            \ to different owners for example. When a handling unit business id is\
+            \ requested for retrieval, the sku / inventory related fields of this\
+            \ line do not have to be specified. These fields are not used in that\
+            \ case."
+          type: string
+        skuBid:
+          description: "The unique business identification of the SKU (within the\
+            \ owner of the order) requested by this line. When a handling unit business\
+            \ id is requested for retrieval, the sku / inventory related fields of\
+            \ this line do not have to be specified. These fields are not used in\
+            \ that case."
+          type: string
+        batch:
+          description: The requested batch.
+          type: string
+        expiryDate:
+          format: date
+          description: The requested expiry date.
+          type: string
+          example: 2022-03-10
+        overdeliveryTolerance:
+          description: "It's the factor to that overdelivery is allowed. Example:\
+            \ When a quantity of 100 is requested and the overdelivery tolerance is\
+            \ 0.08, then a delivery up to 108 is allowed."
+          type: number
+          allOf:
+          - $ref: "./types-api.yaml#/components/schemas/PercentSimpleType"
+        underdeliveryTolerance:
+          description: "It's the factor to which underdelivery is allowed. Example:\
+            \ When a quantity of 100 is requested and the underdelivery tolerance\
+            \ is 0.08, then a delivery up to 92 is still allowed."
+          type: number
+          allOf:
+          - $ref: "./types-api.yaml#/components/schemas/PercentSimpleType"
+        quantity:
+          description: "The quantity to be retrieved for this retrieval request. The\
+            \ quantity is expressed in the quantity unit submitted in this line, or\
+            \ the base quantity unit, when the quantity unit is not defined."
+          type: number
+          allOf:
+          - $ref: "./types-api.yaml#/components/schemas/QuantitySimpleType"
+        quantityUnitBid:
+          description: "The quantity unit business id defines the quantity unit in\
+            \ that the requested quantity is expressed. When this field is not defined,\
+            \ the base quantity unit of the SKU is assumed."
+          type: string
+        specialInventoryMark:
+          description: The special inventory mark that is requested by this line.
+            Inventory can be marked for special requirements.
+          type: string
+        specialInventoryReferenceId:
+          description: "The reference id for the special inventory, which is requested\
+            \ for this line."
+          type: string
+    InventoryUnitDto:
+      x-parent: true
+      x-horizon-no-equals-hashcode: true
+      required:
+      - ownerBid
+      - skuBid
+      - quantity
+      - fifoDate
+      - holdStates
+      type: object
+      properties:
+        ownerBid:
+          description: The business ID of the owner associated to the SKU of the inventory
+            unit.
+          minLength: 1
+          type: string
+          example: CL001
+        skuBid:
+          description: The unique business ID of the SKU within the owner.
+          minLength: 1
+          type: string
+          example: SKU01
+        quantity:
+          description: The total quantity expressed in the base quantity unit of the
+            SKU.
+          type: number
+          allOf:
+          - $ref: "./types-api.yaml#/components/schemas/QuantitySimpleType"
+          example: 100
+        fifoDate:
+          format: date
+          description: By default the FIFO date is the best before date and if the
+            best before date is undefined it will be the date of receipt plus shelf
+            life of SKU.
+          type: string
+          example: 2023-12-31
+        batch:
+          description: The batch the inventory belongs to.
+          type: string
+          example: B001
+        packagingLevel:
+          description: The quantity unit of the inventory.
+          type: string
+        storageQualifier:
+          description: The storage qualifier recommends to the subsystem where to
+            store inventory. For example the storage qualifier could be RESERVE to
+            indicate that the inventory shall be stored in the reserve part of the
+            warehouse and not in the direct fulfillment buffer. An undefined storage
+            qualifier means no preferences for storage.
+          type: string
+          allOf:
+          - $ref: "#/components/schemas/StorageQualifier"
+        expiryDate:
+          format: date
+          description: The date in which it is recommended to consume the inventory
+            before.
+          type: string
+          example: 2023-12-31
+        countryOfOrigin:
+          description: The country of origin defines where the inventory was produced.
+          type: string
+          example: US
+        specialInventoryMark:
+          description: A special inventory mark can classify an inventory unit to
+            have special requirements for the usage for customer orders. An inventory
+            unit without a special inventory mark can be used freely to satisfy customer
+            orders. An example for a special inventory mark is 'inventory on commission'.
+          type: string
+        specialInventoryReferenceBid:
+          description: The special inventory reference id can be used to link the
+            inventory marked as special inventory to a corresponding object.
+          type: string
+        compartmentPosition:
+          format: int32
+          description: The compartment position of the inventory. When no compartments
+            are used the compartment position is not set.
+          type: integer
+        trayLoadingSingleRow:
+          format: int32
+          description: The number of cases in a single row during tray loading. In
+            the case the cases were not loaded in a single row (eg. they are not loaded
+            more compact) this value is not defined.
+          type: integer
+        holdStates:
+          description: List of hold states associated with the inventory.
+          type: array
+          items:
+            $ref: "#/components/schemas/InventoryHoldReasonDto"
+        receivingBid:
+          description: The business id associated with the original receiving of this
+            inventory.
+          type: string
+          example: ADV001
+        receivingReferenceLineId:
+          description: Additional receipt reference. Will generally be the advice
+            line bid.
+          type: string
+        receivingReferenceType:
+          description: Type of receiving that created this inventory.
+          type: string
+          allOf:
+          - $ref: "#/components/schemas/ReceivingReferenceType"
+        lastStocktakingDate:
+          format: date
+          description: The date when the inventory unit was last counted for stocktaking
+            purposes.
+          type: string
+          example: 2022-03-10
+        lastStocktakingOperator:
+          description: The business id of the operator who last counted this inventory
+            unit for stocktaking purposes.
+          type: string
+        dateOfManufacture:
+          format: date
+          description: The data of manufacture is the date and time when the inventory
+            was manufactured.
+          type: string
+          example: 2022-03-10
+        dateOfReceipt:
+          format: date
+          description: "Date when this inventory was received. In the event of a return,\
+            \ it is not updated."
+          type: string
+          example: 2022-03-10
+        packagingVariantBid:
+          description: "The business of the packaging variant, which further specifies\
+            \ the packaging variant within the packaging level."
+          type: string
+    LogisticErrorCode:
+      x-horizon-domainvalue: true
+      x-horizon-module-definition: srp
+      enum:
+      - BREAKAGE
+      - DAMAGED_INVENTORY
+      - DAMAGED_SKU
+      - DECANTING_DIRTY_TOTE
+      - DECANTING_NOT_EMPTY
+      - DECANTING_UNEXPECTED_TOTE
+      - HANDLING_UNIT_DAMAGED
+      - MISSING_QUANTITY
+      - PUTAWAY_ERROR
+      - RECEIVING_ERROR
+      - TEMPERATURE_EXCEEDED
+      - WRONG_EXPIRY_DATE
+      - WRONG_HU
+      - WRONG_INVENTORY
+      - WRONG_SKU
+      type: string
+    RetrievalRequestConfirmation:
+      description: SRP confirms the handling units that were retrieved to their destination.
+      required:
+        - handlingUnits
+      type: object
+      properties:
+        handlingUnits:
+          description: The list of handling units confirmed by SRP to be retrieved
+            to a destination.
+          minItems: 1
+          type: array
+          items:
+            $ref: "#/components/schemas/RetrievalRequestConfirmationDto"
+    ReceivingReferenceType:
+      x-horizon-domainvalue: true
+      x-horizon-module-definition: srp
+      enum:
+      - ADVICE
+      - RECEIPT
+      type: string
+    RetrievalRequestConfirmationCode:
+      x-horizon-domainvalue: true
+      x-horizon-module-definition: srp
+      enum:
+      - OK
+      - NOT_FOUND
+      - FAILED_UNAVAILABLE
+      - INVALID_DESTINATION
+      type: string
+    RetrievalRequestConfirmationDto:
+      x-parent: true
+      x-horizon-no-equals-hashcode: true
+      description: DTO containing the handling unit and retrieval result.
+      required:
+        - retrievalRequestBid
+        - handlingUnitBid
+        - result
+      type: object
+      properties:
+        retrievalRequestBid:
+          description: The unique business ID of the retrieval request.
+          minLength: 1
+          type: string
+          example: R101
+        handlingUnitBid:
+          description: The unique business ID of the handling unit to be retrieved.
+          minLength: 1
+          type: string
+          example: LU001
+        result:
+          description: The retrieval confirmation code describes the retrieval result
+          type: string
+          allOf:
+            - $ref: "#/components/schemas/RetrievalResultCode"
+          example: OK
+    RetrievalResultCode:
+      x-horizon-domainvalue: true
+      x-horizon-module-definition: srp
+      enum:
+      - OK
+      - NOT_FOUND
+      - FAILED_UNAVAILABLE
+      - INVALID_DESTINATION
+      type: string
+    StorageConfirmationCode:
+      x-horizon-domainvalue: true
+      x-horizon-module-definition: srp
+      enum:
+      - OK
+      - CLARIFICATION
+      - FAILED
+      - HEIGHT_LIMIT
+      - NO_DESTINATION_FOUND
+      type: string
+    StorageQualifier:
+      x-horizon-domainvalue: true
+      x-horizon-module-definition: srp
+      enum:
+      - RESERVE
+      - FULFILLMENT
+      type: string
+    StoreReplenHandlingUnitsCommand:
+      x-horizon-topic-name: "srp.handlingunits.cmd"
+      x-horizon-message-type: "srp.store.replen.handlingunits"
+      x-horizon-no-equals-hashcode: true
+      description: Communicates to the SRP the arrival of handling units at a specific
+        handover locations.
+      required:
+        - handlingUnits
+        - confirmationChannel
+      type: object
+      properties:
+        handlingUnits:
+          description: The handling units to be stored/replenished.
+          minItems: 1
+          type: array
+          items:
+            $ref: "#/components/schemas/HandlingUnitWithInventoryDto"
+        confirmationChannel:
+          description: The messaging channel to send confirmations related to this
+            storage.
+          minLength: 1
+          type: string
+    StoreReplenHandlingUnitsConfirmation:
+      description: SRP confirms the ownership of handling units at a specific handover
+        locations. The content of the handling units is summarized in a discriminating
+        key.
+      required:
+        - handlingUnits
+      type: object
+      properties:
+        handlingUnits:
+          description: The list of handling units confirmed to be stored/replenished.
+          minItems: 1
+          type: array
+          items:
+            $ref: "#/components/schemas/HandlingUnitConfirmationDto"
+    SrpModule:
+      x-horizon-horizonmodule: true
