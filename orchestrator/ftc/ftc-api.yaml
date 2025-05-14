@@ -3,7 +3,7 @@ openapi: 3.0.3
 info:
   title: ftc-api
   description: Public API for ftc-api
-  version: 99
+  version: "12"
 tags:
 - name: Announce
 - name: Booking Request

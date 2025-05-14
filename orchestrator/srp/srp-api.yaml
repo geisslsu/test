@@ -3,7 +3,7 @@ openapi: 3.0.3
 info:
   title: srp-api
   description: Public API for srp-api
-  version: @project.version@
+  version: "12"
 tags:
 - name: Depalletizing
 - name: Retrieval

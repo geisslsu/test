@@ -3,7 +3,7 @@ openapi: 3.0.3
 info:
   title: inb-api
   description: Public API for inb-api
-  version: 99
+  version: "12"
 tags:
 - name: ASN
 - name: Delivery
