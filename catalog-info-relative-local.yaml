@@ -33,3 +33,4 @@ spec:
     - ./lib/types/types-api-catalog.yaml
     - ./scm/test/petstore-api.yaml
     - ./scm/dex/dex-api-catalog.yaml
+    - ./scm/mfc/mfc-api-catalog.yaml
