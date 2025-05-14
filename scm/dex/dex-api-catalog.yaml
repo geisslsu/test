@@ -22,5 +22,5 @@ spec:
   lifecycle: production
   owner: Horizon
   definition:
-    $text: ./dex-api.yaml
+    $openapi: ./dex-api.yaml
 
