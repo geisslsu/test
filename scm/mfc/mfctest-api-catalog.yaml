@@ -4,8 +4,8 @@
 apiVersion: backstage.io/v1alpha1
 kind: API
 metadata:
-  name: "mfc-api"
-  description: Public API for mfc-api
+  name: "mfctest-api"
+  description: Public API for mfctest-api
   tags:
     - rest
     - api-documentation
