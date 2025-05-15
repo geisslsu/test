@@ -45,7 +45,7 @@ components:
             \ system, usually in mm."
           type: number
           allOf:
-            - $ref: "../../lib/types/types-api.yaml#/components/schemas/LengthSimpleType"
+            - $ref: "types-api.yaml#/components/schemas/LengthSimpleType"
           example: 1200
           default: 123
         effectiveLhdXExtension:
@@ -55,7 +55,7 @@ components:
             the transport unit xExtension.
           type: number
           allOf:
-          - $ref: "../../lib/types/types-api.yaml#/components/schemas/LengthSimpleType"
+          - $ref: "types-api.yaml#/components/schemas/LengthSimpleType"
         allocationX:
           format: int32
           description: Allocation X specifies how many storage positions a transport
@@ -73,7 +73,7 @@ components:
             \ system, usually in mm."
           type: number
           allOf:
-          - $ref: "../../lib/types/types-api.yaml#/components/schemas/LengthSimpleType"
+          - $ref: "types-api.yaml#/components/schemas/LengthSimpleType"
           example: 1800
           default: 567
         zExtension:
@@ -81,7 +81,7 @@ components:
             \ system, usually in mm."
           type: number
           allOf:
-          - $ref: "../../lib/types/types-api.yaml#/components/schemas/LengthSimpleType"
+          - $ref: "types-api.yaml#/components/schemas/LengthSimpleType"
           example: 800
         weight:
           description: "The overall weight of a transport unit in g (grams), includes\
