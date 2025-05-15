@@ -17,12 +17,16 @@ metadata:
       icon: help
       title: Horizon OpenAPI monorepo in GitLab
   annotations:
-    openapi/ref-basepath: ../../lib/types
+    openapi/ref-basepath: ./
 
 spec:
   type: openapi
   lifecycle: production
   owner: Horizon
+  annotations:
+    openapi/ref-basepath: ./
   definition:
     $openapi: ./mfctest-api.yaml
+    annotations:
+      openapi/ref-basepath: ./
 
