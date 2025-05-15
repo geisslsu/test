@@ -15,63 +15,11 @@ components:
         - transportUnit
       type: object
       properties:
-        transportTaskId:
-          description: The unique ID that identifies this transport in the external
-            SCM. All updates or confirmations for this transport need to encompass
-            this ID.
-          type: string
-          allOf:
-          - $ref: "#/components/schemas/TransportTaskId"
-          example: UUID
-        urgency:
-          format: int64
-          description: The urgency defines the sequence in which the system attempts
-            to process the transport. The urgency value is calculated by the system
-            and this calculation includes all of the factors that influence the sequence
-            in which the transports are to be processed.
-          default: 4000000000000
-          type: integer
-          example: 4000000000000
-          nullable: true
-        destinations:
-          description: Per transport a list of destinations is provided.
-          minItems: 1
-          type: array
-          items:
-            $ref: "#/components/schemas/TransportDestinationDto"
         transportUnit:
           description: The transport unit that shall be moved with this transport.
           type: object
           allOf:
           - $ref: "#/components/schemas/TransportUnitDto"
-        requiresNotifyUponSourceDeparture:
-          description: Set to true if the external SCM needs to be notified when the
-            transport unit has left the global source location. This can be used to
-            book a bin free or update the UI of a workstation.
-          default: "TRUE"
-          type: boolean
-        sourceLhdXExtension:
-          description: "This parameter defines the flex axis extension which an LHD\
-            \ like a flex shuttle or a typhoon can use at the source location to without\
-            \ any obstacles, e.g. fully extend the telescopes and use any fingers\
-            \ for transport unit handling."
-          type: number
-          allOf:
-          - $ref: "../../lib/types/types-api.yaml#/components/schemas/LengthSimpleType"
-          example: 432
-        sourceAllocationInXDirection:
-          format: int32
-          description: The value of how many positions are occupied of the layout
-            in x-direction by this transport at the source location.
-          type: integer
-          example: 1
-        additionalData:
-          type: object
-          additionalProperties: {}
-        transportReason:
-          description: DMS movement reason
-          type: string
-          example: FULFILLMENT_HU
     TransportUnitDto:
       description: This value object contains transport unit related data.
       required:
@@ -84,17 +32,6 @@ components:
             \ or MP(Maxipallet)."
           type: string
           example: EP
-        location:
-          description: Current resp. last known location of the transport unit.
-          type: object
-          allOf:
-          - $ref: "#/components/schemas/DetailedLocationDto"
-          example: BHB.TA50.0.0.PCRE50IS01
-        transportUnitId:
-          description: The identifying value for a transport unit.
-          allOf:
-          - $ref: "#/components/schemas/TransportUnitId"
-          example: LU001
         xExtensionLocal:
           description: "Dynamic dimension: TU extension along X-Axis of equipment\
             \ system, usually in mm."
@@ -166,8 +103,3 @@ components:
           description: The direction in which the front of the transport unit is facing.
           type: string
           example: NORTH
-        childTransportUnit:
-          description: The child transport unit.
-          type: object
-          allOf:
-          - $ref: "#/components/schemas/TransportUnitChildDto"
