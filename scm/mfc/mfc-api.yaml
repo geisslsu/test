@@ -1255,6 +1255,14 @@ components:
           allOf:
           - $ref: "#/components/schemas/TransportUnitId"
           example: LU001
+        xExtensionLocal:
+          description: "Dynamic dimension: TU extension along X-Axis of equipment\
+            \ system, usually in mm."
+          type: number
+          allOf:
+            - $ref: "types-api.yaml#/components/schemas/LengthSimpleType"
+          example: 1200
+          default: 123
         xExtension:
           description: "Dynamic dimension: TU extension along X-Axis of equipment\
             \ system, usually in mm."
