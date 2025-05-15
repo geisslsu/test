@@ -1,0 +1,28 @@
+### dex-api ###
+# This is the API descriptor for the dex-api. It is used to generate the API documentation for the dex-api.
+---
+apiVersion: backstage.io/v1alpha1
+kind: API
+metadata:
+  name: "mfc-api"
+  description: Public API for mfc-api
+  tags:
+    - rest
+    - api-documentation
+    - api
+    - openapi
+    - mfc-api
+  links:
+    - url: https://gitlab.com/dematic/horizon/apis
+      icon: help
+      title: Horizon OpenAPI monorepo in GitLab
+  annotations:
+    openapi/ref-basepath: ../../lib/types
+
+spec:
+  type: openapi
+  lifecycle: production
+  owner: Horizon
+  definition:
+    $openapi: ./mfctest-api.yaml
+

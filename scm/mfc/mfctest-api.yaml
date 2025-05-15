@@ -1,0 +1,173 @@
+---
+openapi: 3.0.3
+info:
+  title: mfctest-api
+  description: Public API for mfctest-api
+  version: "6"
+components:
+  schemas:
+    TransportDto:
+      description: "Representation of the data of a transport to be executed, in the\
+        \ form of a DTO."
+      required:
+        - transportTaskId
+        - destinations
+        - transportUnit
+      type: object
+      properties:
+        transportTaskId:
+          description: The unique ID that identifies this transport in the external
+            SCM. All updates or confirmations for this transport need to encompass
+            this ID.
+          type: string
+          allOf:
+          - $ref: "#/components/schemas/TransportTaskId"
+          example: UUID
+        urgency:
+          format: int64
+          description: The urgency defines the sequence in which the system attempts
+            to process the transport. The urgency value is calculated by the system
+            and this calculation includes all of the factors that influence the sequence
+            in which the transports are to be processed.
+          default: 4000000000000
+          type: integer
+          example: 4000000000000
+          nullable: true
+        destinations:
+          description: Per transport a list of destinations is provided.
+          minItems: 1
+          type: array
+          items:
+            $ref: "#/components/schemas/TransportDestinationDto"
+        transportUnit:
+          description: The transport unit that shall be moved with this transport.
+          type: object
+          allOf:
+          - $ref: "#/components/schemas/TransportUnitDto"
+        requiresNotifyUponSourceDeparture:
+          description: Set to true if the external SCM needs to be notified when the
+            transport unit has left the global source location. This can be used to
+            book a bin free or update the UI of a workstation.
+          default: "TRUE"
+          type: boolean
+        sourceLhdXExtension:
+          description: "This parameter defines the flex axis extension which an LHD\
+            \ like a flex shuttle or a typhoon can use at the source location to without\
+            \ any obstacles, e.g. fully extend the telescopes and use any fingers\
+            \ for transport unit handling."
+          type: number
+          allOf:
+          - $ref: "../../lib/types/types-api.yaml#/components/schemas/LengthSimpleType"
+          example: 432
+        sourceAllocationInXDirection:
+          format: int32
+          description: The value of how many positions are occupied of the layout
+            in x-direction by this transport at the source location.
+          type: integer
+          example: 1
+        additionalData:
+          type: object
+          additionalProperties: {}
+        transportReason:
+          description: DMS movement reason
+          type: string
+          example: FULFILLMENT_HU
+    TransportUnitDto:
+      description: This value object contains transport unit related data.
+      required:
+        - transportUnitTypeId
+        - transportUnitId
+      type: object
+      properties:
+        transportUnitTypeId:
+          description: "The identifying value for a transport unit type, e.g. EP(Europallet)\
+            \ or MP(Maxipallet)."
+          type: string
+          example: EP
+        location:
+          description: Current resp. last known location of the transport unit.
+          type: object
+          allOf:
+          - $ref: "#/components/schemas/DetailedLocationDto"
+          example: BHB.TA50.0.0.PCRE50IS01
+        transportUnitId:
+          description: The identifying value for a transport unit.
+          allOf:
+          - $ref: "#/components/schemas/TransportUnitId"
+          example: LU001
+        xExtensionLocal:
+          description: "Dynamic dimension: TU extension along X-Axis of equipment\
+            \ system, usually in mm."
+          type: number
+          allOf:
+            - $ref: "types-api.yaml#/components/schemas/LengthSimpleType"
+          example: 1200
+          default: 123
+        xExtension:
+          description: "Dynamic dimension: TU extension along X-Axis of equipment\
+            \ system, usually in mm."
+          type: number
+          allOf:
+            - $ref: "../../lib/types/types-api.yaml#/components/schemas/LengthSimpleType"
+          example: 1200
+          default: 123
+        effectiveLhdXExtension:
+          description: The effective x-extension of a transport unit is its extension
+            in x-direction of a location under consideration of positional uncertainty
+            due to previous handling by a flexible LHD which has not been closed to
+            the transport unit xExtension.
+          type: number
+          allOf:
+          - $ref: "../../lib/types/types-api.yaml#/components/schemas/LengthSimpleType"
+        allocationX:
+          format: int32
+          description: Allocation X specifies how many storage positions a transport
+            unit occupies in x direction within a location layout.
+          type: integer
+          example: 41
+        allocationZ:
+          format: int32
+          description: Allocation Z specifies how many storage positions a transport
+            unit occupies in z direction within a location layout.
+          type: integer
+          example: 3
+        yExtension:
+          description: "Dynamic dimension: TU extension along Y-Axis of equipment\
+            \ system, usually in mm."
+          type: number
+          allOf:
+          - $ref: "../../lib/types/types-api.yaml#/components/schemas/LengthSimpleType"
+          example: 1800
+          default: 567
+        zExtension:
+          description: "Dynamic dimension: TU extension along Z-Axis of equipment\
+            \ system, usually in mm."
+          type: number
+          allOf:
+          - $ref: "../../lib/types/types-api.yaml#/components/schemas/LengthSimpleType"
+          example: 800
+        weight:
+          description: "The overall weight of a transport unit in g (grams), includes\
+            \ tare weight of the base transport unit and of the good."
+          type: number
+          allOf:
+          - $ref: "../../lib/types/types-api.yaml#/components/schemas/WeightSimpleType"
+          example: 600000
+        arrivalDate:
+          format: date-time
+          description: The timestamp for the last arrival time for a transport segment.
+          type: string
+          example: 2021-09-09 12:00:00.000
+        contourInfo:
+          description: The detailed contour info.
+          type: string
+          example: '..............'
+        transportUnitOrientation:
+          description: The direction in which the front of the transport unit is facing.
+          type: string
+          example: NORTH
+        childTransportUnit:
+          description: The child transport unit.
+          type: object
+          allOf:
+          - $ref: "#/components/schemas/TransportUnitChildDto"
