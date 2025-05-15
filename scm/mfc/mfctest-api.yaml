@@ -81,14 +81,14 @@ components:
             \ system, usually in mm."
           type: number
           allOf:
-          - $ref: 'types-api.yaml#/components/schemas/LengthSimpleType'
+          - $ref: "types-api.yaml#/components/schemas/LengthSimpleType"
           example: 800
         weight:
           description: "The overall weight of a transport unit in g (grams), includes\
             \ tare weight of the base transport unit and of the good."
           type: number
           allOf:
-          - $ref: 'types-api.yaml#/components/schemas/WeightSimpleType'
+          - $ref: "types-api.yaml#/components/schemas/WeightSimpleType"
           example: 600000
         arrivalDate:
           format: date-time
