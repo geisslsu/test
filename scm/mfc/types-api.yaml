@@ -3,7 +3,7 @@ openapi: 3.0.3
 info:
   title: test-types-api
   description: API description for horizon.foundation:horizon-types (predefined SimpleType(s) and HorizonModule).
-  version: 12
+  version: "12"
 
 components:
   schemas:
