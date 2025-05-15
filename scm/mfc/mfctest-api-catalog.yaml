@@ -24,5 +24,5 @@ spec:
   lifecycle: production
   owner: Horizon
   definition:
-    $openapi: ./mfctest-api.yaml
+    $text: ./mfctest-api.yaml
 
