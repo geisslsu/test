@@ -88,7 +88,7 @@ components:
             \ tare weight of the base transport unit and of the good."
           type: number
           allOf:
-          - $ref: "../../lib/types/types-api.yaml#/components/schemas/WeightSimpleType"
+          - $ref: "types-api.yaml#/components/schemas/WeightSimpleType"
           example: 600000
         arrivalDate:
           format: date-time
