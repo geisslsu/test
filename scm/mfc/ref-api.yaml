@@ -81,7 +81,7 @@ components:
             \ system, usually in mm."
           type: number
           allOf:
-            - $ref: 'types-api.json#/components/schemas/LengthSimpleType'
+            - $ref: 'types-api.yaml#/components/schemas/LengthSimpleType'
           example: 1200
           default: 123
     LocationId:
