@@ -1,30 +1,40 @@
 ---
 openapi: 3.0.3
 info:
-  title: test-types-api
+  title: types-api
   description: API description for horizon.foundation:horizon-types (predefined SimpleType(s) and HorizonModule).
-  version: "12"
+  version: 12
 
 components:
   schemas:
     # external from horizon-types (will not be generated due to schemaMapping/importMapping in pom)
     DateTimeToMinute:
+      x-horizon-simpletype: true
       type: string
     FacilityIdSimpleType:
+      x-horizon-simpletype: true
       type: integer
+      format: int64
     Issuer:
+      x-horizon-simpletype: true
       type: string
     JsonSimpleType:
+      x-horizon-simpletype: true
       type: string
     LengthSimpleType:
+      x-horizon-simpletype: true
       type: number
     MultilineSimpleType:
-      type: number
+      x-horizon-simpletype: true
+      type: string
     PercentSimpleType:
+      x-horizon-simpletype: true
       type: number
     QuantitySimpleType:
+      x-horizon-simpletype: true
       type: number
     WeightSimpleType:
+      x-horizon-simpletype: true
       type: number
     # HorizonModule is from horizon-runtime, which is a transitive dependency from horizon-types
     HorizonModule:

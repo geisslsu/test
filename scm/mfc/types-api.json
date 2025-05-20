@@ -1,0 +1,116 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "types-api",
+    "description": "API description for horizon.foundation:horizon-types (predefined SimpleType(s) and HorizonModule).",
+    "version": 12
+  },
+  "components": {
+    "schemas": {
+      "DateTimeToMinute": {
+        "x-horizon-simpletype": true,
+        "type": "string"
+      },
+      "FacilityIdSimpleType": {
+        "x-horizon-simpletype": true,
+        "type": "integer",
+        "format": "int64"
+      },
+      "Issuer": {
+        "x-horizon-simpletype": true,
+        "type": "string"
+      },
+      "JsonSimpleType": {
+        "x-horizon-simpletype": true,
+        "type": "string"
+      },
+      "LengthSimpleType": {
+        "x-horizon-simpletype": true,
+        "type": "number"
+      },
+      "MultilineSimpleType": {
+        "x-horizon-simpletype": true,
+        "type": "string"
+      },
+      "PercentSimpleType": {
+        "x-horizon-simpletype": true,
+        "type": "number"
+      },
+      "QuantitySimpleType": {
+        "x-horizon-simpletype": true,
+        "type": "number"
+      },
+      "WeightSimpleType": {
+        "x-horizon-simpletype": true,
+        "type": "number"
+      },
+      "HorizonModule": {
+        "x-horizon-import-mapping-property": "runtime-api",
+        "type": "string"
+      },
+      "I18nParameterDefinition": {
+        "x-horizon-import-mapping-property": "i18-parameter-api",
+        "type": "object",
+        "properties": {
+          "fullExpression": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "formatDirectives": {
+            "type": "string"
+          }
+        }
+      },
+      "I18nKey": {
+        "x-horizon-import-mapping-property": "i18-api",
+        "type": "object",
+        "properties": {
+          "lookupKey": {
+            "type": "string"
+          },
+          "defaultText": {
+            "type": "string"
+          },
+          "horizonModule": {
+            "$ref": "#/components/schemas/HorizonModule"
+          },
+          "category": {
+            "type": "string",
+            "default": "Code"
+          },
+          "bundle": {
+            "type": "string"
+          },
+          "requiredParameters": {
+            "type": "array",
+            "uniqueItems": true,
+            "items": {
+              "$ref": "#/components/schemas/I18nParameterDefinition"
+            }
+          }
+        }
+      },
+      "I18nMessage": {
+        "x-horizon-import-mapping-property": "i18-api",
+        "type": "object",
+        "properties": {
+          "i18nKey": {
+            "$ref": "#/components/schemas/I18nKey"
+          },
+          "parameters": {
+            "type": "array",
+            "uniqueItems": true,
+            "items": {
+              "type": "object"
+            }
+          }
+        }
+      }
+    }
+  }
+}
