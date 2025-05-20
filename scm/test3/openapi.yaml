@@ -20,10 +20,10 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "models.yaml#/components/schemas/DataOptionList"
+                $ref: "./spec/models.yaml#/components/schemas/DataOptionList"
         "400":
-          $ref: "models.yaml#/components/responses/ClientError"
+          $ref: "./spec/models.yaml#/components/responses/ClientError"
         "500":
-          $ref: "models.yaml#/components/responses/ServerError"
+          $ref: "./spec/models.yaml#/components/responses/ServerError"
       tags:
         - Vehicle Search
