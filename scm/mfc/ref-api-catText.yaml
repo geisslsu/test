@@ -22,5 +22,5 @@ spec:
   lifecycle: production
   owner: Horizon
   definition:
-    $yaml: ./ref-api.yaml
+    $text: ./ref-api.yaml
 
