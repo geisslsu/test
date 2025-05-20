@@ -27,3 +27,12 @@ paths:
           $ref: "models.yaml#/components/responses/ServerError"
       tags:
         - Vehicle Search
+  /vehicles/brands2:
+    get:
+      summary: Lists all available brands2
+      operationId: vehicleBrands
+      responses:
+        "700":
+          $ref: "models.yaml#/components/responses/ServerError"
+      tags:
+        - Vehicle Search2
