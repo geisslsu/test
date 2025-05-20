@@ -20,10 +20,33 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "models.yaml#/components/schemas/DataOptionList"
+                $ref: "#/components/schemas/DataOptionList"
         "400":
           $ref: "models.yaml#/components/responses/ClientError"
         "500":
           $ref: "models.yaml#/components/responses/ServerError"
       tags:
         - Vehicle Search
+components:
+  schemas:
+    DataOptionList:
+      type: object
+      properties:
+        values:
+          type: array
+          items:
+            $ref: "#/components/schemas/VehicleData"
+    VehicleData:
+      type: object
+      required:
+        - label
+        - value
+      properties:
+        label:
+          type: string
+          example: label
+        value:
+          type: string
+          example: value
+        additionalText:
+          type: string
