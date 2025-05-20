@@ -10,6 +10,15 @@ tags:
 servers:
   - url: test@example.com
 paths:
+  /vehicles/brands2:
+    get:
+      summary: Lists all available brands2
+      operationId: vehicleBrands2
+      responses:
+        "700":
+          $ref: "models.yaml#/components/responses/ServerError"
+      tags:
+        - Vehicle Search
   /vehicles/brands:
     get:
       summary: Lists all available brands
@@ -24,15 +33,6 @@ paths:
         "400":
           $ref: "models.yaml#/components/responses/ClientError"
         "500":
-          $ref: "models.yaml#/components/responses/ServerError"
-      tags:
-        - Vehicle Search
-  /vehicles/brands2:
-    get:
-      summary: Lists all available brands2
-      operationId: vehicleBrands2
-      responses:
-        "700":
           $ref: "models.yaml#/components/responses/ServerError"
       tags:
         - Vehicle Search
