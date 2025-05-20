@@ -81,7 +81,7 @@ components:
             \ system, usually in mm."
           type: number
           allOf:
-            - $ref: 'types-api.yaml#/components/schemas/LengthSimpleType'
+            - $ref: '#/components/schemas/LengthSimpleType'
           example: 1200
           default: 123
     LocationId:
@@ -89,4 +89,7 @@ components:
       type: string
       example: BHB.UL50.51.0.UL51100201
       x-horizon-simpletype: true
+    LengthSimpleType:
+      x-horizon-simpletype: true
+      type: number
 
