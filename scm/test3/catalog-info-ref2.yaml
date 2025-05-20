@@ -1,0 +1,13 @@
+apiVersion: backstage.io/v1alpha1
+kind: API
+metadata:
+  name: vehicle-search
+  description: Vehicle Search
+  annotations:
+    openapi/ref-basepath: ./spec
+spec:
+  type: openapi
+  lifecycle: production
+  owner: vehicle-search-team
+  definition:
+    $openapi: ./spec/brands2.yaml

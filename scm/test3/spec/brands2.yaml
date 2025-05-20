@@ -1,0 +1,21 @@
+openapi: 3.0.0
+info:
+  title: Vehicle Search
+  description: |
+    The Vehicle search API
+  version: 1.0.0-Draft
+tags:
+  - name: Vehicle Search
+    description: APIs to query vehicle properties and vehicle model.
+servers:
+  - url: test@example.com
+paths:
+  /vehicles/brands2:
+    get:
+      summary: Lists all available brands2
+      operationId: vehicleBrands2
+      responses:
+        "700":
+          $ref: "../model/models.yaml#/components/responses/ServerError"
+      tags:
+        - Vehicle Search
