@@ -30,9 +30,11 @@ paths:
             application/json:
               schema:
                 $ref: "models.yaml#/components/schemas/DataOptionList"
-        "400":
-          $ref: "models.yaml#/components/responses/ClientError"
         "500":
           $ref: "models.yaml#/components/responses/ServerError"
+        "400":
+          $ref: "models.yaml#/components/responses/ClientError"
+        "700":
+          $ref: "../model/models.yaml#/components/responses/WorkflowError"
       tags:
         - Vehicle Search
