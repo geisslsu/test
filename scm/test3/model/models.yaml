@@ -64,3 +64,13 @@ components:
             status: 500
             title: "Internal Server Error"
             detail: "Failed to map model"
+    WorkflowError:
+      description: Server side error
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+          example:
+            status: 700
+            title: "Internal Workflow Error"
+            detail: "Maximum invoke depth has been reached"            
