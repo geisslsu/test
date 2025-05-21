@@ -16,7 +16,7 @@ paths:
       operationId: vehicleBrands2
       responses:
         "700":
-          $ref: "../model/models.yaml#/components/responses/ServerError"
+          $ref: "../model/models.yaml#/components/responses/WorkflowError"
       tags:
         - Vehicle Search
   /vehicles/brands:
