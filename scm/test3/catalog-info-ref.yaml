@@ -10,4 +10,4 @@ spec:
   lifecycle: production
   owner: vehicle-search-team
   definition:
-    $openapi: ./spec/openapi.yaml
+    $openapi: ./spec/bundled.yaml
