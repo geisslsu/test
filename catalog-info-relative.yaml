@@ -35,3 +35,5 @@ spec:
     - ./lib/types/types-api-catalog.yaml
     - ./scm/mfc/mfc-api-catalog.yaml
     - ./scm/dex/dex-api-catalog.yaml
+    - ./orchestrator/fop/fop-api-catalog.yaml
+
