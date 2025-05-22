@@ -33,4 +33,5 @@ metadata:
 spec:
   targets:
     - ./lib/types/types-api-catalog.yaml
+    - ./scm/mfc/mfc-api-catalog.yaml
     - ./scm/dex/dex-api-catalog.yaml
