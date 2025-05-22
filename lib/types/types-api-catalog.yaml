@@ -5,7 +5,7 @@ apiVersion: backstage.io/v1alpha1
 kind: API
 metadata:
   name: test-types-api
-  description: Public API for horizon-types
+  description: UPDATE!!! Public API for horizon-types
   links:
     - url: https://gitlab.com/dematic/horizon/apis
       icon: help
